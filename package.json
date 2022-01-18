@@ -4,21 +4,24 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon app.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/davdmoo/repath-be.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "rePath",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/davdmoo/repath-be/issues"
   },
   "homepage": "https://github.com/davdmoo/repath-be#readme",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "express": "^4.17.2",
+    "jsonwebtoken": "^8.5.1",
     "mongodb": "^4.3.0",
     "mongoose": "^6.1.7",
     "mongoose-unique-validator": "^3.0.0"
