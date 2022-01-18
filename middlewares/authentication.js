@@ -9,7 +9,7 @@ async function authentication (req, res, next) {
     if (!access_token) throw { name: "TokenNotFound" };
 
     const payload = jwt.verify(access_token, secretKey);
-    if (!payload) throw { name: "InvalidToken" };
+    if (!payload) throw { name: "JsonWebTokenError" };
 
     const user = await userModel.findOne({ email: payload.email });
     if (!user) throw { name: "JsonWebTokenError" };
