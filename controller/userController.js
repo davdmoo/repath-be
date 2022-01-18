@@ -56,6 +56,31 @@ class User{
             res.status(500).json(err)
         }
     }
+
+    static async editUser(req, res){
+        try{
+            const id = req.params.id
+            await userModel.updateOne({_id: id}, req.body)
+
+            const updatedUser = await userModel.find({_id: id}).exec()
+
+            res.status(200).json(updatedUser)
+        }catch(err){
+            res.status(500).json(err)
+        }
+    }
+
+    static async deleteUser(req, res){
+        try{
+            const id = req.params.id
+            const deletedUser = await userModel.find({_id: id}).exec()
+            await userModel.deleteOne({_id: id})
+
+            res.status(201).json(deletedUser)
+        }catch(err){
+            res.status(500).json(err)
+        }
+    }
 }
 
 module.exports = User

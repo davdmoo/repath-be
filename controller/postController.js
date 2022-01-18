@@ -36,6 +36,30 @@ class Post{
         }
     }
 
+    static async editPost(req, res){
+        try{
+            const id = req.params.id
+            
+            await postModel.updateOne({_id: id}, req.body)
+            const updatedPost = await postModel.find({_id: id}).exec()
+
+            res.status(200).json(updatedPost)
+        }catch(err){
+            res.status(500).json(err)
+        }
+    }
+
+    static async deletePost(req, res){
+        try{
+            const id = req.params.id
+            const deletedPost = await postModel.find({_id: id}).exec()
+            await postModel.deleteOne({_id: id})
+
+            res.status(201).json(deletedPost)
+        }catch(err){
+            res.status(500).json(err)
+        }
+    }
 
 }
 
