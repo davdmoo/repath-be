@@ -33,7 +33,11 @@ userSchema.pre("save", async function save(next) {
   } catch (error) {
       return next(err);
   }
-})
+});
+
+userSchema.methods.validatePassword = async function validatePassword(data) {
+  return bcrypt.compareSync(data, this.password);
+};
 
 userSchema.plugin(uniqueValidator);
 const userModel = mongoose.model("User", userSchema);
