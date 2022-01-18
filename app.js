@@ -4,6 +4,7 @@ const app = express()
 const mongoose = require('mongoose');
 const userRoutes = require('./routes/userRoutes')
 const postRoutes = require('./routes/postRoutes')
+const errorHandler = require("./middlewares/errorHandler")
 
 const mongoDB = 'mongodb://localhost:27017/test'
 mongoose.connect(mongoDB, {useNewUrlParser: true, useUnifiedTopology: true}, (err) => {
@@ -19,6 +20,8 @@ app.use(express.json())
 
 app.use('/users', userRoutes)
 app.use('/posts', postRoutes)
+
+app.use(errorHandler)
 
 app.listen(3000, () => {
     console.log(`Example app listening at http://localhost:3000`)
