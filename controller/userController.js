@@ -60,7 +60,7 @@ class User{
     static async editUser(req, res){
         try{
             const id = req.params.id
-            await userModel.updateOne({_id: id} ,req.body)
+            await userModel.updateOne({_id: id}, req.body)
 
             const updatedUser = await userModel.find({_id: id}).exec()
 
