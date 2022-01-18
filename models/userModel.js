@@ -5,14 +5,36 @@ const uniqueValidator = require('mongoose-unique-validator');
 const bcrypt = require("bcryptjs");
 
 const userSchema = new Schema({
-  firstName:  String,
-  lastName: String,
+  firstName:   {
+    type:String,
+    required:[true, "Please Input First Name"],
+  },
+  lastName: {
+    type:String,
+    required:[true, "Please Input Last Name"],
+  },
   email: {
     type: String,
     unique: true,
-    required: [true, "please input email"]
+    required: [true, "Please Input Email"]
   },
-  password: String,
+  password: {
+    type:String,
+    required:[true, 'Please Input Password'],
+  },
+  username:  {
+    type:String,
+    required:[true, 'Please Input Username'],
+  },
+  address: {
+    type:String
+  },
+  phoneNumber: {
+    type:String
+  },
+  city:{ 
+      type:String
+  },
   posts : [{
     type: ObjectId,
     ref: "Post"
