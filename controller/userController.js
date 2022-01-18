@@ -3,61 +3,58 @@ const jwt = require("jsonwebtoken");
 const secretKey = process.env.SECRETKEY;
 
 class User{
-    static async findUsers(req, res){
+    static async findUsers(req, res, next){
         try{
             const users = await userModel.find().exec()
 
             res.status(200).json(users)
         }catch(err){
-            res.status(500).json(err)
+            next(err)
         }
     }
 
-    static async addUser(req, res){
+    static async addUser(req, res, next){
         try{
             const newUser = await userModel.create(req.body);
 
             res.status(201).json(newUser)
         }catch(err){
-            res.status(500).json(err)
+            next(err)
         }
     }
 
-    static async login(req, res) {
+    static async login(req, res, next) {
         try {
             const { email, password } = req.body;
-            if (!email) res.status(400).json({ message: "Email is required" });
-            else if (!password) res.status(400).json({ message: "Password is required" });
+            if (!email) throw { name: "EmailRequired" };
+            else if(!password) throw { name: "PassRequired" };
 
             const user = await userModel.findOne({ email });
-            if (!user) res.status(401).json({ message: "Unauthorized/UserNotFound" });
-            console.log(user);
+            if (!user) throw { name: "InvalidCredentials" };
 
             const validate = await user.validatePassword(password);
-            if (!validate) res.status(401).json({ message: "Invalid email/password" });
+            if (!validate) throw { name: "InvalidCredentials" };
             
             const payload = { email: user.email };
             const access_token = jwt.sign(payload, secretKey);
             
             res.status(200).json({ access_token });
         } catch (error) {
-            console.log(error);
-            res.status(500).json(error);
+            next(error);
         }
     }
 
-    static async findUser(req, res){
+    static async findUser(req, res, next){
         try{
-            console.log("masuk function");
             const users = await userModel.find().exec()
 
             res.status(200).json(users)
         }catch(err){
-            res.status(500).json(err)
+            next(err)
         }
     }
 
-    static async editUser(req, res){
+    static async editUser(req, res, next){
         try{
             const id = req.params.id
             await userModel.updateOne({_id: id}, req.body)
@@ -66,11 +63,11 @@ class User{
 
             res.status(200).json(updatedUser)
         }catch(err){
-            res.status(500).json(err)
+            next(err)
         }
     }
 
-    static async deleteUser(req, res){
+    static async deleteUser(req, res, next){
         try{
             const id = req.params.id
             const deletedUser = await userModel.find({_id: id}).exec()
@@ -78,7 +75,7 @@ class User{
 
             res.status(201).json(deletedUser)
         }catch(err){
-            res.status(500).json(err)
+            next(err)
         }
     }
 }
