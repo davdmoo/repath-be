@@ -4,6 +4,8 @@ const app = express()
 const mongoose = require('mongoose');
 const userRoutes = require('./routes/userRoutes')
 const postRoutes = require('./routes/postRoutes')
+const commentRoutes = require('./routes/commentRoutes')
+const likesRoutes = require('./routes/likesRoutes')
 const errorHandler = require("./middlewares/errorHandler")
 
 const mongoDB = 'mongodb://localhost:27017/mongose'
@@ -20,6 +22,8 @@ app.use(express.json())
 
 app.use('/users', userRoutes)
 app.use('/posts', postRoutes)
+app.use('/comments', commentRoutes)
+app.use('/likes', likesRoutes)
 
 app.use(errorHandler)
 

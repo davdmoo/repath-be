@@ -12,11 +12,15 @@ const errorHandler = (err, req, res, next) => {
         case "InvalidCredentials":
             res.status(401).json({ message: "Invalid email/password" })
             break;
-
         case "NoInput":
             res.status(400).json({ message: "Please Fill The Input Fields" })
             break;
-        
+        case "TokenNotFound":
+            res.status(401).json({ message: "Access token not found" })
+            break;
+        case "JsonWebTokenError":
+            res.status(401).json({ message: "Invalid token" })
+            break;
         default:
             res.status(500).json({ message: "Internal server error" })
             break;
