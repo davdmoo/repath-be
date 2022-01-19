@@ -21,6 +21,12 @@ const errorHandler = (err, req, res, next) => {
         case "JsonWebTokenError":
             res.status(401).json({ message: "Invalid token" })
             break;
+        case "BigImage":
+            res.status(400).json({ message: "Maximum Image Size is 300kb" })
+            break;
+        case "NotImage":
+            res.status(400).json({ message: "Type of File is Not Image" })
+            break;
         default:
             res.status(500).json({ message: "Internal server error" })
             break;
