@@ -8,7 +8,6 @@ const errorHandler = (err, req, res, next) => {
         case "PassRequired":
             res.status(400).json({ message: "Password is required" })
             break;
-            
         case "InvalidCredentials":
             res.status(401).json({ message: "Invalid email/password" })
             break;
@@ -20,6 +19,9 @@ const errorHandler = (err, req, res, next) => {
             break;
         case "JsonWebTokenError":
             res.status(401).json({ message: "Invalid token" })
+            break;
+        case "LikeTwice":
+            res.status(400).json({ message: "You have liked this post before" })
             break;
         default:
             res.status(500).json({ message: "Internal server error" })

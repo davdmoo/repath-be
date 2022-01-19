@@ -3,14 +3,25 @@ const postModel = require('../models/postModel');
 const { ObjectId } = require("mongodb");
 
 class Like{
-    static async findLikes(req, res){
+    static async findLikes(req, res, next){
         try{
-            const id = req.params.id
-            const posts = await likeModel.find({_id: id}).exec()
+            const { postId } = req.params;
+            const posts = await likeModel.find({ post: postId }).exec()
 
             res.status(200).json(posts)
         }catch(err){
-            res.status(500).json(err)
+            next(err);
+        }
+    }
+
+    static async findLikesByUser(req, res, next){
+        try {
+            const { userId } = req.params;
+            const posts = await likeModel.find({ user: userId }).exec();
+
+            res.status(200).json(posts);
+        } catch(err) {
+            next(err);
         }
     }
 
@@ -20,24 +31,22 @@ class Like{
             const userId = req.user.id;
             const post = await postModel.findOne(ObjectId(postId));
             if (!post) throw { name: "NotFound" };
-            const like = await likeModel.create({
-                userId,
-                content
+
+            // cek dari data likes suatu post, apakah ada like yg dari user
+            const likes = await likeModel.find({ post: postId });
+            likes.forEach(like => {
+              if (like.user.toString() === userId.toString()) throw { name: "LikeTwice" }
             })
 
-            console.log(userId);
+            const like = await likeModel.create({ user: userId, post: postId });
+            const updatedPost = await postModel.findOneAndUpdate({_id: postId},
+            {
+              $push: {
+                likes: like
+              }
+            })
 
-            post.likes.push({
-              _id: new ObjectId,
-              user: userId
-            });
-
-            console.log(post);
-
-            await post.updateOne();
-            console.log(post);
-
-            res.status(201).json("You have liked this post");
+            res.status(201).json(`You have liked this post`);
         } catch(err){
             next(err);
         }
