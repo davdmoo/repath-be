@@ -6,7 +6,7 @@ const userRoutes = require('./routes/userRoutes')
 const postRoutes = require('./routes/postRoutes')
 const errorHandler = require("./middlewares/errorHandler")
 
-const mongoDB = 'mongodb://localhost:27017/test'
+const mongoDB = 'mongodb://localhost:27017/mongose'
 mongoose.connect(mongoDB, {useNewUrlParser: true, useUnifiedTopology: true}, (err) => {
     if(err){
         console.log(err)

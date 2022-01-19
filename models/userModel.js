@@ -25,6 +25,7 @@ const userSchema = new Schema({
   username:  {
     type:String,
     required:[true, 'Please Input Username'],
+    unique: true
   },
   address: {
     type:String

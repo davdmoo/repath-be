@@ -1,3 +1,4 @@
+const e = require('express');
 const postModel = require('../models/postModel')
 
 class Post{
@@ -12,16 +13,36 @@ class Post{
         }
     }
 
-    static async addPost(req, res){
+    static async addPost(req, res,next){
         try{
-            console.log(req.headers);
-            req.body.user = req.headers.keyid
-            console.log(req.body);
-            const newpost = await postModel.create(req.body)
+            const {type,text,imgUrl,location,title,artist,imageAlbum} = req.body
+            const userId = "61e6b11cd4312d6b347f6bcc"
+            let payload = {
+                type,
+                userId,
+            }
+            if (type === 'text' && text) {
+               payload.text = text
+               payload.imgUrl = imgUrl
+            }
+           else if (type === "location" && location) {
+              payload.location = location
+            }
+           else if (type === "music" && title){
+                payload.title = title
+                payload.artist = artist
+                payload.imageAlbum = imageAlbum
+            }
+            else{
+                throw {name : "NoInput"}
+            }
+           
+            const newpost = await postModel.create(payload)
 
             res.status(201).json(newpost)
         }catch(err){
-            res.status(500).json(err)
+            console.log(err, `AAAAA`)
+            next(err)
         }
     }
 
