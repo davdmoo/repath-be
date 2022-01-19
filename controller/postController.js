@@ -16,11 +16,12 @@ class Post{
     static async addPost(req, res,next){
         try{
             const {type,text,imgUrl,location,title,artist,imageAlbum} = req.body
-            const userId = "61e6b11cd4312d6b347f6bcc"
+            const userId = req.user.id
             let payload = {
                 type,
                 userId,
             }
+            
             if (type === 'text' && text) {
                payload.text = text
                payload.imgUrl = imgUrl
