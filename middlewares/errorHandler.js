@@ -23,6 +23,9 @@ const errorHandler = (err, req, res, next) => {
         case "LikeTwice":
             res.status(400).json({ message: "You have liked this post before" })
             break;
+        case "NotFound":
+            res.status(400).json({ message: "Content not found" })
+            break;
         default:
             res.status(500).json({ message: "Internal server error" })
             break;

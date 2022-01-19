@@ -32,14 +32,14 @@ class Like{
             const post = await postModel.findOne(ObjectId(postId));
             if (!post) throw { name: "NotFound" };
 
-            // cek dari data likes suatu post, apakah ada like yg dari user
             const likes = await likeModel.find({ post: postId });
             likes.forEach(like => {
               if (like.user.toString() === userId.toString()) throw { name: "LikeTwice" }
             })
 
             const like = await likeModel.create({ user: userId, post: postId });
-            const updatedPost = await postModel.findOneAndUpdate({_id: postId},
+            
+            await postModel.findOneAndUpdate({_id: postId},
             {
               $push: {
                 likes: like
@@ -52,42 +52,41 @@ class Like{
         }
     }
 
-    static async findLike(req, res){
-        try{
-            const id = req.params.id
-            const Post = await likeModel.findOne({_id: id}).exec()
+    // static async findLike(req, res){
+    //     try{
+    //         const id = req.params.id
+    //         const Post = await likeModel.findOne({_id: id}).exec()
 
-            res.status(200).json(Post)
-        }catch(err){
-            res.status(500).json(err)
-        }
-    }
+    //         res.status(200).json(Post)
+    //     }catch(err){
+    //         res.status(500).json(err)
+    //     }
+    // }
 
-    static async editLike(req, res){
-        try{
-            const id = req.params.id
+    // static async editLike(req, res){
+    //     try{
+    //         const id = req.params.id
             
-            await likeModel.updateOne({_id: id}, req.body)
-            const updatedPost = await likeModel.find({_id: id}).exec()
+    //         await likeModel.updateOne({_id: id}, req.body)
+    //         const updatedPost = await likeModel.find({_id: id}).exec()
 
-            res.status(200).json(updatedPost)
-        }catch(err){
-            res.status(500).json(err)
-        }
-    }
+    //         res.status(200).json(updatedPost)
+    //     }catch(err){
+    //         res.status(500).json(err)
+    //     }
+    // }
 
-    static async deleteLike(req, res){
+    static async deleteLike(req, res, next){
         try{
-            const id = req.params.id
-            const deletedPost = await likeModel.find({_id: id}).exec()
-            await likeModel.deleteOne({_id: id})
+            const { id } = req.params;
+            const deletedPost = await likeModel.findOneAndDelete({_id: id}).exec();
+            if (!deletedPost) throw { name: "NotFound" };
 
-            res.status(201).json(deletedPost)
+            res.status(200).json(deletedPost)
         }catch(err){
-            res.status(500).json(err)
+            next(err)
         }
     }
-
 }
 
 module.exports = Like
