@@ -8,7 +8,7 @@ const commentRoutes = require('./routes/commentRoutes')
 const likesRoutes = require('./routes/likesRoutes')
 const errorHandler = require("./middlewares/errorHandler")
 
-const mongoDB = 'mongodb://localhost:27017/test'
+const mongoDB = 'mongodb://localhost:27017/mongose'
 mongoose.connect(mongoDB, {useNewUrlParser: true, useUnifiedTopology: true}, (err) => {
     if(err){
         console.log(err)

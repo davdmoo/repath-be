@@ -26,7 +26,7 @@ const postSchema = new Schema({
   likes: [{
     type: ObjectId,
     ref: "User",
-    unique: true
+    sparse: true
   }]
 });
 
