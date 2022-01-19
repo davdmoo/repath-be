@@ -1,10 +1,12 @@
-const likesModel = require('../models/likesModel')
+const likeModel = require('../models/likesModel');
+const postModel = require('../models/postModel');
+const { ObjectId } = require("mongodb");
 
 class Like{
     static async findLikes(req, res){
         try{
             const id = req.params.id
-            const posts = await likeModel.find().exec()
+            const posts = await likeModel.find({_id: id}).exec()
 
             res.status(200).json(posts)
         }catch(err){
@@ -12,16 +14,32 @@ class Like{
         }
     }
 
-    static async addLike(req, res){
-        try{
-            console.log(req.headers);
-            req.body.user = req.headers.keyid
-            console.log(req.body);
-            const newpost = await likeModel.create(req.body)
+    static async addLike(req, res, next){
+        try {
+            const { postId } = req.params;
+            const userId = req.user.id;
+            const post = await postModel.findOne(ObjectId(postId));
+            if (!post) throw { name: "NotFound" };
+            const like = await likeModel.create({
+                userId,
+                content
+            })
 
-            res.status(201).json(newpost)
-        }catch(err){
-            res.status(500).json(err)
+            console.log(userId);
+
+            post.likes.push({
+              _id: new ObjectId,
+              user: userId
+            });
+
+            console.log(post);
+
+            await post.updateOne();
+            console.log(post);
+
+            res.status(201).json("You have liked this post");
+        } catch(err){
+            next(err);
         }
     }
 
