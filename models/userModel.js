@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 const uniqueValidator = require('mongoose-unique-validator');
 const bcrypt = require("bcryptjs");
+const { postSchema } = require('./postModel');
 
 const userSchema = new Schema({
   firstName:   {
@@ -36,10 +37,7 @@ const userSchema = new Schema({
   city:{ 
       type:String
   },
-  posts : [{
-    type: ObjectId,
-    ref: "Post"
-  }]
+  posts : [postSchema]
 });
 
 userSchema.pre("save", async function save(next) {
