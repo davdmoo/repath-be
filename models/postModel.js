@@ -1,4 +1,3 @@
-const { ObjectId } = require('mongodb');
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 const uniqueValidator = require('mongoose-unique-validator');
@@ -20,11 +19,11 @@ const postSchema = new Schema({
     required: true
   },
   comments: [{
-    type: ObjectId,
+    type: Schema.Types.ObjectId,
     ref: "Comment"
   }],
   likes: [{
-    type: ObjectId,
+    type: Schema.Types.ObjectId,
     ref: "Like",
   }],
   albumName : String

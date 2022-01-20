@@ -54,7 +54,7 @@ class Post{
                 throw {name : "NoInput"}
             }
            
-            const newpost = await postModel.create(payload)
+            const newpost = await (await postModel.create(payload)).populate('User')
 
             res.status(201).json(newpost)
         }catch(err){
