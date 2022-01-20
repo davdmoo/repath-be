@@ -1,5 +1,6 @@
 const e = require('express');
 const postModel = require('../models/postModel')
+const axios = require('axios');
 
 class Post{
     static async findPosts(req, res){
@@ -27,7 +28,12 @@ class Post{
                payload.imgUrl = imgUrl
             }
            else if (type === "location" && location) {
-              payload.location = location
+            const {data} = await axios({
+                method: 'GET',
+                url: `https://api.mapbox.com/geocoding/v5/mapbox.places/${location}.json?country=id&proximity=-73.990593%2C40.740121&types=place%2Cpostcode%2Caddress&access_token=pk.eyJ1IjoiYWduZXNzdXJ5YSIsImEiOiJja3ltMmt5cnExczhpMnBvbHZzNjZwNHlyIn0.SdeuPBofv_1xPCmVIlI_-Q`,
+            })
+            console.log(data.features[0].place_name,`<<<<<<<<`)
+              payload.location = data.features[0].place_name
             }
            else if (type === "music" && title){
                 payload.title = title
@@ -42,7 +48,7 @@ class Post{
 
             res.status(201).json(newpost)
         }catch(err){
-            console.log(err, `AAAAA`)
+            console.log(err.data, `AAAAA`)
             next(err)
         }
     }
