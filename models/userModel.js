@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 const uniqueValidator = require('mongoose-unique-validator');
 const bcrypt = require("bcryptjs");
+const { postSchema } = require('./postModel');
 
 // tambahin validasi required di semua
 const userSchema = new Schema({

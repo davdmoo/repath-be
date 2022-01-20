@@ -1,11 +1,10 @@
-const commentModel = require('../models/commentModel');
-const postModel = require('../models/postModel');
-const { ObjectId } = require("mongodb");
+const { ObjectId } = require('mongodb');
+const { postModel } = require('../models/postModel');
+const {commentModel} = require('../models/commentModel')
 
 class Comment{
     static async findComments(req, res){
         try{
-            const id = req.params.postId;
             const comments = await commentModel.find().exec()
 
             res.status(200).json(comments)

@@ -16,6 +16,7 @@ const upload = multer({
 
 router.use(authentication)
 router.get('/', postController.findPosts)
+router.post('/',authentication, postController.addPost)
 router.post('/',authentication, upload.single('imgUrl'),imagekit,sizeValidation,typeValidation,postController.addPost)
 router.get('/:id', postController.findPost)
 router.patch('/:id', postController.editPost)
