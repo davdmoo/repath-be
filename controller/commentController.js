@@ -3,11 +3,10 @@ const commentModel = require('../models/commentModel')
 class Comment{
     static async findComments(req, res){
         try{
-            const id = req.params.id
-            console.log(id, req.params);
-            // const comments = await commentModel.find().exec()
+            const id = req.params.postId;
+            const comments = await commentModel.find().exec()
 
-            // res.status(200).json(comments)
+            res.status(200).json(comments)
         }catch(err){
             res.status(500).json(err)
         }
@@ -15,8 +14,7 @@ class Comment{
 
     static async addComment(req, res){
         try{
-            req.body.user = req.headers.keyid
-            const newComment = await commentModel.create(req.body)
+            const newComment = await commentModel.create(req.body);
 
             res.status(201).json(newComment)
         }catch(err){
