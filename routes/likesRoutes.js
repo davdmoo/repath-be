@@ -7,7 +7,7 @@ router.get('/:postId', likesController.findLikes)
 router.get('/:userId', likesController.findLikesByUser)
 router.post('/:postId', likesController.addLike)
 // router.get('/:id', likesController.findLike)
-// router.patch('/:id', likesController.editLike)
+// router.put('/:id', likesController.editLike)
 router.delete('/:id', likesController.deleteLike)
 
 module.exports = router

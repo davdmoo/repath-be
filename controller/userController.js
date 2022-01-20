@@ -57,8 +57,17 @@ class User {
 
     static async editUser(req, res, next){
         try{
-            const id = req.params.id
-            await userModel.updateOne({_id: id}, req.body)
+            const id = req.user.id
+            const {firstName, lastName, username, phoneNumber, city, imgUrl} = req.body
+            
+            await userModel.updateOne({_id: id}, {
+                firstName,
+                lastName,
+                username,
+                phoneNumber,
+                imgUrl,
+                city
+            })
 
             const updatedUser = await userModel.find({_id: id}).exec()
 

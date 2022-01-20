@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-const friendSchema = new mongoose.Schema({
+const followSchema = new mongoose.Schema({
     follower: {
         type: Schema.Types.ObjectId,
         ref: "User"
@@ -12,6 +12,6 @@ const friendSchema = new mongoose.Schema({
     }
 })
 
-const friendModel = mongoose.model("Friend", friendSchema)
+const followModel = mongoose.model("Follow", followSchema)
 
-module.exports = friendModel
+module.exports = followModel
