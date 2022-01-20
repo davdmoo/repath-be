@@ -9,6 +9,7 @@ const commentRoutes = require('./routes/commentRoutes')
 const likesRoutes = require('./routes/likesRoutes')
 const errorHandler = require("./middlewares/errorHandler");
 const authentication = require("./middlewares/authentication");
+const fetchRoutes = require('./routes/fetchroutes')
 
 const mongoDB = process.env.MONGO_URI;
 mongoose.connect(mongoDB, {useNewUrlParser: true, useUnifiedTopology: true}, (err) => {
@@ -27,6 +28,8 @@ app.use('/posts', postRoutes)
 app.use('/comments', commentRoutes)
 app.use('/likes', likesRoutes)
 app.use('/follows', followRoutes)
+app.use('/fetchs', fetchRoutes)
+
 
 app.use(errorHandler)
 
