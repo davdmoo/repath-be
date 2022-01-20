@@ -1,5 +1,5 @@
 const { ObjectId } = require('mongodb');
-const { postModel } = require('../models/postModel');
+const postModel = require('../models/postModel');
 const commentModel = require('../models/commentModel')
 
 class Comment{
@@ -40,6 +40,7 @@ class Comment{
 
             res.status(201).json(newComment);
         } catch(err) {
+            console.log(err);
             next(err);
         }
     }
@@ -71,18 +72,19 @@ class Comment{
     static async deleteComment(req, res, next){
         try{
             const id = req.params.id;
-            const comment = await commentModel.findById(id).exec();
-            if (!comment) throw { name: "NotFound" };
-
+            
+            const deletedComment = await commentModel.findById(id).exec();
+            if (!deletedComment) throw { name: "NotFound" };
             await commentModel.deleteOne({_id: id});
 
-            await postModel.findOneAndUpdate({_id: comment.postId},
+            await postModel.findOneAndUpdate({_id: deletedComment.postId},
             {
                 $pull: { comments: id }
             });
 
             res.status(201).json(deletedComment)
         } catch(err) {
+            console.log(err);
             next(err);
         }
     }
