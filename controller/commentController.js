@@ -4,11 +4,12 @@ const {commentModel} = require('../models/commentModel')
 
 class Comment{
     static async findComments(req, res){
-        try{
-            const comments = await commentModel.find().exec()
+        try {
+            const { postId } = req.params;
+            const comments = await commentModel.find({ postId }).exec();
 
-            res.status(200).json(comments)
-        }catch(err){
+            res.status(200).json(comments);
+        } catch(err){
             res.status(500).json(err)
         }
     }
@@ -20,7 +21,7 @@ class Comment{
             const post = await postModel.findOne(ObjectId(postId));
             if (!post) throw { name: "NotFound" };
 
-            const newComment = await commentModel.create({ postId: postId, content: content });
+            const newComment = await commentModel.create({ postId, content, imgUrl,  });
 
             await postModel.findOneAndUpdate({_id: postId},
             {
