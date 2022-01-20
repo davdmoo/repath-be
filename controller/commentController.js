@@ -1,36 +1,48 @@
-const commentModel = require('../models/commentModel')
+const commentModel = require('../models/commentModel');
+const postModel = require('../models/postModel');
+const { ObjectId } = require("mongodb");
 
 class Comment{
     static async findComments(req, res){
         try{
-            const id = req.params.id
-            console.log(id, req.params);
-            // const comments = await commentModel.find().exec()
+            const id = req.params.postId;
+            const comments = await commentModel.find().exec()
 
-            // res.status(200).json(comments)
+            res.status(200).json(comments)
         }catch(err){
             res.status(500).json(err)
         }
     }
 
-    static async addComment(req, res){
-        try{
-            req.body.user = req.headers.keyid
-            const newComment = await commentModel.create(req.body)
+    static async addComment(req, res, next) {
+        try {
+            const { postId } = req.params;
+            const { content } = req.body;
+            const post = await postModel.findOne(ObjectId(postId));
+            if (!post) throw { name: "NotFound" };
 
-            res.status(201).json(newComment)
-        }catch(err){
-            res.status(500).json(err)
+            const newComment = await commentModel.create({ postId: postId, content: content });
+
+            await postModel.findOneAndUpdate({_id: postId},
+            {
+              $push: {
+                comments: newComment
+              }
+            });
+
+            res.status(201).json(newComment);
+        } catch(err) {
+            next(err);
         }
     }
 
-    static async findComment(req, res){
-        try{
+    static async findComment(req, res) {
+        try {
             const id = req.params.id
             const comment = await commentModel.findOne({_id: id}).exec()
 
             res.status(200).json(comment)
-        }catch(err){
+        } catch(err){
             res.status(500).json(err)
         }
     }
@@ -48,15 +60,22 @@ class Comment{
         }
     }
 
-    static async deleteComment(req, res){
+    static async deleteComment(req, res, next){
         try{
-            const id = req.params.id
-            const deletedComment = await commentModel.find({_id: id}).exec()
-            await commentModel.deleteOne({_id: id})
+            const id = req.params.id;
+            const comment = await commentModel.findById(id).exec();
+            if (!comment) throw { name: "NotFound" };
+
+            await commentModel.deleteOne({_id: id});
+
+            await postModel.findOneAndUpdate({_id: comment.postId},
+            {
+                $pull: { comments: id }
+            });
 
             res.status(201).json(deletedComment)
-        }catch(err){
-            res.status(500).json(err)
+        } catch(err) {
+            next(err);
         }
     }
 

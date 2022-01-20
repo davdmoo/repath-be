@@ -6,13 +6,14 @@ const userRoutes = require('./routes/userRoutes')
 const postRoutes = require('./routes/postRoutes')
 const commentRoutes = require('./routes/commentRoutes')
 const likesRoutes = require('./routes/likesRoutes')
-const errorHandler = require("./middlewares/errorHandler")
+const errorHandler = require("./middlewares/errorHandler");
+const authentication = require("./middlewares/authentication");
 
-const mongoDB = 'mongodb://localhost:27017/mongose'
+const mongoDB = process.env.MONGO_URI;
 mongoose.connect(mongoDB, {useNewUrlParser: true, useUnifiedTopology: true}, (err) => {
-    if(err){
+    if(err) {
         console.log(err)
-    }else{
+    } else {
         console.log("connected")
     }
 })
