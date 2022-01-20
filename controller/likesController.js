@@ -1,12 +1,13 @@
 const likeModel = require('../models/likesModel');
 const postModel = require('../models/postModel');
+const userModel = require("../models/userModel");
 const { ObjectId } = require("mongodb");
 
 class Like{
     static async findLikes(req, res, next){
         try{
             const { postId } = req.params;
-            const posts = await likeModel.find({ post: postId }).exec()
+            const posts = await likeModel.find({ postId: postId }).exec()
 
             res.status(200).json(posts)
         }catch(err){
@@ -17,7 +18,7 @@ class Like{
     static async findLikesByUser(req, res, next){
         try {
             const { userId } = req.params;
-            const posts = await likeModel.find({ user: userId }).exec();
+            const posts = await likeModel.find({ userId: userId }).exec();
 
             res.status(200).json(posts);
         } catch(err) {
@@ -33,11 +34,18 @@ class Like{
             if (!post) throw { name: "NotFound" };
 
             const likes = await likeModel.find({ post: postId });
-            likes.forEach(like => {
-              if (like.user.toString() === userId.toString()) throw { name: "LikeTwice" }
-            })
 
-            const like = await likeModel.create({ user: userId, post: postId });
+            // likes.forEach(like => {
+            //   if (like.userId.toString() === userId.toString()) throw { name: "LikeTwice" };
+            // });
+
+            const user = await userModel.findById(userId);
+            let likeBody = { userId, postId, firstName: user.firstName };
+            if (user.imgUrl) {
+              likeBody.imgUrl = user.imgUrl;
+            }
+
+            const like = await likeModel.create(likeBody);
             
             await postModel.findOneAndUpdate({_id: postId},
             {

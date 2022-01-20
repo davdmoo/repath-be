@@ -1,14 +1,30 @@
 const e = require('express');
 const postModel = require('../models/postModel');
 const likeModel = require('../models/likesModel');
-const axios = require('axios');
+const followModel = require('../models/followModel');
+const userModel = require('../models/userModel');
 
-class Post{
+class Post {
     static async findPosts(req, res, next){
         try {
-            const posts = await postModel.find().populate([{ path: "likes" }, { path: "comments" }]);
+            let filter = [];
+            const friends = await friendModel.find({ follower: req.user.id });
+            friends.forEach(friend => {
+              filter.push(friend.following)
+            });
 
-            res.status(200).json(posts);
+            const posts = await postModel.find({ userId: filter }).populate([{ path: "likes" }, { path: "comments" }]);
+            let filterLikes = [];
+            posts.forEach(post => {
+              filterLikes.push(post._id)
+            });
+
+            let payload = [posts];
+            const likes = await likeModel.find({ postId: filterLikes });
+
+            payload.push(likes);
+
+            res.status(200).json(payload);
         } catch(err){
             next(err);
         }
@@ -35,21 +51,28 @@ class Post{
                 payload.imageAlbum = imageAlbum
                 payload.albumName = albumName
             }
-            else{
+            else {
                 throw {name : "NoInput"}
             }
            
-            const newpost = await (await postModel.create(payload)).populate('User')
+            const newPost = await postModel.create(payload);
 
-            res.status(201).json(newpost)
-        }catch(err){
-            console.log(err.data, `AAAAA`)
+            await userModel.findOneAndUpdate({_id: userId},
+            {
+              $push: {
+                posts: newPost
+              }
+            });
+
+            res.status(201).json(newPost);
+        } catch(err){
+
             next(err)
         }
     }
 
-    static async findPost(req, res){
-        try{
+    static async findPost(req, res) {
+        try {
             const id = req.params.id
             const Post = await postModel.findOne({_id: id}).exec()
 
