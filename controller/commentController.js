@@ -66,17 +66,19 @@ class Comment{
             const id = req.params.id
             // console.log(postId, id);
             const comment = await commentModel.findOne(ObjectId(id));
-            await commentModel.deleteOne(ObjectId(id));
+            const deletedComment = await commentModel.deleteOne(ObjectId(id));
             console.log(comment);
-            // const updatedPost = await postModel.findOneAndUpdate(ObjectId(id),
-            // {
-            //     $pull: {
-            //     comments: id
-            //     }
-            // })
-            await postModel["comments"].findOneAndDelete(ObjectId(id))
-
-            res.status(201).json("updatedPost")
+            const updatedPost = await postModel.update(
+                {_id: postId},
+                {
+                    $pull: {
+                        comments: comments
+                    }
+                }
+            )
+            const hellow = await postModel.findOne({_id:postId}).exec()
+            // console.log(hellow);
+            res.status(201).json(updatedPost)
         }catch(err){
             res.status(500).json(err)
         }

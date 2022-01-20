@@ -2,7 +2,7 @@ const axios = require('axios');
 var FormData = require('form-data');
 
 const imagekit = async (req,res,next)=>{
-    console.log(req.file.mimetype, `<<<ini file type`)
+    // console.log(req.file.mimetype, `<<<ini file type`)
     try {
             const form = new FormData()
             form.append('file', req.file.buffer.toString('base64'))

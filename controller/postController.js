@@ -1,10 +1,9 @@
 const e = require('express');
-const postModel = require('../models/postModel')
+const {postModel} = require('../models/postModel');
 
 class Post{
     static async findPosts(req, res){
         try{
-            console.log("masuk function");
             const posts = await postModel.find().exec()
 
             res.status(200).json(posts)
@@ -38,7 +37,7 @@ class Post{
                 throw {name : "NoInput"}
             }
            
-            const newpost = await postModel.create(payload)
+            const newpost = await (await postModel.create(payload)).populate('User')
 
             res.status(201).json(newpost)
         }catch(err){
