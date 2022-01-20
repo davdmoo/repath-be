@@ -2,8 +2,6 @@ const axios = require('axios');
 var FormData = require('form-data');
 
 const imagekit = async (req,res,next)=>{
-// console.log(req.file, `XX`)
-// console.log(req.body);
     try {   
         if (req.file === undefined) {
             next(); 

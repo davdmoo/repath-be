@@ -25,8 +25,9 @@ const postSchema = new Schema({
   }],
   likes: [{
     type: ObjectId,
-    ref: "Like"
-  }]
+    ref: "Like",
+  }],
+  albumName : String
 });
 
 postSchema.plugin(uniqueValidator)
