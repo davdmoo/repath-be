@@ -1,20 +1,7 @@
 const { ObjectId } = require('mongodb');
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
-var uniqueValidator = require('mongoose-unique-validator');
-// const likeModel = require("./likesModel");
-
-const likeSchema = new Schema({
-  _id: ObjectId,
-  user: {
-    type: ObjectId,
-    ref: "User"
-  }
-})
-
-const commentSchema = new Schema({
-  content: String
-});
+const uniqueValidator = require('mongoose-unique-validator');
 
 const postSchema = new Schema({
   type: {
@@ -36,10 +23,12 @@ const postSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: "Comment"
   }],
-  likes: [likeSchema]
+  likes: [{
+    type: ObjectId,
+    ref: "Like"
+  }]
 });
 
 postSchema.plugin(uniqueValidator)
 const postModel = mongoose.model('Post', postSchema);
-const likeModel = mongoose.model("Like", likeSchema);
-module.exports = {postModel, likeModel}
+module.exports = postModel;
