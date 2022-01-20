@@ -2,8 +2,8 @@ const axios = require('axios');
 var FormData = require('form-data');
 
 const imagekit = async (req,res,next)=>{
-console.log(req.file, `XX`)
-
+// console.log(req.file, `XX`)
+// console.log(req.body);
     try {   
         if (req.file === undefined) {
             next(); 
@@ -12,7 +12,6 @@ console.log(req.file, `XX`)
             const form = new FormData()
             form.append('file', req.file.buffer.toString('base64'))
             form.append('fileName', req.file.originalname)
-          
           
             const privKey = process.env.PRIVATE_KEY_IMAGEKIT
             const encodeKey = Buffer.from(privKey).toString('base64')
@@ -26,15 +25,17 @@ console.log(req.file, `XX`)
                     Authorization: `Basic ${encodeKey}`
                 }
             })
-        
-            req.body.imgUrl = data.url
+            
+            // if (req.body.profilePicture) {
+                req.body.imgUrl = data.url
+            // }
+            // if (req.body.backgroundImage) {
+            //     req.body.backgroundImage = data.url
+            // }
+            // if (req.body.profilePicture && req.body.backgroundImage) // ngapain
             next()
-        
         }
-        
-        
     } catch (err) {
-        console.log(err,`Jiodihafoihfoihofi`)
         next(err)
     }
 }

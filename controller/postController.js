@@ -1,16 +1,16 @@
 const e = require('express');
-const postModel = require('../models/postModel')
+const postModel = require('../models/postModel');
+const likeModel = require('../models/likesModel');
 const axios = require('axios');
 
 class Post{
-    static async findPosts(req, res){
-        try{
-            console.log("masuk function");
-            const posts = await postModel.find().exec()
+    static async findPosts(req, res, next){
+        try {
+            const posts = await postModel.find().populate([{ path: "likes" }, { path: "comments" }]);
 
-            res.status(200).json(posts)
-        }catch(err){
-            res.status(500).json(err)
+            res.status(200).json(posts);
+        } catch(err){
+            next(err);
         }
     }
 
