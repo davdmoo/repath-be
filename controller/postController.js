@@ -1,17 +1,16 @@
 const e = require('express');
-const {postModel} = require('../models/postModel')
+const postModel = require('../models/postModel');
+const likeModel = require('../models/likesModel');
 const axios = require('axios');
 
 class Post{
-    static async findPosts(req, res){
-        try{
-            const posts = await postModel.find().exec()
-            console.log("masuk");
+    static async findPosts(req, res, next){
+        try {
+            const posts = await postModel.find().populate([{ path: "likes" }, { path: "comments" }]);
 
-            res.status(200).json(posts)
-        }catch(err){
-            console.log(err);
-            res.status(500).json(err)
+            res.status(200).json(posts);
+        } catch(err){
+            next(err);
         }
     }
 
@@ -22,8 +21,7 @@ class Post{
             let payload = {
                 type,
                 userId,
-            }
-            
+            } 
             if (type === 'text' && text) {
                payload.text = text
                payload.imgUrl = imgUrl
@@ -37,9 +35,20 @@ class Post{
               payload.location = data.features[0].place_name
             }
            else if (type === "music" && title){
-                payload.title = title
-                payload.artist = artist
-                payload.imageAlbum = imageAlbum
+            const {data} = await axios({
+                method: 'GET',
+                url: 'https://deezerdevs-deezer.p.rapidapi.com/search',
+                params: {q: title},
+                headers: {
+                    'x-rapidapi-host': 'deezerdevs-deezer.p.rapidapi.com',
+                    'x-rapidapi-key': 'a0fd5fdf04msha9dde7e4ff273a1p10644fjsn1b7f916cb262'
+                }
+            })
+            console.log(data.data[0].album,`<<<<<<<< MASUK`)
+                payload.title = data.data[0].title
+                payload.artist = data.data[0].artist.name
+                payload.imageAlbum = data.data[0].album.cover_big
+                payload.albumName = data.data[0].album.title
             }
             else{
                 throw {name : "NoInput"}

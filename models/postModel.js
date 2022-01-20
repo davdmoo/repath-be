@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
-var uniqueValidator = require('mongoose-unique-validator');
-const { commentSchema } = require('./commentModel');
+const uniqueValidator = require('mongoose-unique-validator');
 
 const postSchema = new Schema({
   type: {
@@ -19,13 +18,17 @@ const postSchema = new Schema({
     ref: "User",
     required: true
   },
-  comments: [commentSchema],
+  comments: [{
+    type: Schema.Types.ObjectId,
+    ref: "Comment"
+  }],
   likes: [{
     type: Schema.Types.ObjectId,
-    ref: "Like"
-  }]
+    ref: "Like",
+  }],
+  albumName : String
 });
 
 postSchema.plugin(uniqueValidator)
 const postModel = mongoose.model('Post', postSchema);
-module.exports = {postModel, postSchema};
+module.exports = postModel;

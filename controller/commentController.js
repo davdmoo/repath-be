@@ -13,36 +13,35 @@ class Comment{
         }
     }
 
-    static async addComment(req, res){
-        try{
+    static async addComment(req, res, next) {
+        try {
             const { postId } = req.params;
-            req.body.userId = req.user.id;
-
-            const post = await postModel.findOne({_id: postId});
+            const { content } = req.body;
+            const post = await postModel.findOne(ObjectId(postId));
             if (!post) throw { name: "NotFound" };
-            
-            const comment = await commentModel.create(req.body);
 
-            const updatedPost = await postModel.findOneAndUpdate({_id: postId},
+            const newComment = await commentModel.create({ postId: postId, content: content });
+
+            await postModel.findOneAndUpdate({_id: postId},
             {
               $push: {
-                comments: comment
+                comments: newComment
               }
-            })
-            // console.log(updatedPost);
-            res.status(201).json(updatedPost)
-        }catch(err){
-            res.status(500).json(err)
+            });
+
+            res.status(201).json(newComment);
+        } catch(err) {
+            next(err);
         }
     }
 
-    static async findComment(req, res){
-        try{
+    static async findComment(req, res) {
+        try {
             const id = req.params.id
             const comment = await commentModel.findOne({_id: id}).exec()
 
             res.status(200).json(comment)
-        }catch(err){
+        } catch(err){
             res.status(500).json(err)
         }
     }
@@ -60,29 +59,22 @@ class Comment{
         }
     }
 
-    static async deleteComment(req, res){
+    static async deleteComment(req, res, next){
         try{
-            const { postId } = req.params;
             const id = req.params.id;
+            const comment = await commentModel.findById(id).exec();
+            if (!comment) throw { name: "NotFound" };
 
-            const comment = await commentModel.findOne(ObjectId(id));
             await commentModel.deleteOne({_id: id});
-    
-            await postModel.findOneAndUpdate(
-                {_id: postId},
-                {
-                    $pull: {
-                        comments: {_id: id}
-                    }
-                }
-            )
-    
-            const updatedPost = await postModel.findOne({_id: postId})
-            
-            res.status(201).json(updatedPost)
-        }catch(err){
-            console.log(err);
-            res.status(500).json(err)
+
+            await postModel.findOneAndUpdate({_id: comment.postId},
+            {
+                $pull: { comments: id }
+            });
+
+            res.status(201).json(deletedComment)
+        } catch(err) {
+            next(err);
         }
     }
 

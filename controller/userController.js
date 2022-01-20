@@ -2,7 +2,7 @@ const userModel = require('../models/userModel');
 const jwt = require("jsonwebtoken");
 // const secretKey = process.env.SECRETKEY;
 
-class User{
+class User {
     static async findUsers(req, res, next){
         try{
             const users = await userModel.find().exec()
