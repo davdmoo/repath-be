@@ -1,6 +1,6 @@
 const { ObjectId } = require('mongodb');
 const postModel = require('../models/postModel');
-const {commentModel} = require('../models/commentModel');
+const commentModel = require('../models/commentModel');
 const userModel = require('../models/userModel');
 
 class Comment{
