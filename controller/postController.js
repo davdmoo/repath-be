@@ -2,11 +2,34 @@ const e = require('express');
 const postModel = require('../models/postModel');
 const likeModel = require('../models/likesModel');
 const axios = require('axios');
+const friendModel = require('../models/friendModel');
 
 class Post{
     static async findPosts(req, res, next){
         try {
-            const posts = await postModel.find().populate([{ path: "likes" }, { path: "comments" }]);
+            let filter = [];
+            const friends = await friendModel.find({ follower: req.user.id });
+            friends.forEach(friend => {
+              filter.push(friend.following)
+            });
+
+            const posts = await postModel.find({ userId: filter }).populate([{ path: "likes" }, { path: "comments" }]);
+            // let filterLikes = [];
+            // posts.forEach(post => {
+            //   filterLikes.push(post._id)
+            // });
+
+            // let payload = [posts];
+            // let payloadLikes = [];
+            // const likes = await likeModel.find({ postId: filterLikes }).populate("user");
+            // likes.forEach(like => {
+            //   payloadLikes.push({
+            //     likeId: like._id,
+            //     userId: like.user._id,
+            //     firstName: like.user.firstName,
+            //     // imgUrl: like.
+            //   })
+            // });
 
             res.status(200).json(posts);
         } catch(err){

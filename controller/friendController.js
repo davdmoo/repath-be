@@ -15,6 +15,7 @@ class Friend{
 
     static async addFriend(req, res){
         try{
+            console.log(req.user);
             const id = req.user.id;
             const friendId = req.params.friendId
 
@@ -25,6 +26,7 @@ class Friend{
 
             res.status(201).json(newFriend)
         }catch(err){
+            console.log(err);
             res.status(500).json(err)
         }
     }

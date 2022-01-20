@@ -3,14 +3,16 @@ const { Schema } = mongoose;
 const { ObjectId } = require("mongodb");
 
 const likeSchema = new Schema({
-  user: {
+  userId: {
     type: ObjectId,
     ref: "User"
   },
-  post: {
+  postId: {
     type: ObjectId,
     ref: "Post"
-  }
+  },
+  firstName: String,
+  imgUrl: String
 });
 
 const likeModel = mongoose.model("Like", likeSchema);
