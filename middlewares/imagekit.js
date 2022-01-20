@@ -11,7 +11,6 @@ const imagekit = async (req,res,next)=>{
             form.append('file', req.file.buffer.toString('base64'))
             form.append('fileName', req.file.originalname)
           
-          
             const privKey = process.env.PRIVATE_KEY_IMAGEKIT
             const encodeKey = Buffer.from(privKey).toString('base64')
            
@@ -24,15 +23,17 @@ const imagekit = async (req,res,next)=>{
                     Authorization: `Basic ${encodeKey}`
                 }
             })
-        
-            req.body.imgUrl = data.url
+            
+            // if (req.body.profilePicture) {
+                req.body.imgUrl = data.url
+            // }
+            // if (req.body.backgroundImage) {
+            //     req.body.backgroundImage = data.url
+            // }
+            // if (req.body.profilePicture && req.body.backgroundImage) // ngapain
             next()
-        
         }
-        
-        
     } catch (err) {
-        console.log(err,`Jiodihafoihfoihofi`)
         next(err)
     }
 }
