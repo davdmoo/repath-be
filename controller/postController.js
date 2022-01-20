@@ -1,18 +1,16 @@
 const e = require('express');
-<<<<<<< HEAD
-const {postModel} = require('../models/postModel');
-=======
-const postModel = require('../models/postModel')
+const {postModel} = require('../models/postModel')
 const axios = require('axios');
->>>>>>> 9fb38e90fc3939dbf0cfc22b7819a52c0a80fb9b
 
 class Post{
     static async findPosts(req, res){
         try{
             const posts = await postModel.find().exec()
+            console.log("masuk");
 
             res.status(200).json(posts)
         }catch(err){
+            console.log(err);
             res.status(500).json(err)
         }
     }

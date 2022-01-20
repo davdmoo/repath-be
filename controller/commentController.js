@@ -67,19 +67,21 @@ class Comment{
             // console.log(postId, id);
             const comment = await commentModel.findOne(ObjectId(id));
             const deletedComment = await commentModel.deleteOne(ObjectId(id));
-            console.log(comment);
-            const updatedPost = await postModel.update(
-                {_id: postId},
+            console.log(comment, "halooo");
+            await postModel.findOneAndUpdate(
+                ObjectId(postId),
                 {
                     $pull: {
-                        comments: comments
+                        comments: ObjectId(id)
                     }
                 }
             )
-            const hellow = await postModel.findOne({_id:postId}).exec()
-            // console.log(hellow);
-            res.status(201).json(updatedPost)
+            console.log("masuk sini");
+            const hellow = await postModel.findOne(ObjectId(postId))
+            console.log(hellow, "ini");
+            res.status(201).json(hellow)
         }catch(err){
+            console.log(err);
             res.status(500).json(err)
         }
     }
