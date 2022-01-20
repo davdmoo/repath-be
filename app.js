@@ -25,6 +25,7 @@ app.use('/posts', postRoutes)
 app.use('/comments', commentRoutes)
 app.use('/likes', likesRoutes)
 
+
 app.use(errorHandler)
 
 app.listen(3000, () => {

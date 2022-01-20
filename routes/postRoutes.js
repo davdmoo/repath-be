@@ -6,6 +6,7 @@ const authentication = require("../middlewares/authentication")
 const multer = require('multer');
 const imagekit = require('../middlewares/imagekit')
 const {sizeValidation, typeValidation} = require('../middlewares/imageValidation')
+const { route } = require('./commentRoutes')
 
 const storage = multer.memoryStorage()
 const upload = multer({
@@ -20,5 +21,7 @@ router.patch('/:id', postController.editPost)
 router.delete('/:id', postController.deletePost)
 // router.use('/:id/comments', commentRoutes)
 // router.use('/:id/likes', likesRoutes)
+
+
 
 module.exports = router

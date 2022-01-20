@@ -15,7 +15,7 @@ class Post{
 
     static async addPost(req, res,next){
         try{
-            const {type,text,imgUrl,location,title,artist,imageAlbum} = req.body
+            const {type,text,imgUrl,location,title} = req.body
             const userId = req.user.id
             let payload = {
                 type,
@@ -30,7 +30,7 @@ class Post{
                 method: 'GET',
                 url: `https://api.mapbox.com/geocoding/v5/mapbox.places/${location}.json?country=id&proximity=-73.990593%2C40.740121&types=place%2Cpostcode%2Caddress&access_token=pk.eyJ1IjoiYWduZXNzdXJ5YSIsImEiOiJja3ltMmt5cnExczhpMnBvbHZzNjZwNHlyIn0.SdeuPBofv_1xPCmVIlI_-Q`,
             })
-            console.log(data.features[0].place_name,`<<<<<<<<`)
+            console.log(data.features,`<<<<<<<<`)
               payload.location = data.features[0].place_name
             }
            else if (type === "music" && title){
@@ -43,7 +43,6 @@ class Post{
                     'x-rapidapi-key': 'a0fd5fdf04msha9dde7e4ff273a1p10644fjsn1b7f916cb262'
                 }
             })
-            console.log(data.data[0].album,`<<<<<<<< MASUK`)
                 payload.title = data.data[0].title
                 payload.artist = data.data[0].artist.name
                 payload.imageAlbum = data.data[0].album.cover_big
