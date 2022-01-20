@@ -1,17 +1,16 @@
 const { ObjectId } = require('mongodb');
 const postModel = require('../models/postModel');
-const commentModel = require('../models/commentModel');
-const userModel = require('../models/userModel');
+const commentModel = require('../models/commentModel')
 
 class Comment{
-    static async findComments(req, res){
-        try{
-            const id = req.params.postId
-            const comments = await commentModel.find({postId:ObjectId(id)}).exec()
+    static async findComments(req, res, next){
+        try {
+            const { postId } = req.params;
+            const comments = await commentModel.find({ postId }).exec();
 
-            res.status(200).json(comments)
-        }catch(err){
-            res.status(500).json(err)
+            res.status(200).json(comments);
+        } catch(err){
+            next(err);
         }
     }
 
@@ -19,18 +18,18 @@ class Comment{
         try {
             const { postId } = req.params;
             const { content } = req.body;
-        
-            const user = await userModel.findOne(ObjectId(req.user.id))
+            const userId = req.params.id;
 
             const post = await postModel.findOne(ObjectId(postId));
             if (!post) throw { name: "NotFound" };
-            
-            const newComment = await commentModel.create({ 
-                postId: postId,
-                content: content,
-                firstName: user.firstName,
-                imgUrl: user.imgUrl
-            });
+
+            const user = await userModel.findById(userId);
+            let commentBody = { userId, postId, content, firstName: user.firstName };
+            if (user.imgUrl) {
+              commentBody.imgUrl = user.imgUrl;
+            };
+
+            const newComment = await commentModel.create(commentBody);
 
             await postModel.findOneAndUpdate({_id: postId},
             {
