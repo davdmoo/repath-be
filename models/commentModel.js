@@ -10,9 +10,11 @@ const commentSchema = new Schema({
   postId: {
     type: Schema.Types.ObjectId,
     ref: "Post"
-  }
+  },
+  firstName: String,
+  imgUrl: String
 });
 
 const commentModel = mongoose.model("Comment", commentSchema);
 
-module.exports = {commentModel, commentSchema};
+module.exports = commentModel;

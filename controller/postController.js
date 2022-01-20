@@ -3,8 +3,9 @@ const postModel = require('../models/postModel');
 const likeModel = require('../models/likesModel');
 const axios = require('axios');
 const friendModel = require('../models/friendModel');
+const userModel = require('../models/userModel');
 
-class Post{
+class Post {
     static async findPosts(req, res, next){
         try {
             let filter = [];
@@ -14,31 +15,24 @@ class Post{
             });
 
             const posts = await postModel.find({ userId: filter }).populate([{ path: "likes" }, { path: "comments" }]);
-            // let filterLikes = [];
-            // posts.forEach(post => {
-            //   filterLikes.push(post._id)
-            // });
+            let filterLikes = [];
+            posts.forEach(post => {
+              filterLikes.push(post._id)
+            });
 
-            // let payload = [posts];
-            // let payloadLikes = [];
-            // const likes = await likeModel.find({ postId: filterLikes }).populate("user");
-            // likes.forEach(like => {
-            //   payloadLikes.push({
-            //     likeId: like._id,
-            //     userId: like.user._id,
-            //     firstName: like.user.firstName,
-            //     // imgUrl: like.
-            //   })
-            // });
+            let payload = [posts];
+            const likes = await likeModel.find({ postId: filterLikes });
 
-            res.status(200).json(posts);
+            payload.push(likes);
+
+            res.status(200).json(payload);
         } catch(err){
             next(err);
         }
     }
 
-    static async addPost(req, res,next){
-        try{
+    static async addPost(req, res,next) {
+        try {
             const {type,text,imgUrl,location,title,artist,imageAlbum} = req.body
             const userId = req.user.id
             let payload = {
@@ -54,7 +48,7 @@ class Post{
                 method: 'GET',
                 url: `https://api.mapbox.com/geocoding/v5/mapbox.places/${location}.json?country=id&proximity=-73.990593%2C40.740121&types=place%2Cpostcode%2Caddress&access_token=pk.eyJ1IjoiYWduZXNzdXJ5YSIsImEiOiJja3ltMmt5cnExczhpMnBvbHZzNjZwNHlyIn0.SdeuPBofv_1xPCmVIlI_-Q`,
             })
-            console.log(data.features[0].place_name,`<<<<<<<<`)
+
               payload.location = data.features[0].place_name
             }
            else if (type === "music" && title){
@@ -67,27 +61,33 @@ class Post{
                     'x-rapidapi-key': 'a0fd5fdf04msha9dde7e4ff273a1p10644fjsn1b7f916cb262'
                 }
             })
-            console.log(data.data[0].album,`<<<<<<<< MASUK`)
                 payload.title = data.data[0].title
                 payload.artist = data.data[0].artist.name
                 payload.imageAlbum = data.data[0].album.cover_big
                 payload.albumName = data.data[0].album.title
             }
-            else{
+            else {
                 throw {name : "NoInput"}
             }
            
-            const newpost = await (await postModel.create(payload)).populate('User')
+            const newPost = await postModel.create(payload);
 
-            res.status(201).json(newpost)
-        }catch(err){
-            console.log(err.data, `AAAAA`)
+            await userModel.findOneAndUpdate({_id: userId},
+            {
+              $push: {
+                posts: newPost
+              }
+            });
+
+            res.status(201).json(newPost);
+        } catch(err){
+
             next(err)
         }
     }
 
-    static async findPost(req, res){
-        try{
+    static async findPost(req, res) {
+        try {
             const id = req.params.id
             const Post = await postModel.findOne({_id: id}).exec()
 
