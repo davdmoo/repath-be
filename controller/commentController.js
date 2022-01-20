@@ -63,8 +63,8 @@ class Comment{
     static async deleteComment(req, res){
         try{
             const { postId } = req.params;
-            const id = req.params.id
-            // console.log(postId, id);
+            const id = req.params.id;
+
             const comment = await commentModel.findOne(ObjectId(id));
             await commentModel.deleteOne({_id: id});
     
@@ -77,9 +77,9 @@ class Comment{
                 }
             )
     
-            const hellow = await postModel.findOne({_id: postId})
-            console.log(hellow);
-            res.status(201).json(hellow)
+            const updatedPost = await postModel.findOne({_id: postId})
+            
+            res.status(201).json(updatedPost)
         }catch(err){
             console.log(err);
             res.status(500).json(err)

@@ -1,10 +1,17 @@
-const friends = require("mongoose-friends")
+const mongoose = require('mongoose');
+const { Schema } = mongoose;
 
 const friendSchema = new mongoose.Schema({
-
+    follower: {
+        type: Schema.Types.ObjectId,
+        ref: "User"
+    },
+    following: {
+        type: Schema.Types.ObjectId,
+        ref: "User"
+    }
 })
 
-friendSchema.plugin(friends({index: false}));
 const friendModel = mongoose.model("Friend", friendSchema)
 
 module.exports = friendModel
