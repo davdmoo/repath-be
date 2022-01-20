@@ -1,8 +1,8 @@
 const userModel = require('../models/userModel');
 const jwt = require("jsonwebtoken");
-const secretKey = process.env.SECRETKEY;
+// const secretKey = process.env.SECRETKEY;
 
-class User{
+class User {
     static async findUsers(req, res, next){
         try{
             const users = await userModel.find().exec()
@@ -37,7 +37,7 @@ class User{
             if (!validate) throw { name: "InvalidCredentials" };
             
             const payload = { email: user.email };
-            const access_token = jwt.sign(payload, secretKey);
+            const access_token = jwt.sign(payload, "repathkeren");
             
             res.status(200).json({ access_token });
         } catch (error) {
