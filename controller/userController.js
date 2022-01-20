@@ -80,6 +80,10 @@ class User {
     static async deleteUser(req, res, next){
         try{
             const id = req.params.id
+
+            if(id == req.user.id){
+                res.status(403).json("you cannot delete other user")
+            }
             const deletedUser = await userModel.find({_id: id}).exec()
             await userModel.deleteOne({_id: id})
 
