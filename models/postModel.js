@@ -27,7 +27,8 @@ const postSchema = new Schema({
     type: ObjectId,
     ref: "User",
     sparse: true
-  }]
+  }],
+  albumName : String
 });
 
 postSchema.plugin(uniqueValidator)
