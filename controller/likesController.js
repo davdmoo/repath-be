@@ -79,11 +79,18 @@ class Like{
     static async deleteLike(req, res, next){
         try{
             const { id } = req.params;
-            const deletedPost = await likeModel.findOneAndDelete({_id: id}).exec();
-            if (!deletedPost) throw { name: "NotFound" };
+            const like = await likeModel.findById(id);
+            if (!like) throw { name: "NotFound" };
 
-            res.status(200).json(deletedPost)
-        }catch(err){
+            await likeModel.deleteOne({_id: id});
+
+            await postModel.findOneAndUpdate({_id: like.post},
+            {
+                $pull: { likes: id }
+            })
+
+            res.status(200).json('You have unliked this');
+        } catch(err){
             next(err)
         }
     }
