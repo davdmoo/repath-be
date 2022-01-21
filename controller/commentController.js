@@ -45,18 +45,18 @@ class Comment{
         }
     }
 
-    static async findComment(req, res) {
+    static async findComment(req, res, next) {
         try {
             const id = req.params.id
             const comment = await commentModel.findOne({_id: id}).exec()
 
             res.status(200).json(comment)
         } catch(err){
-            res.status(500).json(err)
+            next(err);
         }
     }
 
-    static async editComment(req, res){
+    static async editComment(req, res, next) {
         try{
             const id = req.params.id
             
@@ -65,11 +65,11 @@ class Comment{
 
             res.status(200).json(updatedComment)
         }catch(err){
-            res.status(500).json(err)
+            next(err);
         }
     }
 
-    static async deleteComment(req, res, next){
+    static async deleteComment(req, res, next) {
         try{
             const id = req.params.id;
             
@@ -82,9 +82,8 @@ class Comment{
                 $pull: { comments: id }
             });
 
-            res.status(201).json(deletedComment)
+            res.status(200).json(deletedComment)
         } catch(err) {
-            console.log(err);
             next(err);
         }
     }

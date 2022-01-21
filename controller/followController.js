@@ -2,18 +2,18 @@ const followModel = require('../models/followModel')
 const userModel = require('../models/userModel')
 
 class Follow{
-    static async findFollows(req, res){
+    static async findFollows(req, res, next) {
         try{
             const id = req.user.id;
             const follows = await followModel.find({follower: id}).exec()
 
             res.status(200).json(follows)
         }catch(err){
-            res.status(500).json(err)
+            next(err);
         }
     }
 
-    static async addFollow(req, res){
+    static async addFollow(req, res, next){
         try{
             const id = req.user.id;
             const followId = req.params.followId
@@ -37,11 +37,11 @@ class Follow{
 
             res.status(201).json(newFollow)
         }catch(err){
-            res.status(500).json(err)
+            next(err);
         }
     }
 
-    static async deleteFollow(req, res){
+    static async deleteFollow(req, res, next){
         try {
             const id = req.user.id;
             const followId = req.params.followId
@@ -56,9 +56,9 @@ class Follow{
                 following: followId
             })
 
-            res.status(201).json(delFollow)
+            res.status(200).json(delFollow)
         }catch (err){
-            res.status(500).json(err)
+            next(err);
         }
     }
 }
