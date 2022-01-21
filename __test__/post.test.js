@@ -46,7 +46,7 @@ describe("GET /posts", () => {
         .set('access_token',access_token)
         .then((resp)=>{
          const result = resp.body
-         console.log(result)
+        //  console.log(result)
         expect(resp.status).toBe(200)
         expect(result).toEqual(expect.any(Array))
             done()

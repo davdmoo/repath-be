@@ -8,7 +8,9 @@ beforeAll(async () => {
 
 describe("GET /users", () => {
     describe("when user have access token", () => {
-       
+       test("as", ()=>{
+           
+       })
     })
 
     describe("when user dont have access token", () => {
