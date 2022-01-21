@@ -9,14 +9,15 @@ let access_token
 
 beforeAll(async () => {
     await userModel.deleteOne({   email: "test@mail.com" })
-    console.log(process.env.NODE_ENV,`<<<<<<<<<<<<<<<<<<<<`)
-
+   
     const userPayload = {
         firstName: "test",
         lastName: "test",
         email: "test@mail.com",
         password: "12345",
-        username: "test"
+        username: "test",
+        city: "test",
+        phoneNumber :"1234455"
     }
     const user = await userModel.create(userPayload)
     const payloadJwt = { email: user.email };
@@ -39,7 +40,7 @@ afterAll(async()=>{
 })
 
 describe("GET /posts", () => {
-    test("when user have access token", (done) => {
+    test.only("when user have access token", (done) => {
         request(app)
         .get('/posts')
         .set('access_token',access_token)
