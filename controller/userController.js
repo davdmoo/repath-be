@@ -6,7 +6,6 @@ class User {
     static async findUsers(req, res, next){
         try{
             const users = await userModel.find().exec()
-            console.log(req.user);
 
             res.status(200).json(users)
         }catch(err){

@@ -8,7 +8,7 @@ class Post {
     static async findPosts(req, res, next){
         try {
             let filter = [];
-            const friends = await friendModel.find({ follower: req.user.id });
+            const friends = await followModel.find({ follower: req.user.id });
             friends.forEach(friend => {
               filter.push(friend.following)
             });
@@ -17,7 +17,7 @@ class Post {
             let filterLikes = [];
             posts.forEach(post => {
               filterLikes.push(post._id)
-            });
+            })
 
             let payload = [posts];
             const likes = await likeModel.find({ postId: filterLikes });
@@ -66,7 +66,6 @@ class Post {
 
             res.status(201).json(newPost);
         } catch(err){
-
             next(err)
         }
     }

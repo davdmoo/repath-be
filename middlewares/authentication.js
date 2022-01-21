@@ -21,7 +21,6 @@ async function authentication (req, res, next) {
 
     next();
   } catch (err) {
-    console.log(err);
     next(err);
   }
 }
