@@ -5,6 +5,7 @@ const mongoose = require('../config/monggoConfig');
 
 beforeAll(async () => {
     await userModel.deleteOne({   email: "test2@mail.com" })
+    await userModel.deleteOne({   email: "test3@mail.com" })
 });
 
 afterAll(async()=>{
@@ -22,7 +23,7 @@ afterAll(async()=>{
 // })
 
 describe("POST /register", () =>{
-    test("success register", (done) => {
+    test.only("success register", (done) => {
         request(app)
          .post('/users/register')
         .send({
@@ -47,60 +48,72 @@ describe("POST /register", () =>{
         })
     })
 
-    test("failed not unique email", (done) => {
-        request(app)
-         .post('/users/register')
-        .send({
-            firstName: "test",
-            lastName: "test",
-            email: "test2@mail.com",
-            password: "12345",
-            username: "test3",
-            city: "test",
-            phoneNumber :"1234455"
-        })
-        .then((resp)=>{
-            const result = resp.body
-            expect(result).toEqual(expect.any(Object))
-            expect(result).toHaveProperty('message')
+    // test("failed not unique email", (done) => {
+    //     request(app)
+    //      .post('/users/register')
+    //     .send({
+    //         firstName: "test",
+    //         lastName: "test",
+    //         email: "test2@mail.com",
+    //         password: "12345",
+    //         username: "test3",
+    //         city: "test",
+    //         phoneNumber :"1234455"
+    //     })
+    //     .then((resp)=>{
+    //         const result = resp.body
+    //         expect(resp.status).toBe(500)
+    //         expect(result).toEqual(expect.any(Object))
+    //         expect(result).toHaveProperty('message')
             
-            done()
-        })
-        .catch((err)=>{
-            done(err)
-        })
-    })
+    //         done()
+    //     })
+    //     .catch((err)=>{
+    //         done(err)
+    //     })
+    // })
 
-    test("failed not unique username", (done) => {
-        request(app)
-         .post('/users/register')
-        .send({
-            firstName: "test",
-            lastName: "test",
-            email: "test3@mail.com",
-            password: "12345",
-            username: "test2",
-            city: "test",
-            phoneNumber :"1234455"
-        })
-        .then((resp)=>{
-            const result = resp.body 
-            expect(result).toEqual(expect.any(Object))
-            expect(result).toHaveProperty('message')
+    // test("failed not unique username", (done) => {
+    //     request(app)
+    //      .post('/users/register')
+    //     .send({
+    //         firstName: "test",
+    //         lastName: "test",
+    //         email: "test3@mail.com",
+    //         password: "12345",
+    //         username: "test2",
+    //         city: "test",
+    //         phoneNumber :"1234455"
+    //     })
+    //     .then((resp)=>{
+    //         const result = resp.body 
+    //         expect(resp.status).toBe(500)
+    //         expect(result).toEqual(expect.any(Object))
+    //         expect(result).toHaveProperty('message')
             
-            done()
-        })
-        .catch((err)=>{
-            done(err)
-        })
-    })
+    //         done()
+    //     })
+    //     .catch((err)=>{
+    //         done(err)
+    //     })
+    // })
 
     test("failed no input", (done) => {
         request(app)
          .post('/users/register')
-        .send({})
+        .send({
+           
+            lastName: "test3",
+            email: "test3@mail.com",
+            password: "12345",
+            username: "test3",
+            city: "tes3",
+            phoneNumber :"1234455"
+        })
         .then((resp)=>{
             const result = resp.body
+            console.log(result , "NANI ERROR")
+          
             expect(result).toEqual(expect.any(Object))
             expect(result).toHaveProperty('message')
             
@@ -163,7 +176,6 @@ describe("POST /login", () =>{
         })
         .then((resp)=>{
             const result = resp.body
-            console.log(result, `<<<<< NANI ERROR`)
             expect(resp.status).toBe(400)
             expect(result).toEqual(expect.any(Object))
             expect(result).toHaveProperty('message', "Password is required")

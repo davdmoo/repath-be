@@ -21,6 +21,7 @@ class User {
 
             res.status(201).json(newUser)
         }catch(err){
+            console.log(err.name,`AAAA KNAPAPPAP`)
             next(err)
         }
     }

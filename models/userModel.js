@@ -15,7 +15,7 @@ const userSchema = new Schema({
   },
   email: {
     type: String,
-    unique: true,
+    unique: [true, "Please Input Email"],
     sparse: true,
     required: [true, "Please Input Email"]
   },

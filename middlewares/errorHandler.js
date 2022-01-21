@@ -1,5 +1,5 @@
 const errorHandler = (err, req, res, next) => {
-    console.log(err, "ERROR HANDLER");
+    // console.log(err, "ERROR HANDLER");
     // validation di mongoose: err.errors -> cek pathnya (ct. email/username/pass) -> masuk properties -> message
     // ct. err.errors.email.properties.message
     switch (err.name) {
