@@ -1,6 +1,6 @@
 const userModel = require('../models/userModel');
 const jwt = require("jsonwebtoken");
-// const secretKey = process.env.SECRETKEY;
+const secretKey = process.env.SECRETKEY;
 
 class User {
     static async findUsers(req, res, next){
@@ -37,9 +37,19 @@ class User {
             if (!validate) throw { name: "InvalidCredentials" };
             
             const payload = { email: user.email };
-            const access_token = jwt.sign(payload, "repathkeren");
+
+            const payloadClient = {
+              email: user.email,
+              id: user._id.toString(),
+              firstName: user.firstName,
+              lastName: user.lastName
+            }
+            if (user.imgUrl) payloadClient.imgUrl = user.imgUrl;
+            if (user.header) payloadClient.header = user.header;
             
-            res.status(200).json({ access_token });
+            const access_token = jwt.sign(payload, secretKey);
+            
+            res.status(200).json({ access_token, payloadClient });
         } catch (error) {
             next(error);
         }

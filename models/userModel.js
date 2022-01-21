@@ -41,9 +41,8 @@ const userSchema = new Schema({
     type: ObjectId,
     ref: "Post"
   }],
-  imgUrl: {
-    type: String
-  }
+  imgUrl: String,
+  header: String
 });
 
 userSchema.pre("save", async function save(next) {
