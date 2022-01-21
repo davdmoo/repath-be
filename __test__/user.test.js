@@ -5,6 +5,7 @@ const mongoose = require('../config/monggoConfig');
 
 beforeAll(async () => {
     await userModel.deleteOne({   email: "test2@mail.com" })
+    await userModel.deleteOne({   email: "test3@mail.com" })
 });
 
 afterAll(async()=>{
@@ -61,6 +62,8 @@ describe("POST /register", () =>{
         })
         .then((resp)=>{
             const result = resp.body
+            console.log(result , "NANI ERROR")
+            expect(resp.status).toBe(400)
             expect(result).toEqual(expect.any(Object))
             expect(result).toHaveProperty('message')
             
@@ -85,6 +88,7 @@ describe("POST /register", () =>{
         })
         .then((resp)=>{
             const result = resp.body 
+            expect(resp.status).toBe(400)
             expect(result).toEqual(expect.any(Object))
             expect(result).toHaveProperty('message')
             
@@ -95,15 +99,161 @@ describe("POST /register", () =>{
         })
     })
 
-    test("failed no input", (done) => {
+    test("failed no firstname", (done) => {
         request(app)
          .post('/users/register')
-        .send({})
+        .send({     
+            lastName: "test3",
+            email: "test3@mail.com",
+            password: "12345",
+            username: "test3",
+            city: "tes3",
+            phoneNumber :"1234455"
+        })
         .then((resp)=>{
             const result = resp.body
+            expect(resp.status).toBe(400)
             expect(result).toEqual(expect.any(Object))
-            expect(result).toHaveProperty('message')
+            expect(result).toHaveProperty('message','Please input first name')
             
+            done()
+        })
+        .catch((err)=>{
+            done(err)
+        })
+    })
+
+    test("failed no last name", (done) => {
+        request(app)
+         .post('/users/register')
+        .send({
+            firstName: "test3",
+            email: "test3@mail.com",
+            password: "12345",
+            username: "test3",
+            city: "tes3t",
+            phoneNumber :"1234455"
+        })
+        .then((resp)=>{
+         const result = resp.body
+         expect(resp.status).toBe(400)
+         expect(result).toEqual(expect.any(Object))
+         expect(result).toHaveProperty('message','Please input last name')
+            done()
+        })
+        .catch((err)=>{
+            done(err)
+        })
+    })
+
+    test("failed no email", (done) => {
+        request(app)
+         .post('/users/register')
+        .send({
+            firstName: "test3",
+            lastName: "test3",
+            password: "12345",
+            username: "test3",
+            city: "test3",
+            phoneNumber :"1234455"
+        })
+        .then((resp)=>{
+            const result = resp.body
+            expect(resp.status).toBe(400)
+            expect(result).toEqual(expect.any(Object))
+            expect(result).toHaveProperty('message','Please input email')
+            done()
+        })
+        .catch((err)=>{
+            done(err)
+        })
+    })
+
+    test("failed no password", (done) => {
+        request(app)
+         .post('/users/register')
+        .send({
+            firstName: "test3",
+            lastName: "test3",
+            email: "test3@mail.com",
+            username: "test2",
+            city: "test3",
+            phoneNumber :"1234455"
+        })
+        .then((resp)=>{
+         const result = resp.body
+         expect(resp.status).toBe(400)
+         expect(result).toEqual(expect.any(Object))
+         expect(result).toHaveProperty('message','Please input password')
+            done()
+        })
+        .catch((err)=>{
+            done(err)
+        })
+    })
+
+    test("failed no username", (done) => {
+        request(app)
+         .post('/users/register')
+        .send({
+            firstName: "test3",
+            lastName: "test3",
+            email: "test3@mail.com",
+            password: "12345",
+            city: "test3",
+            phoneNumber :"1234455"
+        })
+        .then((resp)=>{
+            const result = resp.body
+            expect(resp.status).toBe(400)
+            expect(result).toEqual(expect.any(Object))
+            expect(result).toHaveProperty('message','Please input username')
+            done()
+        })
+        .catch((err)=>{
+            done(err)
+        })
+    })
+
+    test("failed no phonenumber", (done) => {
+        request(app)
+         .post('/users/register')
+        .send({
+            firstName: "test3",
+            lastName: "test3",
+            email: "test3@mail.com",
+            password: "12345",
+            username: "test3",
+            city: "test3",
+        })
+        .then((resp)=>{
+            const result = resp.body
+            expect(resp.status).toBe(400)
+            expect(result).toEqual(expect.any(Object))
+            expect(result).toHaveProperty('message','Please input phone number')
+            done()
+        })
+        .catch((err)=>{
+            done(err)
+        })
+    })
+
+    test("failed no city", (done) => {
+        request(app)
+         .post('/users/register')
+        .send({
+            firstName: "test3",
+            lastName: "test3",
+            email: "test3@mail.com",
+            password: "12345",
+            username: "test3",
+            phoneNumber :"1234455"
+        })
+        .then((resp)=>{
+          const result = resp.body
+            expect(resp.status).toBe(400)
+            expect(result).toEqual(expect.any(Object))
+            expect(result).toHaveProperty('message','Please input city')
             done()
         })
         .catch((err)=>{
@@ -163,7 +313,6 @@ describe("POST /login", () =>{
         })
         .then((resp)=>{
             const result = resp.body
-            console.log(result, `<<<<< NANI ERROR`)
             expect(resp.status).toBe(400)
             expect(result).toEqual(expect.any(Object))
             expect(result).toHaveProperty('message', "Password is required")
