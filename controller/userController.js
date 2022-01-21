@@ -6,7 +6,6 @@ class User {
     static async findUsers(req, res, next){
         try{
             const users = await userModel.find().exec()
-            console.log(req.user);
 
             res.status(200).json(users)
         }catch(err){
@@ -20,6 +19,7 @@ class User {
 
             res.status(201).json(newUser)
         }catch(err){
+            console.log(err.name,`AAAA KNAPAPPAP`)
             next(err)
         }
     }
@@ -57,8 +57,17 @@ class User {
 
     static async editUser(req, res, next){
         try{
-            const id = req.params.id
-            await userModel.updateOne({_id: id}, req.body)
+            const id = req.user.id
+            const {firstName, lastName, username, phoneNumber, city, imgUrl} = req.body
+            
+            await userModel.updateOne({_id: id}, {
+                firstName,
+                lastName,
+                username,
+                phoneNumber,
+                imgUrl,
+                city
+            })
 
             const updatedUser = await userModel.find({_id: id}).exec()
 
@@ -71,10 +80,15 @@ class User {
     static async deleteUser(req, res, next){
         try{
             const id = req.params.id
+
+            if(id == req.user.id){
+                res.status(403).json("you cannot delete other user")
+            }
+            
             const deletedUser = await userModel.find({_id: id}).exec()
             await userModel.deleteOne({_id: id})
 
-            res.status(201).json(deletedUser)
+            res.status(200).json(deletedUser)
         }catch(err){
             next(err)
         }

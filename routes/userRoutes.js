@@ -8,7 +8,7 @@ router.post('/login', userController.login)
 router.use(authentication)
 
 router.get('/', userController.findUsers)
-router.patch('/:id', userController.editUser)
+router.put('/:id', userController.editUser)
 router.delete('/:id', userController.deleteUser)
 
 module.exports = router

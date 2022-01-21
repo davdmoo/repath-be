@@ -1,7 +1,19 @@
 const errorHandler = (err, req, res, next) => {
-    console.log(err, "ERROR HANDLER");
-
-    switch (err.name) {
+    // console.log(err, "ERROR HANDLER");
+    // validation di mongoose: err.errors -> cek pathnya (ct. email/username/pass) -> masuk properties -> message
+    // ct. err.errors.email.properties.message
+    if (err.errors) {
+      if (err.errors.email) res.status(400).json({ message: err.errors.email.properties.message });
+      else if (err.errors.firstName) res.status(400).json({ message: err.errors.firstName.properties.message });
+      else if (err.errors.lastName) res.status(400).json({ message: err.errors.lastName.properties.message });
+      else if (err.errors.password) res.status(400).json({ message: err.errors.password.properties.message });
+      else if (err.errors.username) res.status(400).json({ message: err.errors.username.properties.message });
+      else if (err.errors.phoneNumber) res.status(400).json({ message: err.errors.phoneNumber.properties.message });
+      else if (err.errors.city) res.status(400).json({ message: err.errors.city.properties.message });
+      else if (err.errors.type) res.status(400).json({ message: err.errors.type.properties.message });
+    }
+    else {
+      switch (err.name) {
         case "EmailRequired":
             res.status(400).json({ message: "Email is required" })
             break;
@@ -35,6 +47,7 @@ const errorHandler = (err, req, res, next) => {
         default:
             res.status(500).json({ message: "Internal server error" })
             break;
+      }
     }
 }
 

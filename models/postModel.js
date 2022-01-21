@@ -7,7 +7,9 @@ const postSchema = new Schema({
     type:String,
     required:[true, "Please Pick Type of Post"],
   },
-  text: String,
+  text: {
+    type: String,
+  },
   imgUrl: String,
   location: String,
   title: String,
@@ -27,7 +29,12 @@ const postSchema = new Schema({
     ref: "Like",
   }],
   albumName : String
+},
+{ 
+  timestamps: { createdAt: 'created_at' } 
 });
+
+
 
 postSchema.plugin(uniqueValidator)
 const postModel = mongoose.model('Post', postSchema);
