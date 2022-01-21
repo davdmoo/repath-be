@@ -32,7 +32,6 @@ beforeAll(async () => {
 
     await postModel.create(payload)
 
-   
 });
 
 
