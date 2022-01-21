@@ -35,58 +35,57 @@ beforeAll(async () => {
    
 });
 
-afterAll(async()=>{
-    mongoose.disconnect()
-})
 
 describe("GET /posts", () => {
-    test.only("when user have access token", (done) => {
+    test("when user have access token", (done) => {
         request(app)
         .get('/posts')
         .set('access_token',access_token)
         .then((resp)=>{
-         const result = resp.body
-        //  console.log(result)
-        expect(resp.status).toBe(200)
-        expect(result).toEqual(expect.any(Array))
+            const result = resp.body
+            expect(resp.status).toBe(200)
+            expect(result).toEqual(expect.any(Array))
             done()
         })
         .catch((err)=>{
             done(err)
         })
     })
-
+    
     // describe("when user dont have access token", () => {
-
+        
+        // })
+    })
+    
+    // describe("POST /posts", () =>{
+        //     describe("user input is correct", () => {
+            
+            //     })
+            
+            //     describe("user input is incorrect", () => {
+                
+                //     })
+                // })
+                
+                // describe("PUT /posts", () =>{
+                    //     describe("user input is correct", () => {
+                        
+                        //     })
+                        
+//     describe("user input is incorrect", () => {
+    
+    //     })
     // })
+    
+    // describe("DELETE /posts", () =>{
+        //     describe("user wanted to delete own post", () => {
+            
+            //     })
+            
+            //     describe("user wanted to delete other post", () => {
+                
+                //     })
+                // })
+afterAll(async()=>{
+      await  mongoose.disconnect()
 })
-
-// describe("POST /posts", () =>{
-//     describe("user input is correct", () => {
-
-//     })
-
-//     describe("user input is incorrect", () => {
-
-//     })
-// })
-
-// describe("PUT /posts", () =>{
-//     describe("user input is correct", () => {
-
-//     })
-
-//     describe("user input is incorrect", () => {
-
-//     })
-// })
-
-// describe("DELETE /posts", () =>{
-//     describe("user wanted to delete own post", () => {
-
-//     })
-
-//     describe("user wanted to delete other post", () => {
-
-//     })
-// })

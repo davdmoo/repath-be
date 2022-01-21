@@ -35,6 +35,11 @@ beforeAll(async () => {
    
 });
 
+
+
+afterAll(async()=>{
+    await mongoose.disconnect()
+})
 describe("GET /likes", () => {
     describe("when user have access token", () => {
         test("user cannot access likes section", (done) => {
