@@ -10,9 +10,7 @@ const likeSchema = new Schema({
   postId: {
     type: ObjectId,
     ref: "Post"
-  },
-  firstName: String,
-  imgUrl: String
+  }
 });
 
 const likeModel = mongoose.model("Like", likeSchema);

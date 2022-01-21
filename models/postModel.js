@@ -7,7 +7,9 @@ const postSchema = new Schema({
     type:String,
     required:[true, "Please Pick Type of Post"],
   },
-  text: String,
+  text: {
+    type: String,
+  },
   imgUrl: String,
   location: String,
   title: String,
