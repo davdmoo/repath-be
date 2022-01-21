@@ -33,11 +33,13 @@ class Like{
             const post = await postModel.findOne(ObjectId(postId));
             if (!post) throw { name: "NotFound" };
 
-            const likes = await likeModel.find({ post: postId });
+            const likes = await likeModel.find({postId});
 
-            // likes.forEach(like => {
-            //   if (like.userId.toString() === userId.toString()) throw { name: "LikeTwice" };
-            // });
+            likes.forEach(like => {
+              if (like.userId.toString() === userId.toString()) { 
+                throw { name: "LikeTwice" }
+              };
+            });
 
             const user = await userModel.findById(userId);
             let likeBody = { userId, postId, firstName: user.firstName };

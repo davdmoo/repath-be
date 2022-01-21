@@ -24,11 +24,9 @@ class Fetch {
                 music.imageAlbum = el.album.cover_big
                 tampung.push(music)
             })
-            console.log(limit, `AAAAAAA`)
             res.status(200).json(tampung)
 
         } catch (err) {
-            console.log(err, `KNAPA GA KE FETCH`);
             next(err);
         }
     }
@@ -49,10 +47,9 @@ class Fetch {
                 city.placeName = el.place_name
                 tampung.push(city)
             })
-            console.log(data.features, `AAAAAAA`)
+            
             res.status(200).json(tampung)
         } catch (err) {
-            console.log(err, `KNAPA GA KE FETCH`);
             next(err);
         }
     }

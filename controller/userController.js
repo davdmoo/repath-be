@@ -1,5 +1,4 @@
 const userModel = require('../models/userModel');
-const postModel = require('../models/postModel');
 const jwt = require("jsonwebtoken");
 // const secretKey = process.env.SECRETKEY;
 
@@ -7,7 +6,6 @@ class User {
     static async findUsers(req, res, next){
         try{
             const users = await userModel.find().exec()
-            console.log(req.user);
 
             res.status(200).json(users)
         }catch(err){
@@ -86,11 +84,11 @@ class User {
             if(id == req.user.id){
                 res.status(403).json("you cannot delete other user")
             }
-            await postModel.deleteMany({userId: id})
+            
             const deletedUser = await userModel.find({_id: id}).exec()
             await userModel.deleteOne({_id: id})
 
-            res.status(201).json(deletedUser)
+            res.status(200).json(deletedUser)
         }catch(err){
             next(err)
         }

@@ -14,7 +14,7 @@ class Post {
               filter.push(friend.following)
             });
 
-            const posts = await postModel.find().populate([{ path: "likes", populate: "userId" }, { path: "comments", populate: "userId" }, { path: "userId" }]);
+            const posts = await postModel.find().sort({ created_at: -1 }).populate([{ path: "likes", populate: "userId" }, { path: "comments", populate: "userId" }, { path: "userId" }]);
             // const posts = await postModel.find().populate([{ path: "likes" }, { path: "comments" }, { path: "userId" }]);
             // let filterLikes = [];
             // posts.forEach(post => {
@@ -34,8 +34,8 @@ class Post {
         }
     }
 
-    static async addPost(req, res,next){
-        try{
+    static async addPost(req, res,next) {
+        try {
             const {type,text,imgUrl,location,title,artist,imageAlbum,albumName} = req.body
             const userId = req.user.id
             let payload = {
@@ -56,9 +56,6 @@ class Post {
                 payload.imageAlbum = imageAlbum
                 payload.albumName = albumName
             }
-            else {
-                throw {name : "NoInput"}
-            }
 
             const user = await userModel.findById(userId);
             payload.firstName = user.firstName;
@@ -78,44 +75,47 @@ class Post {
 
             res.status(201).json(newPost);
         } catch(err){
-
             next(err)
         }
     }
 
-    static async findPost(req, res) {
+    static async findPost(req, res, next) {
         try {
             const id = req.params.id
             const Post = await postModel.findOne({_id: id}).exec()
 
             res.status(200).json(Post)
-        }catch(err){
-            res.status(500).json(err)
+        }catch(err) {
+            next(err);
         }
     }
 
-    static async editPost(req, res){
-        try{
-            const id = req.params.id
+    static async editPost(req, res, next){
+        try {
+            const id = req.params.id;
+            const post = await postModel.findById(id);
+            if (!post) throw { name: "NotFound" };
             
-            await postModel.updateOne({_id: id}, req.body)
-            const updatedPost = await postModel.find({_id: id}).exec()
+            await postModel.updateOne({_id: id}, req.body);
+            const updatedPost = await postModel.findById(id).exec();
 
-            res.status(200).json(updatedPost)
-        }catch(err){
-            res.status(500).json(err)
+            res.status(200).json(updatedPost);
+        } catch(err) {
+            next(err);
         }
     }
 
-    static async deletePost(req, res){
+    static async deletePost(req, res, next){
         try{
-            const id = req.params.id
-            const deletedPost = await postModel.find({_id: id}).exec()
-            await postModel.deleteOne({_id: id})
+            const id = req.params.id;
+            const post = await postModel.find({_id: id}).exec();
+            if (!post) throw { name: "NotFound" };
 
-            res.status(201).json(deletedPost)
-        }catch(err){
-            res.status(500).json(err)
+            await postModel.deleteOne({_id: id});
+
+            res.status(200).json(post);
+        }catch(err) {
+            next(err);
         }
     }
 

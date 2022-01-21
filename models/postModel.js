@@ -29,7 +29,12 @@ const postSchema = new Schema({
     ref: "Like",
   }],
   albumName : String
+},
+{ 
+  timestamps: { createdAt: 'created_at' } 
 });
+
+
 
 postSchema.plugin(uniqueValidator)
 const postModel = mongoose.model('Post', postSchema);
