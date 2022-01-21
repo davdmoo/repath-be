@@ -9,22 +9,26 @@ class Post {
         try {
             let filter = [];
             const friends = await followModel.find({ follower: req.user.id });
+            // const friends = await friendModel.find().populate("user");
             friends.forEach(friend => {
               filter.push(friend.following)
             });
 
-            const posts = await postModel.find({ userId: filter }).populate([{ path: "likes" }, { path: "comments" }]);
-            let filterLikes = [];
-            posts.forEach(post => {
-              filterLikes.push(post._id)
-            })
+            const posts = await postModel.find().populate([{ path: "likes", populate: "userId" }, { path: "comments", populate: "userId" }, { path: "userId" }]);
+            // const posts = await postModel.find().populate([{ path: "likes" }, { path: "comments" }, { path: "userId" }]);
+            // let filterLikes = [];
+            // posts.forEach(post => {
+            //   filterLikes.push(post._id)
+            // });
 
-            let payload = [posts];
-            const likes = await likeModel.find({ postId: filterLikes });
+            // let payload = [posts];
+            // const likes = await likeModel.find({ postId: filterLikes });
 
-            payload.push(likes);
+            // payload.push(likes);
+            // console.log(likes);
 
-            res.status(200).json(payload);
+            // res.status(200).json(payload);
+            res.status(200).json(posts);
         } catch(err){
             next(err);
         }
@@ -37,7 +41,8 @@ class Post {
             let payload = {
                 type,
                 userId,
-            } 
+            }
+            
             if (type === 'text' && text) {
                payload.text = text
                payload.imgUrl = imgUrl
@@ -54,7 +59,14 @@ class Post {
             else {
                 throw {name : "NoInput"}
             }
-           
+
+            const user = await userModel.findById(userId);
+            payload.firstName = user.firstName;
+
+            if (user.imgUrl) {
+              likeBody.imgUrl = user.imgUrl;
+            };
+           console.log(payload);
             const newPost = await postModel.create(payload);
 
             await userModel.findOneAndUpdate({_id: userId},

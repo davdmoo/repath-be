@@ -10,15 +10,6 @@ const likesRoutes = require('./routes/likesRoutes')
 const errorHandler = require("./middlewares/errorHandler");
 const fetchRoutes = require('./routes/fetchroutes')
 
-const mongoDB = process.env.MONGO_URI;
-mongoose.connect(mongoDB, {useNewUrlParser: true, useUnifiedTopology: true}, (err) => {
-    if(err) {
-        console.log(err)
-    } else {
-        console.log("connected")
-    }
-})
-
 app.use(express.urlencoded({extended: true}))
 app.use(express.json())
 
