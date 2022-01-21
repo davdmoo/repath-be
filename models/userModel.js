@@ -7,25 +7,25 @@ const bcrypt = require("bcryptjs");
 const userSchema = new Schema({
   firstName:   {
     type: String,
-    required: [true, "Please Input First Name"],
+    required: [true, "Please input first name"],
   },
   lastName: {
     type: String,
-    required: [true, "Please Input Last Name"],
+    required: [true, "Please input last name"],
   },
   email: {
     type: String,
     unique: [true, "Email must be unique"],
     sparse: true,
-    required: [true, "Please Input Email"]
+    required: [true, "Please input email"]
   },
   password: {
     type: String,
-    required:[true, 'Please Input Password'],
+    required:[true, 'Please input password'],
   },
   username:  {
     type: String,
-    required: [true, 'Please Input Username'],
+    required: [true, 'Please input username'],
     unique: true,
     sparse: true
   },

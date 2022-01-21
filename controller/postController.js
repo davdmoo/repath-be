@@ -56,9 +56,6 @@ class Post {
                 payload.imageAlbum = imageAlbum
                 payload.albumName = albumName
             }
-            else {
-                throw {name : "NoInput"}
-            }
 
             const user = await userModel.findById(userId);
             payload.firstName = user.firstName;
