@@ -8,14 +8,14 @@ const mongoose = require('../config/monggoConfig');
 let access_token 
 
 beforeAll(async () => {
-    await userModel.deleteOne({   email: "test@mail.com" })
+    await userModel.deleteOne({ email: "test3@mail.com" })
    
     const userPayload = {
         firstName: "test",
         lastName: "test",
-        email: "test@mail.com",
+        email: "test3@mail.com",
         password: "12345",
-        username: "test",
+        username: "test3",
         city: "test",
         phoneNumber :"1234455"
     }
@@ -52,10 +52,21 @@ describe("GET /posts", () => {
         })
     })
     
-    // describe("when user dont have access token", () => {
-        
-        // })
+    test("when user dont have access token", (done) => {
+        request(app)
+        .get('/posts')
+        .then((resp) => {
+            const result = resp.body
+            expect(resp.status).toBe(401)
+            expect(result).toEqual(expect.any(Object))
+            expect(result).toHaveProperty("message", "Access token not found")
+            done()
+        })
+        .catch(err => {
+            done(err)
+        })
     })
+})
     
     // describe("POST /posts", () =>{
         //     describe("user input is correct", () => {
