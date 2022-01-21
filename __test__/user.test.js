@@ -3,14 +3,6 @@ const request = require('supertest');
 const app = require('../app.js')
 const mongoose = require('mongoose');
 
-const mongoDB = "http://localhost:127017/test";
-mongoose.connect(mongoDB, {useNewUrlParser: true, useUnifiedTopology: true}, (err) => {
-    if(err) {
-        console.log(err)
-    } else {
-        console.log("connected")
-    }
-})
 beforeAll(async () => {
 });
 
