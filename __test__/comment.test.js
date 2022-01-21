@@ -1,7 +1,13 @@
 const postModel = require('../models/postModel');
 const request = require('supertest');
 const app = require('../app.js')
-const mongoose = require('mongoose');
+const mongoose = require('../config/monggoConfig');
+
+
+
+afterAll(async()=>{
+  await  mongoose.disconnect()
+})
 
 describe("GET /comments", () => {
     describe("when user have access token", () => {
