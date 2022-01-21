@@ -1,5 +1,5 @@
 const { ObjectId } = require('mongodb');
-const mongoose = require('mongoose');
+const mongoose = require('../config/monggoConfig');
 const { Schema } = mongoose;
 const uniqueValidator = require('mongoose-unique-validator');
 const bcrypt = require("bcryptjs");
