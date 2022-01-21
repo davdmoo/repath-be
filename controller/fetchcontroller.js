@@ -47,6 +47,7 @@ class Fetch {
                 city.placeName = el.place_name
                 tampung.push(city)
             })
+            
             res.status(200).json(tampung)
         } catch (err) {
             next(err);

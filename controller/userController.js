@@ -87,7 +87,7 @@ class User {
             const deletedUser = await userModel.find({_id: id}).exec()
             await userModel.deleteOne({_id: id})
 
-            res.status(201).json(deletedUser)
+            res.status(200).json(deletedUser)
         }catch(err){
             next(err)
         }
