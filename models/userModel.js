@@ -3,37 +3,39 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 const uniqueValidator = require('mongoose-unique-validator');
 const bcrypt = require("bcryptjs");
-const { postSchema } = require('./postModel');
 
-// tambahin validasi required di semua
 const userSchema = new Schema({
   firstName:   {
-    type:String,
-    required:[true, "Please Input First Name"],
+    type: String,
+    required: [true, "Please Input First Name"],
   },
   lastName: {
-    type:String,
-    required:[true, "Please Input Last Name"],
+    type: String,
+    required: [true, "Please Input Last Name"],
   },
   email: {
     type: String,
     unique: true,
+    sparse: true,
     required: [true, "Please Input Email"]
   },
   password: {
-    type:String,
+    type: String,
     required:[true, 'Please Input Password'],
   },
   username:  {
-    type:String,
-    required:[true, 'Please Input Username'],
-    unique: true
+    type: String,
+    required: [true, 'Please Input Username'],
+    unique: true,
+    sparse: true
   },
   phoneNumber: {
-    type:String
+    type: String,
+    required: [true, 'Please input phone number']
   },
   city:{ 
-    type:String
+    type: String,
+    required: [true, 'Please input city']
   },
   posts : [{
     type: ObjectId,
