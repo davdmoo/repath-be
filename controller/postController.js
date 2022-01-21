@@ -14,7 +14,7 @@ class Post {
               filter.push(friend.following)
             });
 
-            const posts = await postModel.find().populate([{ path: "likes", populate: "userId" }, { path: "comments", populate: "userId" }, { path: "userId" }]);
+            const posts = await postModel.find().sort({ created_at: -1 }).populate([{ path: "likes", populate: "userId" }, { path: "comments", populate: "userId" }, { path: "userId" }]);
             // const posts = await postModel.find().populate([{ path: "likes" }, { path: "comments" }, { path: "userId" }]);
             // let filterLikes = [];
             // posts.forEach(post => {
