@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const postModel = require('../models/postModel');
 const commentModel = require('../models/commentModel');
 const userModel = require('../models/userModel.js');
+const { ObjectId } = require('mongodb');
 
 let access_token 
 let thePost
@@ -33,8 +34,8 @@ beforeAll(async () => {
     } 
 
     await postModel.create(payload)
-    
-    post
+
+    thePost = await postModel.findOne({type: "text", title: "text 1"}).exec()
 })
 
 afterAll(async()=>{
@@ -42,10 +43,11 @@ afterAll(async()=>{
 })
 
 describe("GET /comments", () => {
+    const postId = ObjectId(thePost._id)
     describe("when user have access token", () => {
         test("user cannot access comment section", (done) => {
             request(app)
-            .get("/comments")
+            .get(`/comments/${postId}`)
             .set('access_token', null)
             .then((resp) => {
                 const result = resp.body
@@ -64,14 +66,17 @@ describe("GET /comments", () => {
     describe("when user dont have access token", () => {
         test("user can access and see comment section", (done) => {
             request(app)
-            .get(`/comments/${}`)
+            .get(`/comments/${postId}`)
             .set('access_token', access_token)
             .then((resp) => {
                 const result = resp.body
-                console.log(result, "==========", resp);
+                expect(resp.statusCode).toBe(200)
+                expect(result).toEqual(expect.arrayContaining(result))
                 done()
             })
-            // expect(result.status).toBe(200)
+            .catch((err)=> {
+                done(err)
+            })
         })
     })
 })

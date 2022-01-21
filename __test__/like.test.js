@@ -31,26 +31,29 @@ beforeAll(async () => {
         title: "text 1"
     } 
 
-    thePost = await postModel.create(payload)
-   
-});
+    await postModel.create(payload)
 
+    thePost = await postModel.findOne({type: "text", title: "text 1"}).exec()
+});
 
 
 afterAll(async()=>{
     await mongoose.disconnect()
 })
+
 describe("GET /likes", () => {
+    const postId = ObjectId(thePost._id)
     describe("when user have access token", () => {
         test("user cannot access likes section", (done) => {
             request(app)
-            .get('/likes')
+            .get(`/likes/`)
             .set('access_token', null)
             .then((resp)=>{
-            const result = resp.body
-            //  console.log(result)
-            expect(resp.status).toBe(200)
-            expect(result).toEqual(expect.any(Array))
+                const result = resp.body
+                console.log(result);
+                expect(resp.statusCode).toBe(401)
+                expect(resp.res.statusMessage).toMatch("Unauthorized")
+                expect(result).toMatchObject({"message": 'Invalid token'})
                 done()
             })
             .catch((err)=>{
@@ -59,23 +62,22 @@ describe("GET /likes", () => {
         })
     })
 
-    // describe("when user dont have access token", () => {
-    //     test("user cannot access likes section", (done) => {
-    //         request(app)
-    //         .get('/likes')
-    //         .set('access_token',access_token)
-    //         .then((resp)=>{
-    //         const result = resp.body
-    //         //  console.log(result)
-    //         expect(resp.status).toBe(200)
-    //         expect(result).toEqual(expect.any(Array))
-    //             done()
-    //         })
-    //         .catch((err)=>{
-    //             done(err)
-    //         })
-    //     })
-    // })
+    describe("when user dont have access token", () => {
+        test("user can access likes section", (done) => {
+            request(app)
+            .get(`/likes/${postId}`)
+            .set('access_token', access_token)
+            .then((resp)=>{
+                const result = resp.body
+                expect(resp.statusCode).toBe(200)
+                expect(result).toEqual(expect.arrayContaining(result))
+                done()
+            })
+            .catch((err)=>{
+                done(err)
+            })
+        })
+    })
 })
 
 // describe("POST /likes", () =>{
