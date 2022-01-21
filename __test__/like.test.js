@@ -54,23 +54,23 @@ describe("GET /likes", () => {
         })
     })
 
-    describe("when user dont have access token", () => {
-        test("user cannot access likes section", (done) => {
-            request(app)
-            .get('/likes')
-            .set('access_token',access_token)
-            .then((resp)=>{
-            const result = resp.body
-            //  console.log(result)
-            expect(resp.status).toBe(200)
-            expect(result).toEqual(expect.any(Array))
-                done()
-            })
-            .catch((err)=>{
-                done(err)
-            })
-        })
-    })
+    // describe("when user dont have access token", () => {
+    //     test("user cannot access likes section", (done) => {
+    //         request(app)
+    //         .get('/likes')
+    //         .set('access_token',access_token)
+    //         .then((resp)=>{
+    //         const result = resp.body
+    //         //  console.log(result)
+    //         expect(resp.status).toBe(200)
+    //         expect(result).toEqual(expect.any(Array))
+    //             done()
+    //         })
+    //         .catch((err)=>{
+    //             done(err)
+    //         })
+    //     })
+    // })
 })
 
 // describe("POST /likes", () =>{

@@ -32,10 +32,14 @@ beforeAll(async () => {
         title: "text 1"
     } 
 
-    thePost = await postModel.create(payload)
+    await postModel.create(payload)
+    
+    post
+})
 
-   
-});
+afterAll(async()=>{
+    mongoose.disconnect()
+})
 
 describe("GET /comments", () => {
     describe("when user have access token", () => {
@@ -47,8 +51,8 @@ describe("GET /comments", () => {
                 const result = resp.body
                 console.log(result);
                 expect(resp.statusCode).toBe(401)
-                expect(resp.statusMessage).toBe("Unauthorized")
-                expect(resp.text).toBe({"message": 'Invalid token'})
+                expect(resp.res.statusMessage).toMatch("Unauthorized")
+                expect(result).toMatchObject({"message": 'Invalid token'})
                 done()
             })
             .catch((err) => {
@@ -60,11 +64,11 @@ describe("GET /comments", () => {
     describe("when user dont have access token", () => {
         test("user can access and see comment section", (done) => {
             request(app)
-            .get("/comments")
+            .get(`/comments/${}`)
             .set('access_token', access_token)
             .then((resp) => {
                 const result = resp.body
-                console.log(result);
+                console.log(result, "==========", resp);
                 done()
             })
             // expect(result.status).toBe(200)
@@ -137,7 +141,3 @@ describe("GET /comments", () => {
 //         })
 //     })
 // })
-
-afterAll(async()=>{
-    mongoose.disconnect()
-})

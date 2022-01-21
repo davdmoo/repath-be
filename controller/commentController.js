@@ -25,7 +25,7 @@ class Comment{
             if (!post) throw { name: "NotFound" };
 
             const user = await userModel.findById(userId);
-            let commentBody = { userId, postId, content, firstName: user.firstName };
+            let commentBody = { userId, postId, content };
             if (user.imgUrl) {
               commentBody.imgUrl = user.imgUrl;
             };
