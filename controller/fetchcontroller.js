@@ -24,11 +24,9 @@ class Fetch {
                 music.imageAlbum = el.album.cover_big
                 tampung.push(music)
             })
-            console.log(limit, `AAAAAAA`)
             res.status(200).json(tampung)
 
         } catch (err) {
-
             next(err);
         }
     }

@@ -24,6 +24,13 @@ class Comment{
             const post = await postModel.findOne(ObjectId(postId));
             if (!post) throw { name: "NotFound" };
 
+
+            const user = await userModel.findById(userId);
+            let commentBody = { userId, postId, content };
+            if (user.imgUrl) {
+              commentBody.imgUrl = user.imgUrl;
+            };
+
             const newComment = await commentModel.create({ userId, postId, content });
 
             await postModel.findOneAndUpdate({_id: postId},
@@ -35,7 +42,6 @@ class Comment{
 
             res.status(201).json(newComment);
         } catch(err) {
-
             next(err);
         }
     }
