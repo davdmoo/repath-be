@@ -10,7 +10,10 @@ const likesRoutes = require('./routes/likesRoutes')
 const errorHandler = require("./middlewares/errorHandler");
 const authentication = require("./middlewares/authentication");
 const fetchRoutes = require('./routes/fetchroutes')
+const cors = require("cors");
+const mongoConnection = require("./config/monggoConfig");
 
+app.use(cors());
 app.use(express.urlencoded({extended: true}))
 app.use(express.json())
 
