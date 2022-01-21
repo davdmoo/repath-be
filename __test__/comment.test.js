@@ -1,5 +1,7 @@
-import supertest from "supertest";
-import app from "../app";
+const postModel = require('../models/postModel');
+const request = require('supertest');
+const app = require('../app.js')
+const mongoose = require('mongoose');
 
 describe("GET /comments", () => {
     describe("when user have access token", () => {
