@@ -1,5 +1,5 @@
 const { ObjectId } = require('mongodb');
-const mongoose = require('../config/monggoConfig');
+const mongoose = require('mongoose');
 const { Schema } = mongoose;
 const uniqueValidator = require('mongoose-unique-validator');
 const bcrypt = require("bcryptjs");
@@ -15,7 +15,7 @@ const userSchema = new Schema({
   },
   email: {
     type: String,
-    unique: true,
+    unique: [true, "Email must be unique"],
     sparse: true,
     required: [true, "Please Input Email"]
   },

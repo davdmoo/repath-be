@@ -2,6 +2,11 @@ const errorHandler = (err, req, res, next) => {
     console.log(err, "ERROR HANDLER");
     // validation di mongoose: err.errors -> cek pathnya (ct. email/username/pass) -> masuk properties -> message
     // ct. err.errors.email.properties.message
+    // if (err.errors) {
+    //   if (err.errors.email) res.status(400).json({ message: err.errors.email.properties.message });
+    //   else if (err.errors.username) res.status(400).json({ message: err.errors.username.properties.message });
+    //   else if (err.errors.password) res.status(400).json({ message: err.errors.password.properties.message })
+    // }
     switch (err.name) {
         case "EmailRequired":
             res.status(400).json({ message: "Email is required" })
