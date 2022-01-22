@@ -8,6 +8,7 @@ class Comment{
         try {
             const { postId } = req.params;
             const comments = await commentModel.find({ postId }).exec();
+            if (!comments) throw { name: "NotFound" };
 
             res.status(200).json(comments);
         } catch(err){
@@ -51,6 +52,7 @@ class Comment{
         try {
             const id = req.params.id
             const comment = await commentModel.findOne({_id: id}).exec()
+            if (!comment) throw { name: "NotFound" };
 
             res.status(200).json(comment)
         } catch(err){
@@ -61,7 +63,10 @@ class Comment{
     static async editComment(req, res, next) {
         try{
             const id = req.params.id
-            
+
+            const comment = await commentModel.findOne({_id: id})
+            if (!comment) throw { name: "NotFound" };
+
             await commentModel.updateOne({_id: id}, req.body)
             const updatedComment = await commentModel.find({_id: id}).exec()
 
@@ -77,6 +82,7 @@ class Comment{
             
             const deletedComment = await commentModel.findById(id).exec();
             if (!deletedComment) throw { name: "NotFound" };
+            
             await commentModel.deleteOne({_id: id});
 
             await postModel.findOneAndUpdate({_id: deletedComment.postId},
