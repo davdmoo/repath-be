@@ -491,30 +491,5 @@ describe("PUT /users", () =>{
     })
 
 
-    test("failed update others account", (done) => {
-        const user_three_id = user_three._id.toString()
-        console.log(user_three_id, `AAAAAAAAAAAA`)
-        request(app)
-        .put(`/users/${user_three_id}`)
-        .send({
-            firstName: "testone",
-            lastName: "testone",
-            username: "testone",
-            city: "testone",
-            phoneNumber :"1234455"
-        })
-        .set('access_token',access_token_two)
-        .then((resp)=>{
-            const result = resp.body
-            // expect(resp.status).toBe(200)
-            // expect(result).toEqual(expect.any(Array))
-            // expect(result[0]).toEqual(expect.any(Object))
-            console.log(result,`NANIIIII`)
-            done()
-        })
-        .catch((err)=>{
-            done(err)
-        })
-    })
 
 })

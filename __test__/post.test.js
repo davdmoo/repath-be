@@ -4,34 +4,56 @@ const request = require('supertest');
 const app = require('../app.js')
 const jwt = require("jsonwebtoken");
 const mongoose = require('../config/monggoConfig');
+const secretKey = process.env.SECRETKEY;
 
 let access_token;
+let dummyAccToken;
 let post;
+let dummyPost;
+let user;
+let dummyUser;
 
 beforeAll(async () => {
     await userModel.deleteOne({ email: "test3@mail.com" });
     await postModel.deleteOne({ text: "test1" });
-   
-    const userPayload = {
-        firstName: "test",
-        lastName: "test",
-        email: "test3@mail.com",
-        password: "12345",
-        username: "test3",
-        city: "test",
-        phoneNumber :"1234455"
+    await userModel.deleteOne({ email: "test113@mail.com" });
+    await postModel.deleteOne({ text: "post to delete" });
+
+    
+    const dummyUserPayload = {
+      firstName: "test 11",
+      lastName: "test 11",
+      email: "test113@mail.com",
+      password: "12345",
+      username: "test311",
+      city: "test11",
+      phoneNumber :"1234455"
     }
-    const user = await userModel.create(userPayload)
+    dummyUser = await userModel.create(dummyUserPayload);
+    const dummyPayload = { email: dummyUser.email };
+    dummyAccToken = jwt.sign(dummyPayload, secretKey);
+    
+    const userPayload = {
+      firstName: "test",
+      lastName: "test",
+      email: "test3@mail.com",
+      password: "12345",
+      username: "test3",
+      city: "test",
+      phoneNumber :"1234455"
+    }
+    user = await userModel.create(userPayload)
     const payloadJwt = { email: user.email };
-    access_token = jwt.sign(payloadJwt, "repathkeren");
+    access_token = jwt.sign(payloadJwt, secretKey);
     
     await postModel.deleteOne().or([{ text: "text 1" }, { text: "text 2" }]);
     let payload = {
-        type : "text",
-        userId: user._id,
-        text: "text 1"
+      type : "text",
+      userId: user._id,
+      text: "text 1"
     } 
-
+    
+    dummyPost = await postModel.create({ type: "text", text: "post to delete", userId: user._id });
     post = await postModel.create(payload);
 });
 
@@ -177,19 +199,127 @@ describe("PUT /posts", () =>{
     })
 
     describe("user input is incorrect", () => {
+        test("no access token", (done) => {
+          const postId = post._id;
+          request(app)
+          .put(`/posts/${postId}`)
+          .send({
+            text: "text 2"
+          })
+            .then((response) => {
+              const { body, status } = response;
+              expect(status).toBe(401);
+              expect(body).toEqual(expect.any(Object));
+              expect(body).toHaveProperty("message", "Access token not found");
 
+              done();
+            })
+            .catch((err) => {
+              done(err);
+            });
+        });
+
+        test("post not found", (done) => {
+          const postId = "61ebac652645ef3ccfbc680g";
+          request(app)
+          .put(`/posts/${postId}`)
+          .set("access_token", access_token)
+          .send({
+            text: "text 2"
+          })
+            .then((response) => {
+              const { body, status } = response;
+              expect(status).toBe(404);
+              expect(body).toEqual(expect.any(Object));
+              expect(body).toHaveProperty("message", "Content not found");
+
+              done();
+            })
+            .catch((err) => {
+              done(err);
+            });
+        })
+
+        test("forbidden access", (done) => {
+          request(app)
+          .put(`/posts/${post._id}`)
+          .set("access_token", dummyAccToken)
+          .send({
+            text: "text 2"
+          })
+            .then((response) => {
+              const { body, status } = response;
+              expect(status).toBe(403);
+              expect(body).toEqual(expect.any(Object));
+              expect(body).toHaveProperty("message", "Forbidden access");
+
+              done();
+            })
+            .catch((err) => {
+              done(err);
+            });
+        })
     })
 })
-    
-    // describe("DELETE /posts", () =>{
-        //     describe("user wanted to delete own post", () => {
-            
-            //     })
-            
-            //     describe("user wanted to delete other post", () => {
-                
-                //     })
-                // })
+
+describe("DELETE /posts", () =>{
+    describe("delete failed", () => {
+      test("forbidden access", (done) => {
+        request(app)
+        .delete(`/posts/${post._id}`)
+        .set("access_token", dummyAccToken)
+          .then((response) => {
+            const { body, status } = response;
+            expect(status).toBe(403);
+            expect(body).toEqual(expect.any(Object));
+            expect(body).toHaveProperty("message", "Forbidden access");
+
+            done();
+          })
+          .catch((err) => {
+            done(err);
+          })
+      })
+
+      test("post not found", (done) => {
+        const postId = "61ebac652645ef3ccfbc680g";
+        request(app)
+        .delete(`/posts/${postId}`)
+        .set("access_token", access_token)
+          .then((response) => {
+            const { body, status } = response;
+            expect(status).toBe(404);
+            expect(body).toEqual(expect.any(Object));
+            expect(body).toHaveProperty("message", "Content not found");
+
+            done();
+          })
+          .catch((err) => {
+            done(err);
+          })
+      })
+    })
+
+    describe("delete success", () => {
+      test("delete success", (done) => {
+        request(app)
+        .delete(`/posts/${post._id}`)
+        .set("access_token", access_token)
+          .then((response) => {
+            const { body, status } = response;
+            expect(status).toBe(200);
+            expect(body).toEqual(expect.any(String));
+            expect(body).toEqual("You have deleted the post");
+
+            done();
+          })
+          .catch((err) => {
+            done(err);
+          })
+      })
+    })
+})
+
 afterAll(async()=>{
       await  mongoose.disconnect()
 })

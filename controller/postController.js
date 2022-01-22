@@ -85,9 +85,12 @@ class Post {
 
     static async editPost(req, res, next){
         try {
-            const id = req.params.id;
+            const { id } = req.params;
+            const userId = req.user.id;
             const post = await postModel.findById(id);
             if (!post) throw { name: "NotFound" };
+
+            if (post.userId.toString() !== userId.toString()) throw { name: "Forbidden" };
             
             await postModel.updateOne({_id: id}, req.body);
             const updatedPost = await postModel.findById(id).exec();
@@ -100,13 +103,16 @@ class Post {
 
     static async deletePost(req, res, next){
         try{
-            const id = req.params.id;
-            const post = await postModel.find({_id: id}).exec();
+            const { id } = req.params;
+            const userId = req.user.id;
+            const post = await postModel.findById(id).exec();
             if (!post) throw { name: "NotFound" };
+            
+            if (post.userId.toString() !== userId.toString()) throw { name: "Forbidden" };
 
             await postModel.deleteOne({_id: id});
 
-            res.status(200).json(post);
+            res.status(200).json(`You have deleted the post`);
         }catch(err) {
             next(err);
         }

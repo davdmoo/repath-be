@@ -14,7 +14,7 @@ class Fetch {
                     'x-rapidapi-key': 'a0fd5fdf04msha9dde7e4ff273a1p10644fjsn1b7f916cb262'
                 }
             })
-            const limit =  data.data.slice(0, 5)
+            const limit =  data.data.slice(0, 10)
             const tampung = []
             limit.map(el=>{
                 const music = {}
