@@ -56,7 +56,7 @@ class Like{
               }
             })
 
-            res.status(201).json(`You have liked this post`);
+            res.status(201).json(like);
         } catch(err){
             next(err);
         }
@@ -99,7 +99,7 @@ class Like{
                 $pull: { likes: id }
             })
 
-            res.status(200).json('You have unliked this');
+            res.status(201).json(like);
         } catch(err){
             next(err)
         }

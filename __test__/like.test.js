@@ -90,6 +90,7 @@ describe("POST /likes", () =>{
         })
         .then((resp) => {
             const result = resp.body
+            like = result
             expect(resp.statusCode).toBe(201)
             expect(resp.res.statusMessage).toMatch("Created")
             // expect(result).objectContaining({
@@ -115,7 +116,6 @@ describe("POST /likes", () =>{
         })
         .then((resp) => {
             const result = resp.body
-            // console.log(resp, "=========<<<<<<");
             expect(resp.statusCode).toBe(401)
             expect(resp.res.statusMessage).toMatch("Unauthorized")
             expect(result).toMatchObject({"message": 'Invalid token'})
@@ -127,27 +127,42 @@ describe("POST /likes", () =>{
     })
 })
 
-// describe("DELETE /likes", () =>{
-//     describe("user wanted to delete own post", () => {
-//         test("user success to delete a likes", async () => {
-//             const response = await request(app).delete("/likes")
-//             .send({
-//                 access_token: null
-//             })
-//             expect(response.statusCode).toBe(200)
-//         })
-//     })
+describe("DELETE /likes", () =>{
+    test("user failed to delete a likes", (done) => {
+        let postId = thePost._id.toString()
+        let likeId = like._id.toString()
+        request(app)
+        .delete(`/likes/${postId}/${likeId}`)
+        .set('access_token', null)
+        .then((resp) => {
+            const result = resp.body
+            expect(resp.statusCode).toBe(401)
+            expect(resp.res.statusMessage).toMatch("Unauthorized")
+            expect(result).toMatchObject({"message": 'Invalid token'})
+            done()
+        })
+        .catch((err) => {
+            done(err)
+        })
+    })
 
-//     describe("user wanted to delete other post", () => {
-//         test("user success to delete a likes", async () => {
-//             const response = await request(app).delete("/likes")
-//             .send({
-//                 access_token: null
-//             })
-//             expect(response.statusCode).toBe(200)
-//         })
-//     })
-// })
+    test("user success to delete a likes", (done) => {
+        let postId = thePost._id.toString()
+        let likeId = like._id.toString()
+        request(app)
+        .delete(`/likes/${likeId}`)
+        .set('access_token', access_token)
+        .then((resp) => {
+            const result = resp.body
+            expect(resp.statusCode).toBe(201)
+            expect(resp.res.statusMessage).toMatch("Created")
+            done()
+        })
+        .catch((err) => {
+            done(err)
+        })
+    })
+})
 
 afterAll(async()=>{
     mongoose.disconnect()
