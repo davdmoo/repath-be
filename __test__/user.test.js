@@ -431,7 +431,7 @@ describe("DELETE /users", () =>{
             .set('access_token',access_token_one)
             .then((resp)=>{
                 const result = resp.body
-                expect(resp.status).toBe(200)
+                expect(resp.status).toBe(201)
                 expect(result).toEqual(expect.any(Array))
                 expect(result[0]).toEqual(expect.any(Object))
                

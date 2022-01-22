@@ -3,6 +3,7 @@ const postModel = require('../models/postModel');
 const likeModel = require('../models/likesModel');
 const followModel = require('../models/followModel');
 const userModel = require('../models/userModel');
+const commentModel = require('../models/commentModel');
 
 class Post {
     static async findPosts(req, res, next){
@@ -107,12 +108,14 @@ class Post {
             const userId = req.user.id;
             const post = await postModel.findById(id).exec();
             if (!post) throw { name: "NotFound" };
-            
+
             if (post.userId.toString() !== userId.toString()) throw { name: "Forbidden" };
 
             await postModel.deleteOne({_id: id});
+            await commentModel.deleteMany({postId: id})
+            await likeModel.deleteMany({postId: id})
 
-            res.status(200).json(`You have deleted the post`);
+            res.status(200).json(post);
         }catch(err) {
             next(err);
         }
