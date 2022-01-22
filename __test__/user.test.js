@@ -2,25 +2,103 @@ const userModel = require('../models/userModel');
 const request = require('supertest');
 const app = require('../app.js')
 const mongoose = require('../config/monggoConfig');
+const jwt = require("jsonwebtoken");
+
+let access_token_one
+let access_token_two 
+let access_token_three
+let user_one
+let user_two
+let user_three
 
 beforeAll(async () => {
     await userModel.deleteOne({   email: "test2@mail.com" })
-    await userModel.deleteOne({   email: "test3@mail.com" })
+    await userModel.deleteOne({   email: "test4@mail.com" })
+    await userModel.deleteOne({   email: "test5@mail.com" })
+    await userModel.deleteOne({   email: "test6@mail.com" })
+
+
+    const userPayloadOne = {
+        firstName: "test4",
+        lastName: "test4",
+        email: "test4@mail.com",
+        password: "12345",
+        username: "test4",
+        city: "test4",
+        phoneNumber :"1234455"
+    }
+
+    const userPayloadTwo = {
+        firstName: "test5",
+        lastName: "test5",
+        email: "test5@mail.com",
+        password: "12345",
+        username: "test5",
+        city: "test5",
+        phoneNumber :"1234455"
+    }
+
+
+    const userPayloadThree = {
+        firstName: "test6",
+        lastName: "test6",
+        email: "test6@mail.com",
+        password: "12345",
+        username: "test6",
+        city: "test6",
+        phoneNumber :"1234455"
+    }
+
+
+    user_one = await userModel.create(userPayloadOne)
+    const payloadJWT_ONE = { email: user_one.email };
+    access_token_one = jwt.sign(payloadJWT_ONE, "repathkeren");
+
+    user_two = await userModel.create(userPayloadTwo)
+    const payloadJWT_TWO = { email: user_two.email };
+    access_token_two = jwt.sign(payloadJWT_TWO, "repathkeren");
+  
+    user_three = await userModel.create(userPayloadThree)
+    const payloadJWT_THREE = { email: user_three.email };
+    access_token_two = jwt.sign(payloadJWT_THREE, "repathkeren");
 });
+
 
 afterAll(async()=>{
    await  mongoose.disconnect()
 })
 
-// describe("GET /users", () => {
-//     describe("when user have access token", () => {
-       
-//     })
+describe("GET /users", () => {
+    test("success get all user", (done) => {
+        request(app)
+        .get('/users')
+        .set('access_token',access_token_one)
+        .then((resp)=>{
+            const result = resp.body
+            expect(resp.status).toBe(200)
+            expect(result).toEqual(expect.any(Array))
+            done()
+        })
+        .catch((err)=>{
+            done(err)
+        })
+    })
 
-//     describe("when user dont have access token", () => {
-
-//     })
-// })
+    test("failed no access_token", (done) => {
+        request(app)
+        .get('/users')
+        .then((resp)=>{
+            const result = resp.body
+            expect(resp.status).toBe(401)
+            expect(result).toEqual(expect.any(Object))
+            expect(result).toHaveProperty('message', 'Access token not found')
+            done()
+        })
+        .catch((err)=>{
+            done(err)
+        })
+    })
+})
 
 describe("POST /register", () =>{
     test("success register", (done) => {
@@ -56,13 +134,12 @@ describe("POST /register", () =>{
             lastName: "test",
             email: "test2@mail.com",
             password: "12345",
-            username: "test3",
+            username: "testagnes",
             city: "test",
             phoneNumber :"1234455"
         })
         .then((resp)=>{
             const result = resp.body
-            console.log(result , "NANI ERROR")
             expect(resp.status).toBe(400)
             expect(result).toEqual(expect.any(Object))
             expect(result).toHaveProperty('message')
@@ -80,7 +157,7 @@ describe("POST /register", () =>{
         .send({
             firstName: "test",
             lastName: "test",
-            email: "test3@mail.com",
+            email: "testagnes@mail.com",
             password: "12345",
             username: "test2",
             city: "test",
@@ -103,11 +180,11 @@ describe("POST /register", () =>{
         request(app)
          .post('/users/register')
         .send({     
-            lastName: "test3",
-            email: "test3@mail.com",
+            lastName: "testagnes",
+            email: "testagnes@mail.com",
             password: "12345",
-            username: "test3",
-            city: "tes3",
+            username: "testagnes",
+            city: "testagnes",
             phoneNumber :"1234455"
         })
         .then((resp)=>{
@@ -127,11 +204,11 @@ describe("POST /register", () =>{
         request(app)
          .post('/users/register')
         .send({
-            firstName: "test3",
-            email: "test3@mail.com",
+            firstName: "testagnes",
+            email: "testagnes@mail.com",
             password: "12345",
-            username: "test3",
-            city: "tes3t",
+            username: "testagnes",
+            city: "testagnes",
             phoneNumber :"1234455"
         })
         .then((resp)=>{
@@ -150,11 +227,11 @@ describe("POST /register", () =>{
         request(app)
          .post('/users/register')
         .send({
-            firstName: "test3",
-            lastName: "test3",
+            firstName: "testagnes",
+            lastName: "testagnes",
             password: "12345",
-            username: "test3",
-            city: "test3",
+            username: "testagnes",
+            city: "testagnes",
             phoneNumber :"1234455"
         })
         .then((resp)=>{
@@ -173,11 +250,11 @@ describe("POST /register", () =>{
         request(app)
          .post('/users/register')
         .send({
-            firstName: "test3",
-            lastName: "test3",
-            email: "test3@mail.com",
+            firstName: "testagnes",
+            lastName: "testagnes",
+            email: "testagnes@mail.com",
             username: "test2",
-            city: "test3",
+            city: "testagnes",
             phoneNumber :"1234455"
         })
         .then((resp)=>{
@@ -196,11 +273,11 @@ describe("POST /register", () =>{
         request(app)
          .post('/users/register')
         .send({
-            firstName: "test3",
-            lastName: "test3",
-            email: "test3@mail.com",
+            firstName: "testagnes",
+            lastName: "testagnes",
+            email: "testagnes@mail.com",
             password: "12345",
-            city: "test3",
+            city: "testagnes",
             phoneNumber :"1234455"
         })
         .then((resp)=>{
@@ -219,12 +296,12 @@ describe("POST /register", () =>{
         request(app)
          .post('/users/register')
         .send({
-            firstName: "test3",
-            lastName: "test3",
-            email: "test3@mail.com",
+            firstName: "testagnes",
+            lastName: "testagnes",
+            email: "testagnes@mail.com",
             password: "12345",
-            username: "test3",
-            city: "test3",
+            username: "testagnes",
+            city: "testagnes",
         })
         .then((resp)=>{
             const result = resp.body
@@ -242,11 +319,11 @@ describe("POST /register", () =>{
         request(app)
          .post('/users/register')
         .send({
-            firstName: "test3",
-            lastName: "test3",
-            email: "test3@mail.com",
+            firstName: "testagnes",
+            lastName: "testagnes",
+            email: "testagnes@mail.com",
             password: "12345",
-            username: "test3",
+            username: "testagnes",
             phoneNumber :"1234455"
         })
         .then((resp)=>{
@@ -345,12 +422,74 @@ describe("POST /login", () =>{
     })
 })
 
-// describe("DELETE /users", () =>{
-//     describe("user wanted to delete own account", () => {
+describe("DELETE /users", () =>{
+   
+        test("success delete own account", (done) => {
+            const user_one_id = user_one._id.toString()
+            request(app)
+            .delete(`/users/${user_one_id}`)
+            .set('access_token',access_token_one)
+            .then((resp)=>{
+                const result = resp.body
+                expect(resp.status).toBe(200)
+                expect(result).toEqual(expect.any(Array))
+                expect(result[0]).toEqual(expect.any(Object))
+               
+                done()
+            })
+            .catch((err)=>{
+                done(err)
+            })
+        })
+    
 
-//     })
+        test("failed delete others account", (done) => {
+            const user_one_id = user_one._id.toString()
+            request(app)
+            .delete(`/users/${user_one_id}`)
+            .set('access_token',access_token_two)
+            .then((resp)=>{
+                const result = resp.body
+                expect(resp.status).toBe(403)
+                expect(result).toEqual(expect.any(Object))
+                expect(result).toHaveProperty('message', "you cannot delete other user")
+            
+                done()
+            })
+            .catch((err)=>{
+                done(err)
+            })
+        })
+})
 
-//     describe("user wanted to delete other account", () => {
 
-//     })
-// })
+describe("PUT /users", () =>{
+   
+    test("success update own account", (done) => {
+        const user_two_id = user_two._id.toString()
+        console.log(user_two_id, `AAAAAAAAAAAA`)
+        request(app)
+        .put(`/users/${user_two_id}`)
+        .send({
+            firstName: "testone",
+            lastName: "testone",
+            username: "testone",
+            city: "testone",
+            phoneNumber :"1234455"
+        })
+        .set('access_token',access_token_two)
+        .then((resp)=>{
+            const result = resp.body
+            expect(resp.status).toBe(200)
+            expect(result).toEqual(expect.any(Array))
+            expect(result[0]).toEqual(expect.any(Object))
+            done()
+        })
+        .catch((err)=>{
+            done(err)
+        })
+    })
+
+
+
+})

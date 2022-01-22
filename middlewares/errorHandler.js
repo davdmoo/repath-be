@@ -49,10 +49,12 @@ const errorHandler = (err, req, res, next) => {
             res.status(403).json({ message: "Forbidden access"})
             break;
         default:
+            console.log(err);
             res.status(500).json({ message: "Internal server error" })
             break;
       }
     }
+    
 }
 
 module.exports = errorHandler;

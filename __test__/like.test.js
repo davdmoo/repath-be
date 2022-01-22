@@ -6,8 +6,10 @@ const mongoose = require('mongoose');
 const userModel = require('../models/userModel');
 const { ObjectId } = require("mongodb");
 
-let access_token
-let thePost
+let access_token;
+let thePost;
+let payload;
+let like;
 
 beforeAll(async () => {
     await userModel.deleteOne({   email: "test@mail.com" })
@@ -26,15 +28,14 @@ beforeAll(async () => {
     access_token = jwt.sign(payloadJwt, "repathkeren");
     
     await postModel.deleteOne({  title: "text 1" })
-    let payload = {
+    payload = {
         type : "text",
         userId: user._id,
         title: "text 1"
     } 
 
-    await postModel.create(payload)
-
-    thePost = await postModel.findOne({type: "text", title: "text 1"}).exec()
+    thePost = await postModel.create(payload)
+    console.log(thePost._id.toString(), "<<<<<<<<<<<<<<<<<");
 });
 
 
@@ -43,87 +44,88 @@ afterAll(async()=>{
 })
 
 describe("GET /likes", () => {
-    const postId = ObjectId(thePost._id)
-    describe("when user have access token", () => {
-        test("user cannot access likes section", (done) => {
-            request(app)
-            .get(`/likes/`)
-            .set('access_token', null)
-            .then((resp)=>{
-                const result = resp.body
-                console.log(result);
-                expect(resp.statusCode).toBe(401)
-                expect(resp.res.statusMessage).toMatch("Unauthorized")
-                expect(result).toMatchObject({"message": 'Invalid token'})
-                done()
-            })
-            .catch((err)=>{
-                done(err)
-            })
+    test("user cannot access likes section", (done) => {
+        const postId = thePost._id.toString()
+        request(app)
+        .get(`/likes/${postId}`)
+        .set('access_token', null)
+        .then((resp)=>{
+            const result = resp.body
+            console.log(result);
+            expect(resp.statusCode).toBe(401)
+            expect(resp.res.statusMessage).toMatch("Unauthorized")
+            expect(result).toMatchObject({"message": 'Invalid token'})
+            done()
+        })
+        .catch((err)=>{
+            done(err)
         })
     })
 
-    describe("when user dont have access token", () => {
-        test("user can access likes section", (done) => {
-            request(app)
-            .get(`/likes/${postId}`)
-            .set('access_token', access_token)
-            .then((resp)=>{
-                const result = resp.body
-                expect(resp.statusCode).toBe(200)
-                expect(result).toEqual(expect.arrayContaining(result))
-                done()
-            })
-            .catch((err)=>{
-                done(err)
-            })
+    test("user can access likes section", (done) => {
+        const postId = thePost._id.toString()
+        request(app)
+        .get(`/likes/${postId}`)
+        .set('access_token', access_token)
+        .then((resp)=>{
+            const result = resp.body
+            expect(resp.statusCode).toBe(200)
+            expect(result).toEqual(expect.arrayContaining(result))
+            done()
+        })
+        .catch((err)=>{
+            done(err)
         })
     })
 })
 
-// describe("POST /likes", () =>{
-//     describe("user input is correct", () => {
-//         test("user success to make a likes", async () => {
-//             const response = await request(app).post("/likes")
-//             .send({
-//                 access_token: null
-//             })
-//             expect(response.statusCode).toBe(201)
-//         })
-//     })
+describe("POST /likes", () =>{
+    test("user succes to make a likes with access token", (done) => {
+        let postId = thePost._id.toString()
+        request(app)
+        .post(`/likes/${postId}`)
+        .set('access_token', access_token)
+        .send({
+            content: "haloo"
+        })
+        .then((resp) => {
+            const result = resp.body
+            expect(resp.statusCode).toBe(201)
+            expect(resp.res.statusMessage).toMatch("Created")
+            // expect(result).objectContaining({
+            //     userId: expect.any(String),
+            //     content: expect.any(String),
+            //     _id: expect.any(String)
+            // })
+            done()
+        })
+        .catch((err) => {
+            done(err)
+        })
+    })
 
-//     describe("user input is incorrect", () => {
-//         test("user failed to make a likes", async () => {
-//             const response = await request(app).post("/likes")
-//             .send({
-//                 access_token: null
-//             })
-//             expect(response.statusCode).toBe(200)
-//         })
-//     })
-// })
-
-// describe("PUT /likes", () =>{
-//     describe("user input is correct", () => {
-//         test("user success to edit a likes", async () => {
-//             const response = await request(app).put("/likes")
-//             .send({
-//                 access_token: null
-//             })
-//             expect(response.statusCode).toBe(200)
-//         })
-//     })
-
-//     describe("user input is incorrect", () => {
-//         test("user failed to edit a likes", async () => {
-//             const response = await request(app).put("/likes")
-//             .send({
-//                 access_token: null
-//             })
-//             expect(response.statusCode).toBe(200)
-//         })
-//     })
-// })
+    test("user failed to make a likes cause no access token", (done) => {
+        let postId = thePost._id.toString()
+        request(app)
+        .post(`/likes/${postId}`)
+        .set('access_token', null)
+        .send({
+            userId: payload.userId,
+            content: "haloo"
+        })
+        .then((resp) => {
+            const result = resp.body
+            // console.log(resp, "=========<<<<<<");
+            expect(resp.statusCode).toBe(401)
+            expect(resp.res.statusMessage).toMatch("Unauthorized")
+            expect(result).toMatchObject({"message": 'Invalid token'})
+            done()
+        })
+        .catch((err) => {
+            done(err)
+        })
+    })
+})
 
 // describe("DELETE /likes", () =>{
 //     describe("user wanted to delete own post", () => {
