@@ -5,9 +5,17 @@ const secretKey = process.env.SECRETKEY;
 class User {
     static async findUsers(req, res, next){
         try{
-            const users = await userModel.find().exec()
+            const { name } = req.query
 
-            res.status(200).json(users)
+            if(name){
+                const users = await userModel.find({ firstName: name }).exec()
+    
+                res.status(200).json(users)
+            }else{
+                const users = await userModel.find().exec()
+    
+                res.status(200).json(users)
+            }
         }catch(err){
             next(err)
         }
@@ -54,20 +62,20 @@ class User {
         }
     }
 
-    static async findUser(req, res, next){
-        try{
-            const users = await userModel.find().exec()
+    // static async findUser(req, res, next){
+    //     try{
+    //         const users = await userModel.find().exec()
 
-            res.status(200).json(users)
-        }catch(err){
-            next(err)
-        }
-    }
+    //         res.status(200).json(users)
+    //     }catch(err){
+    //         next(err)
+    //     }
+    // }
 
     static async editUser(req, res, next){
         try{
             const id = req.user.id
-            const {firstName, lastName, username, phoneNumber, city, imgUrl} = req.body
+            const {firstName, lastName, username, phoneNumber, city, imgUrl, header} = req.body
 
 
                 await userModel.updateOne({_id: id}, {
@@ -76,7 +84,8 @@ class User {
                     username,
                     phoneNumber,
                     imgUrl,
-                    city
+                    city,
+                    header
                 })
     
                 const updatedUser = await userModel.find({_id: id}).exec()
@@ -94,14 +103,13 @@ class User {
 
             if(id !== req.user.id.toString() ){
                 res.status(403).json({message: "you cannot delete other user"})
-            }
-
-            else {
+            } else {
+                
                 const deletedUser = await userModel.find({_id: id}).exec()
                 
                 await userModel.deleteOne({_id: id})
-                res.status(200).json(deletedUser)
-                
+
+                res.status(201).json(deletedUser)
             }
         }catch(err){
             next(err)
