@@ -7,9 +7,11 @@ class Like{
     static async findLikes(req, res, next){
         try{
             const { postId } = req.params;
-            const posts = await likeModel.find({ postId: postId }).exec()
 
-            res.status(200).json(posts)
+            const likes = await likeModel.find({ postId: postId }).exec()
+            if (!likes) throw { name: "NotFound" };
+
+            res.status(200).json(likes)
         }catch(err){
             next(err);
         }
@@ -18,9 +20,11 @@ class Like{
     static async findLikesByUser(req, res, next){
         try {
             const { userId } = req.params;
-            const posts = await likeModel.find({ userId: userId }).exec();
 
-            res.status(200).json(posts);
+            const likes = await likeModel.find({ userId: userId }).exec();
+            if (!likes) throw { name: "NotFound" };
+
+            res.status(200).json(likes);
         } catch(err) {
             next(err);
         }
@@ -34,6 +38,7 @@ class Like{
             if (!post) throw { name: "NotFound" };
 
             const likes = await likeModel.find({postId});
+            if (!likes) throw { name: "NotFound" };
 
             likes.forEach(like => {
               if (like.userId.toString() === userId.toString()) { 
@@ -42,6 +47,8 @@ class Like{
             });
 
             const user = await userModel.findById(userId);
+            if (!user) throw { name: "NotFound" };
+
             let likeBody = { userId, postId, firstName: user.firstName };
             if (user.imgUrl) {
               likeBody.imgUrl = user.imgUrl;

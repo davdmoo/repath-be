@@ -9,11 +9,13 @@ class User {
 
             if(name){
                 const users = await userModel.find({ firstName: name }).exec()
-    
+                if (!users) throw { name: "NotFound" };
+                
                 res.status(200).json(users)
             }else{
                 const users = await userModel.find().exec()
-    
+                if (!users) throw { name: "NotFound" };
+
                 res.status(200).json(users)
             }
         }catch(err){
@@ -75,22 +77,31 @@ class User {
     static async editUser(req, res, next){
         try{
             const id = req.user.id
-            const {firstName, lastName, username, phoneNumber, city, imgUrl, header} = req.body
+            const { firstName,
+                lastName,
+                username,
+                phoneNumber,
+                city,
+                imgUrl,
+                header
+            } = req.body
 
+            const user = await userModel.findOne({_id: id})
+            if (!user) throw { name: "NotFound" };
 
-                await userModel.updateOne({_id: id}, {
-                    firstName,
-                    lastName,
-                    username,
-                    phoneNumber,
-                    imgUrl,
-                    city,
-                    header
-                })
-    
-                const updatedUser = await userModel.find({_id: id}).exec()
-    
-                res.status(200).json(updatedUser)
+            await userModel.updateOne({_id: id}, {
+                firstName,
+                lastName,
+                username,
+                phoneNumber,
+                imgUrl,
+                city,
+                header
+            })
+
+            const updatedUser = await userModel.find({_id: id}).exec()
+
+            res.status(200).json(updatedUser)
         
         }catch(err){
             next(err)
@@ -104,9 +115,9 @@ class User {
             if(id !== req.user.id.toString() ){
                 res.status(403).json({message: "you cannot delete other user"})
             } else {
-                
                 const deletedUser = await userModel.find({_id: id}).exec()
-                
+                if (!deletedUser) throw { name: "NotFound" };
+
                 await userModel.deleteOne({_id: id})
 
                 res.status(201).json(deletedUser)

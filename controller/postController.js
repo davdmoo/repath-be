@@ -76,9 +76,10 @@ class Post {
     static async findPost(req, res, next) {
         try {
             const id = req.params.id
-            const Post = await postModel.findOne({_id: id}).exec()
+            const post = await postModel.findOne({_id: id}).exec()
+            if (!post) throw { name: "NotFound" };
 
-            res.status(200).json(Post)
+            res.status(200).json(post)
         }catch(err) {
             next(err);
         }
