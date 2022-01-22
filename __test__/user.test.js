@@ -4,26 +4,47 @@ const app = require('../app.js')
 const mongoose = require('../config/monggoConfig');
 const jwt = require("jsonwebtoken");
 
-let access_token
+let access_token_one
+let access_token_two 
+let user_one
+
 beforeAll(async () => {
     await userModel.deleteOne({   email: "test2@mail.com" })
-    await userModel.deleteOne({   email: "tes4@mail.com" })
+    await userModel.deleteOne({   email: "test4@mail.com" })
+    await userModel.deleteOne({   email: "test5@mail.com" })
 
-    const userPayload = {
+    const userPayloadOne = {
         firstName: "test4",
         lastName: "test4",
-        email: "tes4@mail.com",
+        email: "test4@mail.com",
         password: "12345",
         username: "test4",
         city: "test4",
         phoneNumber :"1234455"
     }
 
-    const user = await userModel.create(userPayload)
+    const userPayloadTwo = {
+        firstName: "test5",
+        lastName: "test5",
+        email: "test5@mail.com",
+        password: "12345",
+        username: "test5",
+        city: "test5",
+        phoneNumber :"1234455"
+    }
 
-    const payloadJwt = { email: user.email };
-    access_token = jwt.sign(payloadJwt, "repathkeren");
+
+    user_one = await userModel.create(userPayloadOne)
+    const payloadJWT_ONE = { email: user_one.email };
+    access_token_one = jwt.sign(payloadJWT_ONE, "repathkeren");
+
+    const user_two = await userModel.create(userPayloadTwo)
+    const payloadJWT_TWO = { email: user_two.email };
+    access_token_two = jwt.sign(payloadJWT_TWO, "repathkeren");
+    // console.log(access_token_one, `1111111111111111111111111111`)
+    // console.log(access_token_two, `2222222222222222222222222221`)
 });
+
 
 afterAll(async()=>{
    await  mongoose.disconnect()
@@ -33,7 +54,7 @@ describe("GET /users", () => {
     test("success get all user", (done) => {
         request(app)
         .get('/users')
-        .set('access_token',access_token)
+        .set('access_token',access_token_one)
         .then((resp)=>{
             const result = resp.body
             expect(resp.status).toBe(200)
@@ -50,7 +71,7 @@ describe("GET /users", () => {
         .get('/users')
         .then((resp)=>{
             const result = resp.body
-            console.log(result, '+++++++ WHAT IS THIS+++++++')
+            // console.log(result, '+++++++ WHAT IS THIS+++++++')
             expect(resp.status).toBe(401)
             expect(result).toEqual(expect.any(Object))
             expect(result).toHaveProperty('message', 'Access token not found')
@@ -146,7 +167,7 @@ describe("POST /register", () =>{
             email: "testagnes@mail.com",
             password: "12345",
             username: "testagnes",
-            city: "tes3",
+            city: "testagnes",
             phoneNumber :"1234455"
         })
         .then((resp)=>{
@@ -170,7 +191,7 @@ describe("POST /register", () =>{
             email: "testagnes@mail.com",
             password: "12345",
             username: "testagnes",
-            city: "tes3t",
+            city: "testagnes",
             phoneNumber :"1234455"
         })
         .then((resp)=>{
@@ -384,12 +405,42 @@ describe("POST /login", () =>{
     })
 })
 
-// describe("DELETE /users", () =>{
-//     describe("user wanted to delete own account", () => {
+describe("DELETE /users", () =>{
+   
+        test("success delete own account", (done) => {
+            const user_one_id = user_one._id.toString()
+            request(app)
+            .delete(`/users/${user_one_id}`)
+            .set('access_token',access_token_one)
+            .then((resp)=>{
+                const result = resp.body
+                expect(resp.status).toBe(200)
+                expect(result).toEqual(expect.any(Array))
+                expect(result[0]).toEqual(expect.any(Object))
+                console.log(result,`NANIIIII`)
+                done()
+            })
+            .catch((err)=>{
+                done(err)
+            })
+        })
+    
 
-//     })
-
-//     describe("user wanted to delete other account", () => {
-
-//     })
-// })
+        test("failed delete others account", (done) => {
+            const user_one_id = user_one._id.toString()
+            request(app)
+            .delete(`/users/${user_one_id}`)
+            .set('access_token',access_token_two)
+            .then((resp)=>{
+                const result = resp.body
+                expect(resp.status).toBe(403)
+                expect(result).toEqual(expect.any(Object))
+                expect(result).toHaveProperty('message', "you cannot delete other user")
+                console.log(result,`NANIIIII`)
+                done()
+            })
+            .catch((err)=>{
+                done(err)
+            })
+        })
+})
