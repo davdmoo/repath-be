@@ -96,7 +96,7 @@ describe("POST /register", () =>{
             lastName: "test",
             email: "test2@mail.com",
             password: "12345",
-            username: "test3",
+            username: "testagnes",
             city: "test",
             phoneNumber :"1234455"
         })
@@ -119,7 +119,7 @@ describe("POST /register", () =>{
         .send({
             firstName: "test",
             lastName: "test",
-            email: "test3@mail.com",
+            email: "testagnes@mail.com",
             password: "12345",
             username: "test2",
             city: "test",
@@ -142,10 +142,10 @@ describe("POST /register", () =>{
         request(app)
          .post('/users/register')
         .send({     
-            lastName: "test3",
-            email: "test3@mail.com",
+            lastName: "testagnes",
+            email: "testagnes@mail.com",
             password: "12345",
-            username: "test3",
+            username: "testagnes",
             city: "tes3",
             phoneNumber :"1234455"
         })
@@ -166,10 +166,10 @@ describe("POST /register", () =>{
         request(app)
          .post('/users/register')
         .send({
-            firstName: "test3",
-            email: "test3@mail.com",
+            firstName: "testagnes",
+            email: "testagnes@mail.com",
             password: "12345",
-            username: "test3",
+            username: "testagnes",
             city: "tes3t",
             phoneNumber :"1234455"
         })
@@ -189,11 +189,11 @@ describe("POST /register", () =>{
         request(app)
          .post('/users/register')
         .send({
-            firstName: "test3",
-            lastName: "test3",
+            firstName: "testagnes",
+            lastName: "testagnes",
             password: "12345",
-            username: "test3",
-            city: "test3",
+            username: "testagnes",
+            city: "testagnes",
             phoneNumber :"1234455"
         })
         .then((resp)=>{
@@ -212,11 +212,11 @@ describe("POST /register", () =>{
         request(app)
          .post('/users/register')
         .send({
-            firstName: "test3",
-            lastName: "test3",
-            email: "test3@mail.com",
+            firstName: "testagnes",
+            lastName: "testagnes",
+            email: "testagnes@mail.com",
             username: "test2",
-            city: "test3",
+            city: "testagnes",
             phoneNumber :"1234455"
         })
         .then((resp)=>{
@@ -235,11 +235,11 @@ describe("POST /register", () =>{
         request(app)
          .post('/users/register')
         .send({
-            firstName: "test3",
-            lastName: "test3",
-            email: "test3@mail.com",
+            firstName: "testagnes",
+            lastName: "testagnes",
+            email: "testagnes@mail.com",
             password: "12345",
-            city: "test3",
+            city: "testagnes",
             phoneNumber :"1234455"
         })
         .then((resp)=>{
@@ -258,12 +258,12 @@ describe("POST /register", () =>{
         request(app)
          .post('/users/register')
         .send({
-            firstName: "test3",
-            lastName: "test3",
-            email: "test3@mail.com",
+            firstName: "testagnes",
+            lastName: "testagnes",
+            email: "testagnes@mail.com",
             password: "12345",
-            username: "test3",
-            city: "test3",
+            username: "testagnes",
+            city: "testagnes",
         })
         .then((resp)=>{
             const result = resp.body
@@ -281,11 +281,11 @@ describe("POST /register", () =>{
         request(app)
          .post('/users/register')
         .send({
-            firstName: "test3",
-            lastName: "test3",
-            email: "test3@mail.com",
+            firstName: "testagnes",
+            lastName: "testagnes",
+            email: "testagnes@mail.com",
             password: "12345",
-            username: "test3",
+            username: "testagnes",
             phoneNumber :"1234455"
         })
         .then((resp)=>{
