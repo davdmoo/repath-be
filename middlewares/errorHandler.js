@@ -11,8 +11,9 @@ const errorHandler = (err, req, res, next) => {
       else if (err.errors.phoneNumber) res.status(400).json({ message: err.errors.phoneNumber.properties.message });
       else if (err.errors.city) res.status(400).json({ message: err.errors.city.properties.message });
       else if (err.errors.type) res.status(400).json({ message: err.errors.type.properties.message });
-    }
-    else {
+    } else if (err.kind === "ObjectId") {
+      res.status(404).json({ message: "Content not found" });
+    } else {
       switch (err.name) {
         case "EmailRequired":
             res.status(400).json({ message: "Email is required" })
@@ -43,6 +44,9 @@ const errorHandler = (err, req, res, next) => {
             break;
         case "NotImage":
             res.status(400).json({ message: "Invalid file type" })
+            break;
+        case "Forbidden":
+            res.status(403).json({ message: "Forbidden access"})
             break;
         default:
             res.status(500).json({ message: "Internal server error" })
