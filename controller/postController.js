@@ -46,24 +46,17 @@ class Post {
             if (type === 'text' && text) {
                payload.text = text
                payload.imgUrl = imgUrl
-            }
-           else if (type === "location" && location) {
+            } else if (type === "location" && location) {
               payload.location = location
-            }
-           else if (type === "music" && title){
+            } else if (type === "music" && title){
                 payload.title = title
                 payload.artist = artist
                 payload.imageAlbum = imageAlbum
                 payload.albumName = albumName
+            } else {
+                throw { name: "NoInput" }
             }
 
-            const user = await userModel.findById(userId);
-            payload.firstName = user.firstName;
-
-            if (user.imgUrl) {
-              likeBody.imgUrl = user.imgUrl;
-            };
-           console.log(payload);
             const newPost = await postModel.create(payload);
 
             await userModel.findOneAndUpdate({_id: userId},
