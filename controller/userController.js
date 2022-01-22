@@ -19,7 +19,6 @@ class User {
 
             res.status(201).json(newUser)
         }catch(err){
-            console.log(err.name,`AAAA KNAPAPPAP`)
             next(err)
         }
     }
@@ -90,16 +89,22 @@ class User {
     static async deleteUser(req, res, next){
         try{
             const id = req.params.id
+            console.log(id, `IDDD PARAMS`)
 
-            if(id == req.user.id){
+            if(id !== req.user.id.toString() ){
+                console.log(req.user.id.toString(), `AAAAA NANI USER ID`)
                 res.status(403).json("you cannot delete other user")
             }
-            
-            const deletedUser = await userModel.find({_id: id}).exec()
-            await userModel.deleteOne({_id: id})
 
-            res.status(200).json(deletedUser)
+            else {
+                const deletedUser = await userModel.find({_id: id}).exec()
+                console.log(deletedUser,`ID INI APA`)
+                await userModel.deleteOne({_id: id})
+                res.status(200).json(deletedUser)
+                
+            }
         }catch(err){
+            console.log(err, `+++++++++NANI`);
             next(err)
         }
     }

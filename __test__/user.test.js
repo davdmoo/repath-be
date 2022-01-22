@@ -2,25 +2,65 @@ const userModel = require('../models/userModel');
 const request = require('supertest');
 const app = require('../app.js')
 const mongoose = require('../config/monggoConfig');
+const jwt = require("jsonwebtoken");
 
+let access_token
 beforeAll(async () => {
     await userModel.deleteOne({   email: "test2@mail.com" })
-    await userModel.deleteOne({   email: "test3@mail.com" })
+    await userModel.deleteOne({   email: "tes4@mail.com" })
+
+    const userPayload = {
+        firstName: "test4",
+        lastName: "test4",
+        email: "tes4@mail.com",
+        password: "12345",
+        username: "test4",
+        city: "test4",
+        phoneNumber :"1234455"
+    }
+
+    const user = await userModel.create(userPayload)
+
+    const payloadJwt = { email: user.email };
+    access_token = jwt.sign(payloadJwt, "repathkeren");
 });
 
 afterAll(async()=>{
    await  mongoose.disconnect()
 })
 
-// describe("GET /users", () => {
-//     describe("when user have access token", () => {
-       
-//     })
+describe("GET /users", () => {
+    test("success get all user", (done) => {
+        request(app)
+        .get('/users')
+        .set('access_token',access_token)
+        .then((resp)=>{
+            const result = resp.body
+            expect(resp.status).toBe(200)
+            expect(result).toEqual(expect.any(Array))
+            done()
+        })
+        .catch((err)=>{
+            done(err)
+        })
+    })
 
-//     describe("when user dont have access token", () => {
-
-//     })
-// })
+    test("failed no access_token", (done) => {
+        request(app)
+        .get('/users')
+        .then((resp)=>{
+            const result = resp.body
+            console.log(result, '+++++++ WHAT IS THIS+++++++')
+            expect(resp.status).toBe(401)
+            expect(result).toEqual(expect.any(Object))
+            expect(result).toHaveProperty('message', 'Access token not found')
+            done()
+        })
+        .catch((err)=>{
+            done(err)
+        })
+    })
+})
 
 describe("POST /register", () =>{
     test("success register", (done) => {
@@ -62,7 +102,6 @@ describe("POST /register", () =>{
         })
         .then((resp)=>{
             const result = resp.body
-            console.log(result , "NANI ERROR")
             expect(resp.status).toBe(400)
             expect(result).toEqual(expect.any(Object))
             expect(result).toHaveProperty('message')
