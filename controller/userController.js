@@ -89,17 +89,17 @@ class User {
             const user = await userModel.findOne({_id: id})
             if (!user) throw { name: "NotFound" };
 
-            await userModel.updateOne({_id: id}, {
-                firstName,
-                lastName,
-                username,
-                phoneNumber,
-                imgUrl,
-                city,
-                header
+            const updatedUser = await userModel.updateOne({_id: id}, {
+                firstName: firstName,
+                lastName: lastName,
+                username: username,
+                phoneNumber: phoneNumber,
+                imgUrl: imgUrl,
+                city: city,
+                header: header
             })
 
-            const updatedUser = await userModel.find({_id: id}).exec()
+            // const updatedUser = await userModel.find({_id: id}).exec()
 
             res.status(200).json(updatedUser)
         
