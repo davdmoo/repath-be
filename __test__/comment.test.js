@@ -3,13 +3,14 @@ const request = require('supertest');
 const mongoose = require('mongoose');
 const jwt = require("jsonwebtoken");
 const postModel = require('../models/postModel');
-const commentModel = require('../models/commentModel');
 const userModel = require('../models/userModel.js');
 const { ObjectId } = require('mongodb');
 
-let access_token 
-let thePost
-let payload 
+let access_token;
+let thePost;
+let payload;
+let comment;
+
 beforeAll(async () => {
     await userModel.deleteOne({   email: "test@mail.com" })
    
@@ -78,9 +79,8 @@ describe("GET /comments", () => {
 })
 
 describe("POST /comments", () => {
-    test("user failed to make a comment", (done) => {
+    test("user failed to make a comment cause no access token", (done) => {
         let postId = thePost._id.toString()
-        console.log(postId, "=================");
         request(app)
         .post(`/comments/${postId}`)
         .set('access_token', null)
@@ -100,7 +100,7 @@ describe("POST /comments", () => {
         })
     })
 
-    test("user succes to make a comment", (done) => {
+    test("user succes to make a comment with access token", (done) => {
         let postId = thePost._id.toString()
         request(app)
         .post(`/comments/${postId}`)
@@ -109,6 +109,7 @@ describe("POST /comments", () => {
             content: "haloo"
         })
         .then((resp) => {
+            comment = resp.body
             const result = resp.body
             expect(resp.statusCode).toBe(201)
             expect(resp.res.statusMessage).toMatch("Created")
@@ -126,27 +127,55 @@ describe("POST /comments", () => {
     
 })
 
-// describe("PUT /comments", () => {
-//     describe("user input is correct", () => {
-//         test("user success to edit a comment", () => {
-//             const response = await request(app).put("/comments")
-//             .send({
-//                 access_token: null
-//             })
-//             expect(response.statusCode).toBe(200)
-//         })
-//     })
+describe("PUT /comments", () => {
+    test("user succes to edit a comment with access token", (done) => {
+        let postId = thePost._id.toString()
+        let commentId = comment._id.toString()
+        request(app)
+        .put(`/comments/${postId}/${commentId}`)
+        .set('access_token', access_token)
+        .send({
+            content: "haloo ini edit comment"
+        })
+        .then((resp) => {
+            comment = resp.body
+            const result = resp.body
+            expect(resp.statusCode).toBe(200)
+            // expect(resp.res.statusMessage).toMatch("Created")
+            // expect(result).objectContaining({
+            //     userId: expect.any(String),
+            //     content: expect.any(String),
+            //     _id: expect.any(String)
+            // })
+            done()
+        })
+        .catch((err) => {
+            done(err)
+        })
+    })
 
-//     describe("user input is incorrect", () => {
-//         test("user failed to edit a comment", () => {
-//             const response = await request(app).put("/comments")
-//             .send({
-//                 access_token: null
-//             })
-//             expect(response.statusCode).toBe(200)
-//         })
-//     })
-// })
+    test("user failed to edit a comment with access token", (done) => {
+        let postId = thePost._id.toString()
+        let commentId = comment[0]._id.toString()
+        request(app)
+        .put(`/comments/${postId}/${commentId}`)
+        .set('access_token', null)
+        .send({
+            content: "haloo ini edit comment"
+        })
+        .then((resp) => {
+            comment = resp.body
+            const result = resp.body
+            expect(resp.statusCode).toBe(401)
+            expect(resp.res.statusMessage).toMatch("Unauthorized")
+            expect(result).toMatchObject({"message": 'Invalid token'})
+            done()
+        })
+        .catch((err) => {
+            done(err)
+        })
+    })
+})
 
 // describe("DELETE /comments", () => {
 //     describe("user wanted to delete own comment", () => {
