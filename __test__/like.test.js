@@ -90,7 +90,6 @@ describe("POST /likes", () =>{
         })
         .then((resp) => {
             const result = resp.body
-            console.log(result, "INI RESULT<<<<<<<<<<<<<<<<<<<<<<<<<<");
             like = result
             expect(resp.statusCode).toBe(201)
             expect(resp.res.statusMessage).toMatch("Created")
@@ -117,7 +116,6 @@ describe("POST /likes", () =>{
         })
         .then((resp) => {
             const result = resp.body
-            // console.log(resp, "=========<<<<<<");
             expect(resp.statusCode).toBe(401)
             expect(resp.res.statusMessage).toMatch("Unauthorized")
             expect(result).toMatchObject({"message": 'Invalid token'})
@@ -130,7 +128,7 @@ describe("POST /likes", () =>{
 })
 
 describe("DELETE /likes", () =>{
-    test("user success to delete a likes", (done) => {
+    test("user failed to delete a likes", (done) => {
         let postId = thePost._id.toString()
         let likeId = like._id.toString()
         request(app)
@@ -150,15 +148,14 @@ describe("DELETE /likes", () =>{
 
     test("user success to delete a likes", (done) => {
         let postId = thePost._id.toString()
-        console.log(like, "INIIII LIKEEEE");
         let likeId = like._id.toString()
         request(app)
-        .delete(`/likes/${postId}/${likeId}`)
+        .delete(`/likes/${likeId}`)
         .set('access_token', access_token)
         .then((resp) => {
             const result = resp.body
-            expect(resp.statusCode).toBe(200)
-            expect(resp.res.statusMessage).toMatch("OK")
+            expect(resp.statusCode).toBe(201)
+            expect(resp.res.statusMessage).toMatch("Created")
             done()
         })
         .catch((err) => {
