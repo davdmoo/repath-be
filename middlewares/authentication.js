@@ -2,6 +2,7 @@ const userModel = require('../models/userModel');
 const jwt = require("jsonwebtoken");
 // const secretKey = process.env.SECRETKEY;
 const { ObjectId } = require('mongodb');
+const postModel = require('../models/postModel');
 
 async function authentication (req, res, next) {
   try {
@@ -25,4 +26,21 @@ async function authentication (req, res, next) {
   }
 }
 
-module.exports = authentication;
+// async function authorization (req, res, next){
+//   try{
+//     const userId = req.header.id
+//     const {id} = req.params
+
+//     const post = await postModel.findOne({_id: id})
+
+//     if(post.userId !== userId){
+//       throw { name: "Forbidden" }
+//     }else{
+//       next()
+//     }
+//   }catch(err){
+//     next(err)
+//   }
+// }
+
+module.exports = authentication
