@@ -1,5 +1,5 @@
 const errorHandler = (err, req, res, next) => {
-    console.log(err, "ERROR HANDLER");
+    // console.log(err, "ERROR HANDLER");
     // validation di mongoose: err.errors -> cek pathnya (ct. email/username/pass) -> masuk properties -> message
     // ct. err.errors.email.properties.message
     if (err.errors) {
@@ -45,10 +45,12 @@ const errorHandler = (err, req, res, next) => {
             res.status(400).json({ message: "Invalid file type" })
             break;
         default:
+            console.log(err);
             res.status(500).json({ message: "Internal server error" })
             break;
       }
     }
+    
 }
 
 module.exports = errorHandler;

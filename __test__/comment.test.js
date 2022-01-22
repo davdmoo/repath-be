@@ -9,7 +9,7 @@ const { ObjectId } = require('mongodb');
 
 let access_token 
 let thePost
-
+let payload 
 beforeAll(async () => {
     await userModel.deleteOne({   email: "test@mail.com" })
    
@@ -27,15 +27,14 @@ beforeAll(async () => {
     access_token = jwt.sign(payloadJwt, "repathkeren");
     
     await postModel.deleteOne({  title: "text 1" })
-    let payload = {
+    payload = {
         type : "text",
         userId: user._id,
         title: "text 1"
     } 
 
-    await postModel.create(payload)
-
-    thePost = await postModel.findOne({type: "text", title: "text 1"}).exec()
+    thePost = await postModel.create(payload)
+    // await postModel.findOne({type: "text", title: "text 1"}).exec()
 })
 
 afterAll(async()=>{
@@ -43,65 +42,89 @@ afterAll(async()=>{
 })
 
 describe("GET /comments", () => {
-    const postId = ObjectId(thePost._id)
-    describe("when user have access token", () => {
-        test("user cannot access comment section", (done) => {
-            request(app)
-            .get(`/comments/${postId}`)
-            .set('access_token', null)
-            .then((resp) => {
-                const result = resp.body
-                console.log(result);
-                expect(resp.statusCode).toBe(401)
-                expect(resp.res.statusMessage).toMatch("Unauthorized")
-                expect(result).toMatchObject({"message": 'Invalid token'})
-                done()
-            })
-            .catch((err) => {
-                done(err)
-            })
+    test("user cannot access comment section", (done) => {
+        let postId = thePost._id.toString()
+        request(app)
+        .get(`/comments/${postId}`)
+        .set('access_token', null)
+        .then((resp) => {
+            const result = resp.body
+            console.log(result);
+            expect(resp.statusCode).toBe(401)
+            expect(resp.res.statusMessage).toMatch("Unauthorized")
+            expect(result).toMatchObject({"message": 'Invalid token'})
+            done()
+        })
+        .catch((err) => {
+            done(err)
         })
     })
 
-    describe("when user dont have access token", () => {
-        test("user can access and see comment section", (done) => {
-            request(app)
-            .get(`/comments/${postId}`)
-            .set('access_token', access_token)
-            .then((resp) => {
-                const result = resp.body
-                expect(resp.statusCode).toBe(200)
-                expect(result).toEqual(expect.arrayContaining(result))
-                done()
-            })
-            .catch((err)=> {
-                done(err)
-            })
+    test("user can access and see comment section", (done) => {
+        let postId = thePost._id.toString()
+        request(app)
+        .get(`/comments/${postId}`)
+        .set('access_token', access_token)
+        .then((resp) => {
+            const result = resp.body
+            expect(resp.statusCode).toBe(200)
+            expect(result).toEqual(expect.arrayContaining(result))
+            done()
+        })
+        .catch((err)=> {
+            done(err)
         })
     })
 })
 
-// describe("POST /comments", () => {
-//     describe("user input is correct", () => {
-//         test("user success to make a comment", () => {
-//             const response = await request(app).post("/comments")
-//             .send({
-//                 access_token: null
-//             })
-//             expect(response.statusCode).toBe(201)
-//         })
-//     })
+describe("POST /comments", () => {
+    test("user failed to make a comment", (done) => {
+        let postId = thePost._id.toString()
+        console.log(postId, "=================");
+        request(app)
+        .post(`/comments/${postId}`)
+        .set('access_token', null)
+        .send({
+            userId: payload.userId,
+            content: "haloo"
+        })
+        .then((resp) => {
+            const result = resp.body
+            expect(resp.statusCode).toBe(401)
+            expect(resp.res.statusMessage).toMatch("Unauthorized")
+            expect(result).toMatchObject({"message": 'Invalid token'})
+            done()
+        })
+        .catch((err) => {
+            done(err)
+        })
+    })
 
-//     describe("user input is incorrect", () => {
-//         test("user failed to make a comment", () => {
-//             const response = await request(app).post("/comments")
-//             .send({
-//                 access_token: null
-//             })
-//             expect(response.statusCode).toBe(200)
-//         })
-//     })
-// })
+    test("user succes to make a comment", (done) => {
+        let postId = thePost._id.toString()
+        request(app)
+        .post(`/comments/${postId}`)
+        .set('access_token', access_token)
+        .send({
+            content: "haloo"
+        })
+        .then((resp) => {
+            const result = resp.body
+            expect(resp.statusCode).toBe(201)
+            expect(resp.res.statusMessage).toMatch("Created")
+            // expect(result).objectContaining({
+            //     userId: expect.any(String),
+            //     content: expect.any(String),
+            //     _id: expect.any(String)
+            // })
+            done()
+        })
+        .catch((err) => {
+            done(err)
+        })
+    })
+    
+})
 
 // describe("PUT /comments", () => {
 //     describe("user input is correct", () => {
