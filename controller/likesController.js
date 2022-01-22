@@ -62,6 +62,7 @@ class Like{
                 likes: like
               }
             })
+            console.log(like, "MASUK");
 
             res.status(201).json(like);
         } catch(err){
@@ -98,15 +99,16 @@ class Like{
             const { id } = req.params;
             const like = await likeModel.findById(id);
             if (!like) throw { name: "NotFound" };
+            console.log("?????");
 
             await likeModel.deleteOne({_id: id});
 
-            await postModel.findOneAndUpdate({_id: like.post},
+            await postModel.findOneAndUpdate({_id: like.postId},
             {
                 $pull: { likes: id }
             })
 
-            res.status(201).json(like);
+            res.status(200).json(`YOU HAVE UNLIKED BRO`);
         } catch(err){
             next(err)
         }
