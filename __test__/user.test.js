@@ -6,12 +6,17 @@ const jwt = require("jsonwebtoken");
 
 let access_token_one
 let access_token_two 
+let access_token_three
 let user_one
+let user_two
+let user_three
 
 beforeAll(async () => {
     await userModel.deleteOne({   email: "test2@mail.com" })
     await userModel.deleteOne({   email: "test4@mail.com" })
     await userModel.deleteOne({   email: "test5@mail.com" })
+    await userModel.deleteOne({   email: "test6@mail.com" })
+
 
     const userPayloadOne = {
         firstName: "test4",
@@ -34,15 +39,28 @@ beforeAll(async () => {
     }
 
 
+    const userPayloadThree = {
+        firstName: "test6",
+        lastName: "test6",
+        email: "test6@mail.com",
+        password: "12345",
+        username: "test6",
+        city: "test6",
+        phoneNumber :"1234455"
+    }
+
+
     user_one = await userModel.create(userPayloadOne)
     const payloadJWT_ONE = { email: user_one.email };
     access_token_one = jwt.sign(payloadJWT_ONE, "repathkeren");
 
-    const user_two = await userModel.create(userPayloadTwo)
+    user_two = await userModel.create(userPayloadTwo)
     const payloadJWT_TWO = { email: user_two.email };
     access_token_two = jwt.sign(payloadJWT_TWO, "repathkeren");
-    // console.log(access_token_one, `1111111111111111111111111111`)
-    // console.log(access_token_two, `2222222222222222222222222221`)
+  
+    user_three = await userModel.create(userPayloadThree)
+    const payloadJWT_THREE = { email: user_three.email };
+    access_token_two = jwt.sign(payloadJWT_THREE, "repathkeren");
 });
 
 
@@ -71,7 +89,6 @@ describe("GET /users", () => {
         .get('/users')
         .then((resp)=>{
             const result = resp.body
-            // console.log(result, '+++++++ WHAT IS THIS+++++++')
             expect(resp.status).toBe(401)
             expect(result).toEqual(expect.any(Object))
             expect(result).toHaveProperty('message', 'Access token not found')
@@ -417,7 +434,7 @@ describe("DELETE /users", () =>{
                 expect(resp.status).toBe(200)
                 expect(result).toEqual(expect.any(Array))
                 expect(result[0]).toEqual(expect.any(Object))
-                console.log(result,`NANIIIII`)
+               
                 done()
             })
             .catch((err)=>{
@@ -436,11 +453,68 @@ describe("DELETE /users", () =>{
                 expect(resp.status).toBe(403)
                 expect(result).toEqual(expect.any(Object))
                 expect(result).toHaveProperty('message', "you cannot delete other user")
-                console.log(result,`NANIIIII`)
+            
                 done()
             })
             .catch((err)=>{
                 done(err)
             })
         })
+})
+
+
+describe("PUT /users", () =>{
+   
+    test("success update own account", (done) => {
+        const user_two_id = user_two._id.toString()
+        console.log(user_two_id, `AAAAAAAAAAAA`)
+        request(app)
+        .put(`/users/${user_two_id}`)
+        .send({
+            firstName: "testone",
+            lastName: "testone",
+            username: "testone",
+            city: "testone",
+            phoneNumber :"1234455"
+        })
+        .set('access_token',access_token_two)
+        .then((resp)=>{
+            const result = resp.body
+            expect(resp.status).toBe(200)
+            expect(result).toEqual(expect.any(Array))
+            expect(result[0]).toEqual(expect.any(Object))
+            done()
+        })
+        .catch((err)=>{
+            done(err)
+        })
+    })
+
+
+    test("failed update others account", (done) => {
+        const user_three_id = user_three._id.toString()
+        console.log(user_three_id, `AAAAAAAAAAAA`)
+        request(app)
+        .put(`/users/${user_three_id}`)
+        .send({
+            firstName: "testone",
+            lastName: "testone",
+            username: "testone",
+            city: "testone",
+            phoneNumber :"1234455"
+        })
+        .set('access_token',access_token_two)
+        .then((resp)=>{
+            const result = resp.body
+            // expect(resp.status).toBe(200)
+            // expect(result).toEqual(expect.any(Array))
+            // expect(result[0]).toEqual(expect.any(Object))
+            console.log(result,`NANIIIII`)
+            done()
+        })
+        .catch((err)=>{
+            done(err)
+        })
+    })
+
 })

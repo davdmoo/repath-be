@@ -68,19 +68,21 @@ class User {
         try{
             const id = req.user.id
             const {firstName, lastName, username, phoneNumber, city, imgUrl} = req.body
-            
-            await userModel.updateOne({_id: id}, {
-                firstName,
-                lastName,
-                username,
-                phoneNumber,
-                imgUrl,
-                city
-            })
 
-            const updatedUser = await userModel.find({_id: id}).exec()
 
-            res.status(200).json(updatedUser)
+                await userModel.updateOne({_id: id}, {
+                    firstName,
+                    lastName,
+                    username,
+                    phoneNumber,
+                    imgUrl,
+                    city
+                })
+    
+                const updatedUser = await userModel.find({_id: id}).exec()
+    
+                res.status(200).json(updatedUser)
+        
         }catch(err){
             next(err)
         }
