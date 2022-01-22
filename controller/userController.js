@@ -8,7 +8,7 @@ class User {
             const { name } = req.query
 
             if(name){
-                const users = await userModel.find({ firstName: name }).exec()
+                const users = await userModel.find({ username: { $regex: name + '.*' } }).exec()
                 if (!users) throw { name: "NotFound" };
                 
                 res.status(200).json(users)
