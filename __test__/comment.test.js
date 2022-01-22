@@ -138,10 +138,9 @@ describe("PUT /comments", () => {
             content: "haloo ini edit comment"
         })
         .then((resp) => {
-            comment = resp.body
             const result = resp.body
             expect(resp.statusCode).toBe(200)
-            // expect(resp.res.statusMessage).toMatch("Created")
+            expect(resp.res.statusMessage).toMatch("OK")
             // expect(result).objectContaining({
             //     userId: expect.any(String),
             //     content: expect.any(String),
@@ -156,7 +155,7 @@ describe("PUT /comments", () => {
 
     test("user failed to edit a comment with access token", (done) => {
         let postId = thePost._id.toString()
-        let commentId = comment[0]._id.toString()
+        let commentId = comment._id.toString()
         request(app)
         .put(`/comments/${postId}/${commentId}`)
         .set('access_token', null)
@@ -164,7 +163,6 @@ describe("PUT /comments", () => {
             content: "haloo ini edit comment"
         })
         .then((resp) => {
-            comment = resp.body
             const result = resp.body
             expect(resp.statusCode).toBe(401)
             expect(resp.res.statusMessage).toMatch("Unauthorized")
@@ -177,24 +175,39 @@ describe("PUT /comments", () => {
     })
 })
 
-// describe("DELETE /comments", () => {
-//     describe("user wanted to delete own comment", () => {
-//         test("user success to delete a comment", () => {
-//             const response = await request(app).delete("/comments")
-//             .send({
-//                 access_token: null
-//             })
-//             expect(response.statusCode).toBe(200)
-//         })
-//     })
+describe("DELETE /comments", () => {
+    test("user success to delete a comment", (done) => {
+        let postId = thePost._id.toString()
+        let commentId = comment._id.toString()
+        request(app)
+        .delete(`/comments/${postId}/${commentId}`)
+        .set('access_token', access_token)
+        .then((resp) => {
+            const result = resp.body
+            expect(resp.statusCode).toBe(200)
+            expect(resp.res.statusMessage).toMatch("OK")
+            done()
+        })
+        .catch((err) => {
+            done(err)
+        })
+    })
 
-//     describe("user wanted to delete other comment", () => {
-//         test("user success to delete a comment", () => {
-//             const response = await request(app).delete("/comments")
-//             .send({
-//                 access_token: null
-//             })
-//             expect(response.statusCode).toBe(200)
-//         })
-//     })
-// })
+    test("user success to delete a comment", (done) => {
+        let postId = thePost._id.toString()
+        let commentId = comment._id.toString()
+        request(app)
+        .delete(`/comments/${postId}/${commentId}`)
+        .set('access_token', null)
+        .then((resp) => {
+            const result = resp.body
+            expect(resp.statusCode).toBe(401)
+            expect(resp.res.statusMessage).toMatch("Unauthorized")
+            expect(result).toMatchObject({"message": 'Invalid token'})
+            done()
+        })
+        .catch((err) => {
+            done(err)
+        })
+    })
+})
