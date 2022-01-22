@@ -86,10 +86,14 @@ class User {
                 header
             } = req.body
 
+            if(!firstName || !lastName || !username || !phoneNumber || !city){
+                throw {name: "EditInput"}
+            }
             const user = await userModel.findOne({_id: id})
+            
             if (!user) throw { name: "NotFound" };
 
-            const updatedUser = await userModel.updateOne({_id: id}, {
+            await userModel.updateOne({_id: id}, {
                 firstName: firstName,
                 lastName: lastName,
                 username: username,
@@ -99,7 +103,7 @@ class User {
                 header: header
             })
 
-            // const updatedUser = await userModel.find({_id: id}).exec()
+            const updatedUser = await userModel.findOne({_id: id}).exec()
 
             res.status(200).json(updatedUser)
         

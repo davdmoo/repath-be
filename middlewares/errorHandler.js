@@ -48,6 +48,8 @@ const errorHandler = (err, req, res, next) => {
         case "Forbidden":
             res.status(403).json({ message: "Forbidden access"})
             break;
+        case "EditInput":
+            res.status(400).json({message: "Please input required fields on edit form"})
         default:
             console.log(err);
             res.status(500).json({ message: "Internal server error" })

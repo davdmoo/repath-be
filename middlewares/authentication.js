@@ -28,7 +28,7 @@ async function authentication (req, res, next) {
 
 // async function authorization (req, res, next){
 //   try{
-//     const userId = req.header.id
+//     const userId = req.user.id
 //     const {id} = req.params
 
 //     const post = await postModel.findOne({_id: id})
