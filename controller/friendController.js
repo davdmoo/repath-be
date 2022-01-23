@@ -10,7 +10,7 @@ class Friend{
             const friends = await userModel.findById(id).populate("friends")
             let payload = [];
 
-            friends.forEach(friend => {
+            friends.friends.forEach(friend => {
                 if(friend.sender.toString() == id.toString() && friend.status) {
                   payload.push(friend)
                 } else if (friend.sender == id && friend.status) {
@@ -58,6 +58,14 @@ class Friend{
             const {reqId} = req.params
 
             const friendReq = await friendModel.findById(reqId)
+           
+            if(friendReq.sender.toString() == id.toString()){
+                throw {name: "Forbidden"}
+            }
+            if(!friendReq){
+                throw {name: "NotFound"}
+            }
+
             const request = await friendModel.findOneAndUpdate(
                 {_id: reqId},
                 {
@@ -76,22 +84,31 @@ class Friend{
                     friends: request
                     }
                 });
+
             res.status(200).json(request)
         } catch (error) {
+            console.log(error, "ini kenapaaaa");
             next(error)
         }
     }
 
     static async delFriend(req, res, next){
         try {
+            const {id} = req.user
             const { reqId } = req.params
             const friend = await friendModel.findById(reqId)
             if (!friend) throw { name: "NotFound" }
-
-            const deleteStatus = await friendModel.deleteOne({ _id: ObjectId(reqId) })
             
-            res.status(200).json(deleteStatus)
+            if(friend.receiver.toString() !== id.toString()
+            && friend.sender.toString() !== id.toString()){
+                throw {name: "Forbidden"}
+            }
+
+            await friendModel.deleteOne({ _id: ObjectId(reqId) })
+            
+            res.status(201).json(friend)
         } catch (error) {
+            console.log(error, "INI KENAPA DI DELETE FRIENDS");
             next(error)
         }
     }
