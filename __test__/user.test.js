@@ -446,7 +446,7 @@ describe("PUT /users", () =>{
         .send({
             firstName: "testone",
             lastName: "testone",
-            username: "testone1233",
+            username: "testone",
             city: "testone",
             phoneNumber :"1234455"
         })

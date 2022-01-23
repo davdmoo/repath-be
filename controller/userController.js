@@ -65,15 +65,17 @@ class User {
         }
     }
 
-    // static async findUser(req, res, next){
-    //     try{
-    //         const users = await userModel.find().exec()
+    static async findUserById(req, res, next){
+        try {
+            const { id } = req.params;
+            const user = await userModel.findById(id).exec();
+            if (!user) throw { name: "NotFound" };
 
-    //         res.status(200).json(users)
-    //     }catch(err){
-    //         next(err)
-    //     }
-    // }
+            res.status(200).json(user);
+        } catch(err){
+            next(err)
+        }
+    }
 
     static async editUser(req, res, next){
         try{
