@@ -80,31 +80,40 @@ class User {
     static async editUser(req, res, next){
         try{
             const id = req.user.id
-            const { firstName,
-                lastName,
-                username,
-                phoneNumber,
-                city,
-                imgUrl,
-                header
-            } = req.body
+           
+              const payload = { 
+                    firstName: req.body.firstName,
+                    lastName : req.body.lastName,
+                    username: req.body.username,
+                    phoneNumber : req.body.phoneNumber,
+                    city : req.body.city,
+                    header :req.body.header,
+                    imgUrl : req.body.imgUrl
+                }
 
-            if(!firstName || !lastName || !username || !phoneNumber || !city){
+         
+        
+        
+
+            if(!payload.firstName || !payload.lastName || !payload.username || !payload.phoneNumber || !payload.city){
                 throw {name: "EditInput"}
             }
             const user = await userModel.findOne({_id: id})
             
             if (!user) throw { name: "NotFound" };
 
-            await userModel.updateOne({_id: id}, {
-                firstName: firstName,
-                lastName: lastName,
-                username: username,
-                phoneNumber: phoneNumber,
-                imgUrl: imgUrl,
-                city: city,
-                header: header
-            })
+            await userModel.updateOne({_id: id}, 
+            //     {
+            //     firstName: firstName,
+            //     lastName: lastName,
+            //     username: username,
+            //     phoneNumber: phoneNumber,
+            //     imgUrl: imgUrl,
+            //     city: city,
+            //     header: header
+            // }
+             payload
+            )
 
             const updatedUser = await userModel.findOne({_id: id}).exec()
 

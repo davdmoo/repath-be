@@ -456,8 +456,8 @@ describe("PUT /users", () =>{
             const result = resp.body
             expect(resp.status).toBe(200)
             expect(result).toEqual(expect.any(Object))
-            // // expect(result[0]).toEqual(expect.any(Object))
-            // console.log(result, `NANI DELETE`)
+    
+            console.log(result, `NANI DELETE`)
             done()
         })
         .catch((err)=>{
