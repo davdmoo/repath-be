@@ -1,9 +1,9 @@
 require("dotenv").config();
 const mongoose = require('mongoose');
 
-let mongoDB
-if(process.env.NODE_ENV === "test") mongoDB = process.env.MONGO_URI_TEST
-else mongoDB = process.env.MONGO_URI
+let mongoDB = "mongodb://localhost:27017/test"
+// if(process.env.NODE_ENV === "test") mongoDB = process.env.MONGO_URI_TEST
+// else mongoDB = process.env.MONGO_URI
 
 mongoose.connect(mongoDB, {useNewUrlParser: true, useUnifiedTopology: true}, (err) => {
     if(err) {

@@ -81,34 +81,20 @@ class Like{
     //     }
     // }
 
-    // static async editLike(req, res){
-    //     try{
-    //         const id = req.params.id
-            
-    //         await likeModel.updateOne({_id: id}, req.body)
-    //         const updatedPost = await likeModel.find({_id: id}).exec()
-
-    //         res.status(200).json(updatedPost)
-    //     }catch(err){
-    //         res.status(500).json(err)
-    //     }
-    // }
-
     static async deleteLike(req, res, next){
         try{
             const { id } = req.params;
             const like = await likeModel.findById(id);
             if (!like) throw { name: "NotFound" };
-            console.log("?????");
 
             await likeModel.deleteOne({_id: id});
 
             await postModel.findOneAndUpdate({_id: like.postId},
             {
                 $pull: { likes: id }
-            })
+            });
 
-            res.status(200).json(`YOU HAVE UNLIKED BRO`);
+            res.status(200).json(`You have unliked the post`);
         } catch(err){
             next(err)
         }
