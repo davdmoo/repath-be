@@ -109,6 +109,7 @@ class User {
             res.status(200).json(updatedUser)
         
         }catch(err){
+            console.log(err, `AAAAA KNAPA`)
             next(err)
         }
     }

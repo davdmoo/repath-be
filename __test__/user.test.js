@@ -6,46 +6,45 @@ const jwt = require("jsonwebtoken");
 
 let access_token_one
 let access_token_two 
-let access_token_three
 let user_one
 let user_two
 let user_three
 
 beforeAll(async () => {
-    await userModel.deleteOne({   email: "test2@mail.com" })
-    await userModel.deleteOne({   email: "test4@mail.com" })
-    await userModel.deleteOne({   email: "test5@mail.com" })
-    await userModel.deleteOne({   email: "test6@mail.com" })
+    await userModel.deleteOne({   email: "testuser@mail.com" })
+    await userModel.deleteOne({   email: "testuser2@mail.com" })
+    await userModel.deleteOne({   email: "testuser3@mail.com" })
+    await userModel.deleteOne({   email: "testuser4@mail.com" })
 
 
     const userPayloadOne = {
-        firstName: "test4",
-        lastName: "test4",
-        email: "test4@mail.com",
+        firstName: "testuser2",
+        lastName: "testuser2",
+        email: "testuser2@mail.com",
         password: "12345",
-        username: "test4",
-        city: "test4",
+        username: "testuser2",
+        city: "testuser2",
         phoneNumber :"1234455"
     }
 
     const userPayloadTwo = {
-        firstName: "test5",
-        lastName: "test5",
-        email: "test5@mail.com",
+        firstName: "testuser3",
+        lastName: "testuser3",
+        email: "testuser3@mail.com",
         password: "12345",
-        username: "test5",
-        city: "test5",
+        username: "testuser3",
+        city: "testuser3",
         phoneNumber :"1234455"
     }
 
 
     const userPayloadThree = {
-        firstName: "test6",
-        lastName: "test6",
-        email: "test6@mail.com",
+        firstName: "testuser4",
+        lastName: "testuser4",
+        email: "testuser4@mail.com",
         password: "12345",
-        username: "test6",
-        city: "test6",
+        username: "testuser4",
+        city: "testuser4",
         phoneNumber :"1234455"
     }
 
@@ -107,9 +106,9 @@ describe("POST /register", () =>{
         .send({
             firstName: "test",
             lastName: "test",
-            email: "test2@mail.com",
+            email: "testuser@mail.com",
             password: "12345",
-            username: "test2",
+            username: "testuser",
             city: "test",
             phoneNumber :"1234455"
         })
@@ -118,7 +117,7 @@ describe("POST /register", () =>{
             expect(resp.status).toBe(201)
             expect(result).toEqual(expect.any(Object))
             expect(result).toHaveProperty('_id')
-            expect(result).toHaveProperty('email',"test2@mail.com")
+            expect(result).toHaveProperty('email',"testuser@mail.com")
             done()
         })
         .catch((err)=>{
@@ -132,7 +131,7 @@ describe("POST /register", () =>{
         .send({
             firstName: "test",
             lastName: "test",
-            email: "test2@mail.com",
+            email: "testuser@mail.com",
             password: "12345",
             username: "testagnes",
             city: "test",
@@ -151,30 +150,6 @@ describe("POST /register", () =>{
         })
     })
 
-    test("failed not unique username", (done) => {
-        request(app)
-         .post('/users/register')
-        .send({
-            firstName: "test",
-            lastName: "test",
-            email: "testagnes@mail.com",
-            password: "12345",
-            username: "test2",
-            city: "test",
-            phoneNumber :"1234455"
-        })
-        .then((resp)=>{
-            const result = resp.body 
-            expect(resp.status).toBe(400)
-            expect(result).toEqual(expect.any(Object))
-            expect(result).toHaveProperty('message')
-            
-            done()
-        })
-        .catch((err)=>{
-            done(err)
-        })
-    })
 
     test("failed no firstname", (done) => {
         request(app)
@@ -253,7 +228,7 @@ describe("POST /register", () =>{
             firstName: "testagnes",
             lastName: "testagnes",
             email: "testagnes@mail.com",
-            username: "test2",
+            username: "testuser",
             city: "testagnes",
             phoneNumber :"1234455"
         })
@@ -344,7 +319,7 @@ describe("POST /login", () =>{
         request(app)
          .post('/users/login')
         .send({
-            email: "test2@mail.com",
+            email: "testuser@mail.com",
             password: "12345",
         })
         .then((resp)=>{
@@ -365,7 +340,7 @@ describe("POST /login", () =>{
         request(app)
          .post('/users/login')
         .send({
-            email: "test2@mail.com",
+            email: "testuser@mail.com",
             password: "1234",
         })
         .then((resp)=>{
@@ -386,7 +361,7 @@ describe("POST /login", () =>{
         request(app)
          .post('/users/login')
         .send({
-            email: "test2@mail.com",
+            email: "testuser@mail.com",
         })
         .then((resp)=>{
             const result = resp.body
@@ -431,9 +406,8 @@ describe("DELETE /users", () =>{
             .set('access_token',access_token_one)
             .then((resp)=>{
                 const result = resp.body
-                expect(resp.status).toBe(201)
-                expect(result).toEqual(expect.any(Array))
-                expect(result[0]).toEqual(expect.any(Object))
+                expect(resp.status).toBe(200)
+                expect(result).toEqual(expect.any(String))
                
                 done()
             })
@@ -452,7 +426,7 @@ describe("DELETE /users", () =>{
                 const result = resp.body
                 expect(resp.status).toBe(403)
                 expect(result).toEqual(expect.any(Object))
-                expect(result).toHaveProperty('message', "you cannot delete other user")
+                expect(result).toHaveProperty('message', "Forbidden access")
             
                 done()
             })
@@ -481,8 +455,9 @@ describe("PUT /users", () =>{
         .then((resp)=>{
             const result = resp.body
             expect(resp.status).toBe(200)
-            expect(result).toEqual(expect.any(Array))
-            expect(result[0]).toEqual(expect.any(Object))
+            expect(result).toEqual(expect.any(Object))
+            // // expect(result[0]).toEqual(expect.any(Object))
+            // console.log(result, `NANI DELETE`)
             done()
         })
         .catch((err)=>{

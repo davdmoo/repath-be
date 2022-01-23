@@ -154,8 +154,8 @@ describe("DELETE /likes", () =>{
         .set('access_token', access_token)
         .then((resp) => {
             const result = resp.body
-            expect(resp.statusCode).toBe(201)
-            expect(resp.res.statusMessage).toMatch("Created")
+            expect(resp.statusCode).toBe(200)
+            expect(resp.res.statusMessage).toMatch("OK")
             done()
         })
         .catch((err) => {
