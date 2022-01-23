@@ -439,21 +439,20 @@ describe("DELETE /users", () =>{
 
 describe("PUT /users", () =>{
    
-    test.only("success update own account", (done) => {
+    test("success update own account", (done) => {
         const user_two_id = user_two._id.toString()
-        console.log(user_two_id, `AAAAAAAAAAAA`)
+        
         request(app)
         .put(`/users/${user_two_id}`)
         .send({
             firstName: "testone",
             lastName: "testone",
-            username: "testone1233",
+            username: "testone",
             city: "testone",
             phoneNumber :"1234455"
         })
         .set('access_token',access_token_two)
         .then((resp)=>{
-            console.log(resp, "==============", resp.body);
             const result = resp.body
             expect(resp.status).toBe(200)
             expect(result).toEqual(expect.any(Object))
