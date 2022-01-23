@@ -91,10 +91,6 @@ class User {
                     imgUrl : req.body.imgUrl
                 }
 
-         
-        
-        
-
             if(!payload.firstName || !payload.lastName || !payload.username || !payload.phoneNumber || !payload.city){
                 throw {name: "EditInput"}
             }
