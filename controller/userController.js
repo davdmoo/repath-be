@@ -1,6 +1,7 @@
 const userModel = require('../models/userModel');
 const postModel = require('../models/postModel')
 const jwt = require("jsonwebtoken");
+const postModel = require('../models/postModel');
 const secretKey = process.env.SECRETKEY;
 
 class User {
@@ -114,22 +115,21 @@ class User {
     }
 
     static async deleteUser(req, res, next){
-        try{
-            const id = req.params.id
+        try {
+            const id = req.params.id;
+            const userId = req.user.id;
 
-            if(id !== req.user.id.toString() ){
-                res.status(403).json({message: "you cannot delete other user"})
-            } else {
-                const deletedUser = await userModel.find({_id: id}).exec()
-                if (!deletedUser) throw { name: "NotFound" };
+            if(id !== userId.toString()) throw { name: "Forbidden" };
 
-                await postModel.deleteMany({userId: id})
-                await userModel.deleteOne({_id: id})
+            const deletedUser = await userModel.findById(id).exec();
+            if (!deletedUser) throw { name: "NotFound" };
 
-                res.status(201).json(deletedUser)
-            }
-        }catch(err){
-            next(err)
+            await userModel.deleteOne({_id: id});
+            await postModel.deleteMany({ userId });
+
+            res.status(200).json(`The following user has been deleted: ${deletedUser.email}`);
+        } catch(err){
+            next(err);
         }
     }
 }

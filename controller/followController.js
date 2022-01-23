@@ -5,8 +5,8 @@ class Follow{
     static async findFollows(req, res, next) {
         try{
             const id = req.user.id;
-            const follows = await followModel.find({follower: id}).populate("follower").exec()
-
+            const follows = await followModel.find({follower: id}).populate("following").exec()
+            console.log(follows,`TESTTTT`)
             res.status(200).json(follows)
         }catch(err){
             next(err);
@@ -58,6 +58,17 @@ class Follow{
 
             res.status(200).json(delFollow)
         }catch (err){
+            next(err);
+        }
+    }
+
+    static async findFollowers(req, res, next) {
+        try{
+            const id = req.user.id;
+            const follows = await followModel.find({following: id}).populate("follower").exec()
+            console.log(follows,`TESTTTT`)
+            res.status(200).json(follows)
+        }catch(err){
             next(err);
         }
     }

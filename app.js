@@ -13,7 +13,7 @@ const cors = require("cors");
 const mongoConnection = require("./config/monggoConfig");
 
 app.use(cors());
-app.use(express.urlencoded({extended: true}))
+app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
 
 app.use('/users', userRoutes)
@@ -25,8 +25,8 @@ app.use('/fetchs', fetchRoutes)
 
 app.use(errorHandler)
 
-app.listen(3000, () => {
-    console.log(`Example app listening at http://localhost:3000`)
-})
+// app.listen(3000, () => {
+//     console.log(`Example app listening at http://localhost:3000`)
+// })
 
 module.exports = app

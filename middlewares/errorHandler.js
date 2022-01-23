@@ -50,6 +50,7 @@ const errorHandler = (err, req, res, next) => {
             break;
         case "EditInput":
             res.status(400).json({message: "Please input required fields on edit form"})
+            break;
         default:
             console.log(err);
             res.status(500).json({ message: "Internal server error" })
