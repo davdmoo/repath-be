@@ -26,7 +26,6 @@ const userSchema = new Schema({
   username:  {
     type: String,
     required: [true, 'Please input username'],
-    unique: true,
     sparse: true
   },
   phoneNumber: {

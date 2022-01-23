@@ -1,3 +1,4 @@
+const { ObjectId } = require("mongodb");
 const friendModel = require("../models/friendModel")
 const userModel = require('../models/userModel')
 const { ObjectId } = require("mongodb")
@@ -6,19 +7,9 @@ class Friend{
     static async findFriends(req, res, next){
         try {
             const {id} = req.user
-            // const { friends } = await userModel.findById(id).populate({path: "friends", 
-            // populate: [{path: "sender"}, {path: "receiver"}]
-            // });
-            // const friends = await friendModel.find({ $or: 
-            //   [{ sender: id }, { receiver: id }],
-            //   $and: [{ status: true }]
-            // }).populate([{path: "sender"}, {path: "receiver"}]);
-            const friends = await friendModel.find().exec();
-            // find friends -> populate 2 2nya
-            // bkin array kosong
-            // loop -> setiap ketemu yg bukan id user -> push ke array
+            
+            const friends = await userModel.findById(id).populate("friends")
             let payload = [];
-            // console.log(friends);
 
             friends.forEach(friend => {
                 if(friend.sender.toString() == id.toString() && friend.status) {
@@ -27,8 +18,6 @@ class Friend{
                   payload.push(friend)
                 }
             })
-
-            // console.log(payload);
             
             res.status(200).json(payload)
         } catch (error) {
