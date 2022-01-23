@@ -439,7 +439,7 @@ describe("DELETE /users", () =>{
 
 describe("PUT /users", () =>{
    
-    test.only("success update own account", (done) => {
+    test("success update own account", (done) => {
         const user_two_id = user_two._id.toString()
         console.log(user_two_id, `AAAAAAAAAAAA`)
         request(app)
