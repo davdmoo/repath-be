@@ -6,5 +6,6 @@ router.use(authentication)
 router.get('/', followController.findFollows)
 router.post('/:followId', followController.addFollow)
 router.delete('/:followId', followController.deleteFollow)
+router.get('/followers', followController.findFollowers)
 
 module.exports = router
