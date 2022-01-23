@@ -42,7 +42,11 @@ const userSchema = new Schema({
     ref: "Post"
   }],
   imgUrl: String,
-  header: String
+  header: String,
+  friends:[{
+    type: Schema.Types.ObjectId,
+    ref: "Friend"
+  }]
 });
 
 userSchema.pre("save", async function save(next) {
