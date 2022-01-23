@@ -1,4 +1,5 @@
 const userModel = require('../models/userModel');
+const postModel = require('../models/postModel')
 const jwt = require("jsonwebtoken");
 const secretKey = process.env.SECRETKEY;
 
@@ -122,6 +123,7 @@ class User {
                 const deletedUser = await userModel.find({_id: id}).exec()
                 if (!deletedUser) throw { name: "NotFound" };
 
+                await postModel.deleteMany({userId: id})
                 await userModel.deleteOne({_id: id})
 
                 res.status(201).json(deletedUser)
