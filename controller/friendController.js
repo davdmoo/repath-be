@@ -1,3 +1,4 @@
+const { ObjectId } = require("mongodb");
 const friendModel = require("../models/friendModel")
 const userModel = require('../models/userModel')
 
@@ -5,13 +6,19 @@ class Friend{
     static async findFriends(req, res, next){
         try {
             const {id} = req.user
+            
             const friends = await userModel.findById(id).populate("friends")
-            friends.friends.filter(el => {
-                if(el.sender == id || el.receiver == id){
-                    return el
+            let payload = [];
+
+            friends.forEach(friend => {
+                if(friend.sender.toString() == id.toString() && friend.status) {
+                  payload.push(friend)
+                } else if (friend.sender == id && friend.status) {
+                  payload.push(friend)
                 }
             })
-            res.status(200).json(friends.friends)
+            
+            res.status(200).json(payload)
         } catch (error) {
             next(error)
         }
@@ -77,12 +84,13 @@ class Friend{
 
     static async delFriend(req, res, next){
         try {
-            const {id} = req.user
-            const {reqId} = req.params
-            const decline = await friendModel.findOne({sender: followId, receiver: id})
-            friendModel.deleteOne({sender: followId, receiver: id})
+            const { reqId } = req.params
+            const friend = await friendModel.findById(reqId)
+            if (!friend) throw { name: "NotFound" }
 
-            res.status(201).json(decline)
+            const deleteStatus = await friendModel.deleteOne({ _id: ObjectId(reqId) })
+            
+            res.status(200).json(deleteStatus)
         } catch (error) {
             next(error)
         }
