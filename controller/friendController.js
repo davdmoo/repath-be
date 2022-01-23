@@ -1,17 +1,36 @@
 const friendModel = require("../models/friendModel")
 const userModel = require('../models/userModel')
+const { ObjectId } = require("mongodb")
 
 class Friend{
     static async findFriends(req, res, next){
         try {
             const {id} = req.user
-            const friends = await userModel.findById(id).populate("friends")
-            friends.friends.filter(el => {
-                if(el.sender == id || el.receiver == id){
-                    return el
+            // const { friends } = await userModel.findById(id).populate({path: "friends", 
+            // populate: [{path: "sender"}, {path: "receiver"}]
+            // });
+            // const friends = await friendModel.find({ $or: 
+            //   [{ sender: id }, { receiver: id }],
+            //   $and: [{ status: true }]
+            // }).populate([{path: "sender"}, {path: "receiver"}]);
+            const friends = await friendModel.find().exec();
+            // find friends -> populate 2 2nya
+            // bkin array kosong
+            // loop -> setiap ketemu yg bukan id user -> push ke array
+            let payload = [];
+            // console.log(friends);
+
+            friends.forEach(friend => {
+                if(friend.sender.toString() == id.toString() && friend.status) {
+                  payload.push(friend)
+                } else if (friend.sender == id && friend.status) {
+                  payload.push(friend)
                 }
             })
-            res.status(200).json(friends.friends)
+
+            // console.log(payload);
+            
+            res.status(200).json(payload)
         } catch (error) {
             next(error)
         }
@@ -77,12 +96,13 @@ class Friend{
 
     static async delFriend(req, res, next){
         try {
-            const {id} = req.user
-            const {reqId} = req.params
-            const decline = await friendModel.findOne({sender: followId, receiver: id})
-            friendModel.deleteOne({sender: followId, receiver: id})
+            const { reqId } = req.params
+            const friend = await friendModel.findById(reqId)
+            if (!friend) throw { name: "NotFound" }
 
-            res.status(201).json(decline)
+            const deleteStatus = await friendModel.deleteOne({ _id: ObjectId(reqId) })
+            
+            res.status(200).json(deleteStatus)
         } catch (error) {
             next(error)
         }
