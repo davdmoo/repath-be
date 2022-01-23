@@ -62,7 +62,6 @@ class Like{
                 likes: like
               }
             })
-            console.log(like, "MASUK");
 
             res.status(201).json(like);
         } catch(err){
