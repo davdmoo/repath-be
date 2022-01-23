@@ -104,9 +104,136 @@ describe("GET /follows", () => {
 })
 
 describe("POST /follows", () => {
+    test("success add following", (done) => {
+        const userId = user_two._id.toString()
+        request(app)
+        .post(`/follows/${userId}`)
+        .set({
+            access_token: access_token_one
+        })
+        .then((resp)=>{
+            const result = resp.body
+            expect(resp.status).toBe(201)
+            expect(result).toEqual(expect.any(Object))
+            done()
+        })
+        .catch((err)=>{
+            done(err)
+        })
+    })
 
+    test("failed add following", (done) => {
+        const userId = user_two._id.toString()
+        request(app)
+        .post(`/follows/${userId}`)
+        .set({
+            access_token: null
+        })
+        .then((resp)=>{
+            const result = resp.body
+            expect(resp.statusCode).toBe(401)
+            expect(resp.res.statusMessage).toMatch("Unauthorized")
+            expect(result).toMatchObject({"message": 'Invalid token'})
+            done()
+        })
+        .catch((err)=>{
+            done(err)
+        })
+    })
+
+    test("failed add existing following", (done) => {
+        const userId = user_two._id.toString()
+        request(app)
+        .post(`/follows/${userId}`)
+        .set({
+            access_token: access_token_one
+        })
+        .then((resp)=>{
+            const result = resp.body
+            expect(resp.statusCode).toBe(403)
+            expect(resp.res.statusMessage).toMatch("Forbidden")
+            expect(result).toBe("you already follow this user")
+            done()
+        })
+        .catch((err)=>{
+            done(err)
+        })
+    })
+
+    test("failed add following own user", (done) => {
+        const userId = user_one._id.toString()
+        request(app)
+        .post(`/follows/${userId}`)
+        .set({
+            access_token: access_token_one
+        })
+        .then((resp)=>{
+            const result = resp.body
+            expect(resp.statusCode).toBe(403)
+            expect(resp.res.statusMessage).toMatch("Forbidden")
+            expect(result).toBe("you cannot follow yourself")
+            done()
+        })
+        .catch((err)=>{
+            done(err)
+        })
+    })
 })
 
 describe("DELETE /follows", () => {
+    test("success delete following", (done) => {
+        const userId = user_two._id.toString()
+        request(app)
+        .delete(`/follows/${userId}`)
+        .set({
+            access_token: access_token_one
+        })
+        .then((resp)=>{
+            const result = resp.body
+            expect(resp.status).toBe(201)
+            expect(result).toEqual(expect.any(Object))
+            done()
+        })
+        .catch((err)=>{
+            done(err)
+        })
+    })
 
+    test("failed delete unexisting following", (done) => {
+        const userId = user_three._id.toString()
+        request(app)
+        .delete(`/follows/${userId}`)
+        .set({
+            access_token: access_token_one
+        })
+        .then((resp)=>{
+            const result = resp.body
+            expect(resp.status).toBe(400)
+            expect(resp.res.statusMessage).toMatch("Bad Request")
+            expect(result).toEqual({message: 'Content not found'})
+            done()
+        })
+        .catch((err)=>{
+            done(err)
+        })
+    })
+
+    test("failed delete following", (done) => {
+        const userId = user_two._id.toString()
+        request(app)
+        .delete(`/follows/${userId}`)
+        .set({
+            access_token: null
+        })
+        .then((resp)=>{
+            const result = resp.body
+            expect(resp.statusCode).toBe(401)
+            expect(resp.res.statusMessage).toMatch("Unauthorized")
+            expect(result).toMatchObject({"message": 'Invalid token'})
+            done()
+        })
+        .catch((err)=>{
+            done(err)
+        })
+    })
 })

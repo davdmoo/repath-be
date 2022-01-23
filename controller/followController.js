@@ -17,17 +17,17 @@ class Follow{
         try{
             const id = req.user.id;
             const followId = req.params.followId
-
+            
             const checkFollow = await followModel.findOne({
                 follower: id,
                 following: followId
             })
 
             if(checkFollow){
-                return res.status(200).json("you already follow this user")
+                return res.status(403).json("you already follow this user")
             }
-            if(id == followId){
-                return res.status(200).json("you cannot follow yourself")
+            if(id.toString() == followId){
+                return res.status(403).json("you cannot follow yourself")
             }
 
             const newFollow = await followModel.create({
@@ -50,13 +50,15 @@ class Follow{
                 follower: id,
                 following: followId
             })
-            
+            if(!delFollow){
+                throw {name: "NotFound"}
+            }
             await followModel.deleteOne({
                 follower: id,
                 following: followId
             })
 
-            res.status(200).json(delFollow)
+            res.status(201).json(delFollow)
         }catch (err){
             next(err);
         }
