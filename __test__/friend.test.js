@@ -6,7 +6,8 @@ const jwt = require("jsonwebtoken");
 const friendModel = require('../models/friendModel');
 
 let access_token_one
-let access_token_two 
+let access_token_two
+let access_token_three 
 let user_one
 let user_two
 let user_three
@@ -59,7 +60,7 @@ beforeAll(async () => {
   
     user_three = await userModel.create(userPayloadThree)
     const payloadJWT_THREE = { email: user_three.email };
-    access_token_two = jwt.sign(payloadJWT_THREE, "repathkeren");
+    access_token_three = jwt.sign(payloadJWT_THREE, "repathkeren");
 });
 
 afterAll(async()=>{
@@ -242,13 +243,13 @@ describe("DELETE /friends", () => {
         request(app)
         .delete(`/friends/${reqId}`)
         .set({
-            access_token: access_token_one
+            access_token: access_token_three
         })
         .then((resp)=>{
             const result = resp.body
-            expect(resp.status).toBe(403)
-            expect(resp.res.statusMessage).toMatch("Forbidden")
-            expect(result).toEqual({message: 'Forbidden access'})
+            expect(resp.status).toBe(400)
+            expect(resp.res.statusMessage).toMatch("Bad Request")
+            expect(result).toEqual({message: 'Content not found'})
             done()
         })
         .catch((err)=>{

@@ -100,7 +100,7 @@ class Friend{
             if (!friend) throw { name: "NotFound" }
             
             if(friend.receiver.toString() !== id.toString()
-            || friend.sender.toString() !== id.toString()){
+            && friend.sender.toString() !== id.toString()){
                 throw {name: "Forbidden"}
             }
 
