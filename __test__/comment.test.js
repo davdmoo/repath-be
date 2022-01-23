@@ -50,7 +50,6 @@ describe("GET /comments", () => {
         .set('access_token', null)
         .then((resp) => {
             const result = resp.body
-            console.log(result);
             expect(resp.statusCode).toBe(401)
             expect(resp.res.statusMessage).toMatch("Unauthorized")
             expect(result).toMatchObject({"message": 'Invalid token'})
