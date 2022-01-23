@@ -61,6 +61,17 @@ class Follow{
             next(err);
         }
     }
+
+    static async findFollowers(req, res, next) {
+        try{
+            const id = req.user.id;
+            const follows = await followModel.find({following: id}).populate("follower").exec()
+            console.log(follows,`TESTTTT`)
+            res.status(200).json(follows)
+        }catch(err){
+            next(err);
+        }
+    }
 }
 
 module.exports = Follow
