@@ -7,7 +7,9 @@ class Comment{
     static async findComments(req, res, next){
         try {
             const { postId } = req.params;
+
             const comments = await commentModel.find({ postId }).exec();
+
             if (!comments) throw { name: "NotFound" };
 
             res.status(200).json(comments);
@@ -78,8 +80,14 @@ class Comment{
     static async deleteComment(req, res, next) {
         try{
             const id = req.params.id;
+            const userId = req.user.id
             
             const deletedComment = await commentModel.findById(id).exec();
+            console.log(deletedComment.userId.toString(), "!==", userId.toString());
+            if(deletedComment.userId.toString() !== userId.toString()){
+                throw {name: "Forbidden"}
+            }
+
             if (!deletedComment) throw { name: "NotFound" };
             
             await commentModel.deleteOne({_id: id});
@@ -91,6 +99,7 @@ class Comment{
 
             res.status(200).json(deletedComment)
         } catch(err) {
+            console.log(err, "INI ERROR");
             next(err);
         }
     }

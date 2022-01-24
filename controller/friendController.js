@@ -68,12 +68,11 @@ class Friend{
             
             const friendReq = await friendModel.findById(reqId)
             
-            if(friendReq.sender.toString() == id.toString()){
+            if(friendReq.sender == id){
+                console.log("masuk 1");
                 throw {name: "Forbidden"}
             }
-            if(friendReq.sender.toString() !== id.toString() && friendReq.receiver.toString() !== id.toString()){
-                throw {name: "Forbidden"}
-            }
+            
             if(!friendReq){
                 throw {name: "NotFound"}
             }
@@ -84,19 +83,18 @@ class Friend{
                     status: true
                 })
             
-            const friendReceiver = await userModel.findOneAndUpdate({_id: friendReq.receiver},
+            await userModel.findOneAndUpdate({_id: friendReq.receiver},
                 {
                     $push: {
-                    friends: request
+                    friends: request.sender
                     }
                 });
-            const friendSender = userModel.findOneAndUpdate({_id: friendReq.sender},
+            await userModel.findOneAndUpdate({_id: friendReq.sender},
                 {
                     $push: {
-                    friends: request
+                    friends: request.receiver
                     }
                 });
-            console.log(friendReceiver, friendSender);
             // const list = await friendModel.find()
             console.log(request)
             res.status(200).json(request)
@@ -110,22 +108,23 @@ class Friend{
         try {
             const {id} = req.user
             const { reqId } = req.params
-            const list = await friendModel.find()
-            console.log(list);
+            
             const friend = await friendModel.findOne({_id: ObjectId(reqId)})
-            console.log(friend);
-            if (!friend) throw { name: "NotFound" }
+            
+            if (!friend) {
+                throw { name: "NotFound" }
+            }
             
             if(friend.receiver.toString() !== id.toString()
             && friend.sender.toString() !== id.toString()){
                 throw {name: "Forbidden"}
             }
-            console.log("masuk uhuy delete request");
-            // await friendModel.deleteOne({ _id: ObjectId(reqId) })
+            
+            await friendModel.deleteOne({ _id: ObjectId(reqId) })
             
             res.status(200).json(friend)
         } catch (error) {
-            console.log(error);
+            console.log(error, "INI MAU DELETE ERROR");
             next(error)
         }
     }
