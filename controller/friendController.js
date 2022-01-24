@@ -27,11 +27,11 @@ class Friend{
     static async addFriend(req, res, next){
         try {
             const {id} = req.user
-            const {followId} = req.params
+            const {userId} = req.params
 
             const sendReq = await friendModel.create({
                 sender: id,
-                receiver: followId,
+                receiver: userId,
                 status: false
             })
 
@@ -87,7 +87,6 @@ class Friend{
 
             res.status(200).json(request)
         } catch (error) {
-            console.log(error, "ini kenapaaaa");
             next(error)
         }
     }
@@ -106,9 +105,8 @@ class Friend{
 
             await friendModel.deleteOne({ _id: ObjectId(reqId) })
             
-            res.status(201).json(friend)
+            res.status(200).json(friend)
         } catch (error) {
-            console.log(error, "INI KENAPA DI DELETE FRIENDS");
             next(error)
         }
     }
