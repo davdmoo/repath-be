@@ -230,7 +230,7 @@ describe("DELETE /friends", () => {
         })
         .then((resp)=>{
             const result = resp.body
-            expect(resp.status).toBe(201)
+            expect(resp.status).toBe(200)
             expect(result).toEqual(expect.any(Object))
             done()
         })
@@ -248,9 +248,9 @@ describe("DELETE /friends", () => {
         })
         .then((resp)=>{
             const result = resp.body
-            expect(resp.status).toBe(400)
-            expect(resp.res.statusMessage).toMatch("Bad Request")
-            expect(result).toEqual({message: 'Content not found'})
+            expect(resp.status).toBe(403)
+            expect(resp.res.statusMessage).toMatch("Forbidden")
+            expect(result).toEqual({message: 'Forbidden access'})
             done()
         })
         .catch((err)=>{
