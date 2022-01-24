@@ -66,8 +66,13 @@ class Friend{
             
             const friendReq = await friendModel.findById(reqId);
             
-            if(friendReq.sender.toString() == id) throw {name: "Forbidden"};
-            
+            if(friendReq.sender.toString() == id.toString()){
+                throw {name: "Forbidden"};
+            }
+            if(friendReq.receiver.toString() !== id.toString()){
+                throw {name: "Forbidden"};
+            }
+
             if(!friendReq) throw {name: "NotFound"};
 
             const request = await friendModel.findOneAndUpdate(
@@ -91,6 +96,7 @@ class Friend{
 
             res.status(200).json(request)
         } catch (error) {
+            console.log(error, "INI ERROR DARI FRIEND CONTROLLER");
             next(error)
         }
     }
