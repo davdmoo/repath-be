@@ -5,7 +5,8 @@ const mongoose = require('../config/monggoConfig');
 const jwt = require("jsonwebtoken");
 
 let access_token_one
-let access_token_two 
+let access_token_two
+let access_token_three
 let user_one
 let user_two
 let user_three
@@ -59,7 +60,7 @@ beforeAll(async () => {
   
     user_three = await userModel.create(userPayloadThree)
     const payloadJWT_THREE = { email: user_three.email };
-    access_token_two = jwt.sign(payloadJWT_THREE, "repathkeren");
+    access_token_three = jwt.sign(payloadJWT_THREE, "repathkeren");
 });
 
 
@@ -96,6 +97,40 @@ describe("GET /users", () => {
         .catch((err)=>{
             done(err)
         })
+    })
+
+    test("with query", (done) => {
+        request(app)
+        .get("/users?name=wow")
+        .set('access_token',access_token_one)
+          .then((resp) => {
+            const result = resp.body;
+
+            expect(resp.status).toBe(200);
+            expect(result).toEqual(expect.any(Array));
+
+            done();
+          })
+          .catch((err) => {
+            done(err);
+          })
+    })
+
+    test("get user by id success", (done) => {
+        request(app)
+        .get(`/users/${user_one._id}`)
+        .set("access_token", access_token_one)
+        .then((resp) => {
+            const result = resp.body;
+
+            expect(resp.status).toBe(200);
+            expect(result).toEqual(expect.any(Object));
+
+            done();
+          })
+          .catch((err) => {
+            done(err);
+          })
     })
 })
 
@@ -395,6 +430,109 @@ describe("POST /login", () =>{
             done(err)
         })
     })
+
+    test("failed invalid email", (done) => {
+        request(app)
+        .post("/users/login")
+        .send({
+            email: "testuser100@mail.com",
+            password: "12345"
+        })
+          .then((resp) => {
+            const result = resp.body
+            expect(resp.status).toBe(401)
+            expect(result).toEqual(expect.any(Object))
+            expect(result).toHaveProperty('message', 'Invalid email/password')
+
+              done();
+          })
+          .catch((err) => {
+              done(err);
+          })
+    })
+})
+
+describe("PUT /users", () =>{
+   
+    test("success update own account", (done) => {
+        const user_two_id = user_two._id.toString()
+        // console.log(user_two_id, `AAAAAAAAAAAA`)
+        request(app)
+        .put(`/users/${user_two_id}`)
+        .send({
+            firstName: "testone",
+            lastName: "testone",
+            username: "testoneaas",
+            city: "testone",
+            phoneNumber :"1234455"
+        })
+        .set('access_token',access_token_two)
+        .then((resp)=>{
+            console.log(resp, "==============", resp.body);
+            const result = resp.body
+            expect(resp.status).toBe(200)
+            expect(result).toEqual(expect.any(Object))
+    
+            console.log(result, `NANI DELETE`)
+            done()
+        })
+        .catch((err)=>{
+            done(err)
+        })
+    })
+
+    test("failed update own account", (done) => {
+        const user_two_id = user_two._id.toString()
+        
+        request(app)
+        .put(`/users/${user_two_id}`)
+        .send({
+            firstName: "testone",
+            lastName: "testone",
+            username: "testoneaas",
+            city: "testone",
+            // phoneNumber :"1234455"
+        })
+        .set('access_token',access_token_two)
+        .then((resp)=> {
+            // console.log(resp, "==============", resp.body);
+            const result = resp.body;
+            expect(resp.status).toBe(400);
+            expect(result).toEqual(expect.any(Object));
+            expect(result).toHaveProperty("message", "Please input required fields on edit form");
+    
+            done()
+        })
+        .catch((err)=>{
+            done(err)
+        })
+    })
+
+    test("failed update other user's account", (done) => {
+        const user_two_id = user_two._id.toString()
+        
+        request(app)
+        .put(`/users/${user_two_id}`)
+        .send({
+            firstName: "testone",
+            lastName: "testone",
+            username: "testoneaas",
+            city: "testone",
+            phoneNumber :"1234455"
+        })
+        .set('access_token',access_token_one)
+        .then((resp)=> {
+            const result = resp.body;
+            expect(resp.status).toBe(403);
+            expect(result).toEqual(expect.any(Object));
+            expect(result).toHaveProperty("message", "Forbidden access");
+    
+            done();
+        })
+        .catch((err)=>{
+            done(err)
+        })
+    })
 })
 
 describe("DELETE /users", () =>{
@@ -434,36 +572,4 @@ describe("DELETE /users", () =>{
                 done(err)
             })
         })
-})
-
-describe("PUT /users", () =>{
-   
-    test("success update own account", (done) => {
-        const user_two_id = user_two._id.toString()
-        // console.log(user_two_id, `AAAAAAAAAAAA`)
-        request(app)
-        .put(`/users/${user_two_id}`)
-        .send({
-            firstName: "testone",
-            lastName: "testone",
-            username: "testoneaas",
-            city: "testone",
-            phoneNumber :"1234455"
-        })
-        .set('access_token',access_token_two)
-        .then((resp)=>{
-            // console.log(resp, "==============", resp.body);
-            const result = resp.body
-            expect(resp.status).toBe(200)
-            expect(result).toEqual(expect.any(Object))
-    
-            done()
-        })
-        .catch((err)=>{
-            done(err)
-        })
-    })
-
-
-
 })

@@ -73,17 +73,17 @@ class Post {
         }
     }
 
-    static async findPost(req, res, next) {
-        try {
-            const id = req.params.id
-            const post = await postModel.findOne({_id: id}).exec()
-            if (!post) throw { name: "NotFound" };
+    // static async findPost(req, res, next) {
+    //     try {
+    //         const id = req.params.id
+    //         const post = await postModel.findOne({_id: id}).exec()
+    //         if (!post) throw { name: "NotFound" };
 
-            res.status(200).json(post)
-        }catch(err) {
-            next(err);
-        }
-    }d
+    //         res.status(200).json(post)
+    //     }catch(err) {
+    //         next(err);
+    //     }
+    // }
 
     static async editPost(req, res, next){
         try {
