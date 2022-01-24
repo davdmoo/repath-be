@@ -64,7 +64,6 @@ class Friend{
         try {
             const {id} = req.user
             const {reqId} = req.params
-            console.log(reqId);
             
             const friendReq = await friendModel.findById(reqId)
             
@@ -74,6 +73,7 @@ class Friend{
             }
             
             if(!friendReq){
+                console.log("masuk 2");
                 throw {name: "NotFound"}
             }
 
@@ -83,20 +83,19 @@ class Friend{
                     status: true
                 })
             
-            await userModel.findOneAndUpdate({_id: friendReq.receiver},
+            const receiver = await userModel.findOneAndUpdate({_id: friendReq.receiver._id},
                 {
                     $push: {
                     friends: request.sender
                     }
                 });
-            await userModel.findOneAndUpdate({_id: friendReq.sender},
+            const sender = await userModel.findOneAndUpdate({_id: friendReq.sender._id},
                 {
                     $push: {
                     friends: request.receiver
                     }
                 });
-            // const list = await friendModel.find()
-            console.log(request)
+
             res.status(200).json(request)
         } catch (error) {
             console.log(error);

@@ -210,10 +210,9 @@ describe("GET /comments", () => {
 
 describe("PUT /comments", () => {
     test("user succes to edit a comment with access token", (done) => {
-        let postId = thePost._id.toString()
         let commentId = comment._id.toString()
         request(app)
-        .put(`/comments/${postId}/${commentId}`)
+        .put(`/comments/${commentId}`)
         .set('access_token', access_token)
         .send({
             content: "haloo ini edit comment"
@@ -235,10 +234,9 @@ describe("PUT /comments", () => {
     })
 
     test("user failed to edit a comment due to unexisting comment", (done) => {
-        let postId = thePost._id.toString()
         let commentId = comment._id.toString().slice(2, 0)
         request(app)
-        .put(`/comments/${postId}/${commentId}`)
+        .put(`/comments/${commentId}`)
         .set('access_token', access_token)
         .send({
             content: "haloo ini edit comment"
@@ -254,10 +252,9 @@ describe("PUT /comments", () => {
     })
 
     test("user failed to edit a comment with access token", (done) => {
-        let postId = thePost._id.toString()
         let commentId = comment._id.toString()
         request(app)
-        .put(`/comments/${postId}/${commentId}`)
+        .put(`/comments/${commentId}`)
         .set('access_token', null)
         .send({
             content: "haloo ini edit comment"
@@ -277,10 +274,9 @@ describe("PUT /comments", () => {
 
 describe("DELETE /comments", () => {
     test("user success to delete a comment", (done) => {
-        let postId = thePost._id.toString()
         let commentId = comment._id.toString()
         request(app)
-        .delete(`/comments/${postId}/${commentId}`)
+        .delete(`/comments/${commentId}`)
         .set('access_token', access_token)
         .then((resp) => {
             const result = resp.body
@@ -294,10 +290,9 @@ describe("DELETE /comments", () => {
     })
 
     test("user success to delete a comment due to different user", (done) => {
-        let postId = thePost._id.toString()
         let commentId = comment._id.toString()
         request(app)
-        .delete(`/comments/${postId}/${commentId}`)
+        .delete(`/comments/${commentId}`)
         .set('access_token', access_token)
         .then((resp) => {
             const result = resp.body
@@ -312,10 +307,9 @@ describe("DELETE /comments", () => {
     })
 
     test("user success to delete a comment", (done) => {
-        let postId = thePost._id.toString()
         let commentId = comment._id.toString()
         request(app)
-        .delete(`/comments/${postId}/${commentId}`)
+        .delete(`/comments/${commentId}`)
         .set('access_token', null)
         .then((resp) => {
             const result = resp.body
