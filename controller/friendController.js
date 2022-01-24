@@ -7,26 +7,41 @@ class Friend{
         try {
             const {id} = req.user
             
-            const friends = await userModel.findById(id).populate(
-                { path: "friends", 
-                populate: 
-                [
-                    { path: "sender" },
-                    { path: "receiver" },
-                ]})
+            // const friends = await userModel.findById(id).populate(
+            //     { path: "friends", 
+            //     populate: 
+            //     [
+            //         { path: "sender" },
+            //         { path: "receiver" },
+            //     ]})
             
-            let payload = [];
+            // let payload = [];
 
-            friends.friends.forEach(friend => {
-                if(friend.sender._id.toString() == id.toString() && friend.status) {
-                  payload.push(friend.receiver)
-                } else if (friend.receiver._id.toString() == id.toString() && friend.status) {
-                  payload.push(friend.sender)
+            // friends.friends.forEach(friend => {
+            //     if(friend.sender._id.toString() == id.toString() && friend.status) {
+            //       payload.push(friend.receiver)
+            //     } else if (friend.receiver._id.toString() == id.toString() && friend.status) {
+            //       payload.push(friend.sender)
+            //     }
+            // })
+
+            const friends = await friendModel.find({status: true}).populate([
+                { path: "sender" },
+                { path: "receiver"},
+            ])
+            
+            let payload = []
+            friends.forEach(el =>{
+                if(el.sender._id.toString() == id.toString()){
+                    payload.push(el.receiver)
+                }else if(el.receiver._id.toString() == id.toString()){
+                    payload.push(el.sender)
                 }
             })
             
             res.status(200).json(payload)
         } catch (error) {
+            console.log(error, "INI EROR=======");
             next(error)
         }
     }
@@ -56,6 +71,7 @@ class Friend{
     static async getRequest(req, res, next){
         try {
             const {id} = req.user
+            
             let request = await friendModel.find({receiver: id, status: false}).populate("sender")
 
             res.status(200).json(request)
@@ -125,8 +141,19 @@ class Friend{
             && friend.sender.toString() !== id.toString()){
                 throw {name: "Forbidden"}
             }
+            await friendModel.deleteOne({ _id: ObjectId(reqId)})
             
-            await friendModel.deleteOne({ _id: ObjectId(reqId) })
+            if(friend.sender.toString() == id.toString()){
+                await userModel.findOneAndUpdate({_id: id},
+                    {
+                        $pull: { friends:  friend.receiver}
+                    });
+            }else if(friend.receiver.toString() == id.toString()){
+                await userModel.findOneAndUpdate({_id: id},
+                    {
+                        $pull: { friends:  friend.sender}
+                    });
+            }
             
             res.status(200).json(friend)
         } catch (error) {

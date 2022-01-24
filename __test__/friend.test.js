@@ -15,6 +15,7 @@ let request_one
 let reqUser_one_three
 
 beforeAll(async () => {
+    await friendModel.collection.drop()
     await userModel.deleteOne({   email: "testuser@mail.com" })
     await userModel.deleteOne({   email: "testuser2@mail.com" })
     await userModel.deleteOne({   email: "testuser3@mail.com" })
@@ -94,6 +95,25 @@ describe("POST /friends", () => {
         })
     })
 
+    test("failed send friend request due to existing request", (done) => {
+        const userId = user_two._id.toString()
+        request(app)
+        .post(`/friends/${userId}`)
+        .set({
+            access_token: access_token_one
+        })
+        .then((resp)=>{
+            const result = resp.body
+            expect(resp.status).toBe(400)
+            expect(resp.res.statusMessage).toMatch("Bad Request")
+            expect(result).toEqual({message: 'You have a pending friend request involving this user'})
+            done()
+        })
+        .catch((err)=>{
+            done(err)
+        })
+    })
+
     test("failed send friend request due to existing friend", (done) => {
         const userId = user_three._id.toString()
         request(app)
@@ -103,9 +123,9 @@ describe("POST /friends", () => {
         })
         .then((resp)=>{
             const result = resp.body
-            expect(resp.status).toBe(403)
-            expect(resp.res.statusMessage).toMatch("Forbidden")
-            expect(result).toEqual({message: 'Forbidden access'})
+            expect(resp.status).toBe(400)
+            expect(resp.res.statusMessage).toMatch("Bad Request")
+            expect(result).toEqual({message: 'You have a pending friend request involving this user'})
             done()
         })
         .catch((err)=>{
@@ -172,8 +192,26 @@ describe("PATCH /friends", () => {
         })
     })
 
+    test("failed acc friend request twice", (done) => {
+        const reqId = request_one._id
+        request(app)
+        .patch(`/friends/${reqId}`)
+        .set({
+            access_token: access_token_two
+        })
+        .then((resp)=>{
+            const result = resp.body
+            expect(resp.status).toBe(400)
+            expect(resp.res.statusMessage).toMatch("Bad Request")
+            expect(result).toEqual({message: 'You are already friends with this user'})
+            done()
+        })
+        .catch((err)=>{
+            done(err)
+        })
+    })
+
     test("failed acc unexisting friend request", (done) => {
-        console.log(request_one, "<<<<INIAPA");
         const reqId = request_one._id
         request(app)
         .patch(`/friends/${reqId}`)
@@ -182,7 +220,6 @@ describe("PATCH /friends", () => {
         })
         .then((resp)=>{
             const result = resp.body
-            console.log(result, "ASDasdasdasd");
             expect(resp.status).toBe(403)
             expect(resp.res.statusMessage).toMatch("Forbidden")
             expect(result).toEqual({message: 'Forbidden access'})
