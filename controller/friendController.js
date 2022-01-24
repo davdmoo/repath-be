@@ -76,13 +76,13 @@ class Friend{
                     status: true
                 })
             
-            await userModel.findOneAndUpdate({_id: friendReq.receiver},
+            const receiver = await userModel.findOneAndUpdate({_id: friendReq.receiver},
                 {
                     $push: {
                     friends: request.sender
                     }
                 });
-            await userModel.findOneAndUpdate({_id: friendReq.sender},
+            const sender = await userModel.findOneAndUpdate({_id: friendReq.sender},
                 {
                     $push: {
                     friends: request.receiver

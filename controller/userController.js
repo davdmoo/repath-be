@@ -9,7 +9,9 @@ class User {
       const { name } = req.query;
 
       if (name) {
-        const users = await userModel.find({ username: { $regex: name + '.*' } }).exec();
+        const users = await userModel.find(
+          { username: { $regex: '^' + name, $options: 'i' } }
+        ).exec();
 
         res.status(200).json(users);
       } else {
