@@ -5,6 +5,8 @@ const app = require('../app.js')
 const jwt = require("jsonwebtoken");
 const mongoose = require('../config/monggoConfig');
 const secretKey = process.env.SECRETKEY;
+const axios = require("axios");
+const Post = require("../controller/postController");
 
 let access_token;
 let dummyAccToken;
@@ -57,8 +59,26 @@ beforeAll(async () => {
     post = await postModel.create(payload);
 });
 
+beforeEach(() => {
+  jest.restoreAllMocks()
+});
 
 describe("GET /posts", () => {
+    it('Should handle error when hit findAll', async () => {
+      jest.spyOn(Post, 'findPosts').mockRejectedValue('Error')
+  
+      return request(app)
+        .get('/posts')
+        .then((res) => {
+          expect(res.status).toBe(500)
+  
+          expect(res.body.err).toBe('Error')
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    })
+
     test("when user have access token", (done) => {
         request(app)
         .get('/posts')
@@ -90,7 +110,21 @@ describe("GET /posts", () => {
     })
 })
 
-describe("POST /posts", () =>{
+describe("POST /posts", () => {
+  it('Should handle error 500', async () => {
+    jest.spyOn(Post, 'addPost').mockRejectedValue('Error')
+
+    return request(app)
+      .post('/posts')
+      .then((res) => {
+        expect(res.status).toBe(500)
+
+        expect(res.body.err).toBe('Error')
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  })
     describe("user input is correct", () => {
         test("success posting", (done) => {
             request(app)
@@ -174,7 +208,22 @@ describe("POST /posts", () =>{
     })
 })
 
-describe("PUT /posts", () =>{
+describe("PUT /posts", () => {
+  it('Should handle error 500', async () => {
+    jest.spyOn(Post, 'editPost').mockRejectedValue('Error')
+
+    return request(app)
+      .put('/posts/mockId')
+      .then((res) => {
+        expect(res.status).toBe(500)
+
+        expect(res.body.err).toBe('Error')
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  })
+
     describe("user input is correct", () => {
         test("update success", (done) => {
             const postId = post._id;
@@ -262,7 +311,21 @@ describe("PUT /posts", () =>{
     })
 })
 
-describe("DELETE /posts", () =>{
+describe("DELETE /posts", () => {
+  it('Should handle error 500', async () => {
+    jest.spyOn(Post, 'deletePost').mockRejectedValue('Error')
+
+    return request(app)
+      .post('/posts/mockId')
+      .then((res) => {
+        expect(res.status).toBe(500)
+
+        expect(res.body.err).toBe('Error')
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  })
     describe("delete failed", () => {
       test("forbidden access", (done) => {
         request(app)
