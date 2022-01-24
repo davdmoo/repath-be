@@ -83,7 +83,9 @@ class Comment{
             const userId = req.user.id
             
             const deletedComment = await commentModel.findById(id).exec();
-            console.log(deletedComment.userId.toString(), "!==", userId.toString());
+            console.log(deletedComment, "=====INI", userId);
+            // console.log(deletedComment.userId.toString(), "!==", userId.toString());
+
             if(deletedComment.userId.toString() !== userId.toString()){
                 throw {name: "Forbidden"}
             }

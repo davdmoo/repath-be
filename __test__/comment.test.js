@@ -42,7 +42,7 @@ beforeAll(async () => {
     access_token = jwt.sign(payloadJwt, "repathkeren");
 
     const userOne = await userModel.create(userPayloadOne)
-    const payloadJwtOne = { email: user.email };
+    const payloadJwtOne = { email: userOne.email };
     access_token_one = jwt.sign(payloadJwtOne, "repathkeren");
     
     await postModel.deleteOne({  title: "text 1" })
@@ -273,6 +273,23 @@ describe("PUT /comments", () => {
 })
 
 describe("DELETE /comments", () => {
+    test("user failed to delete a comment due to different user", (done) => {
+        let commentId = comment._id.toString()
+        request(app)
+        .delete(`/comments/${commentId}`)
+        .set('access_token', access_token_one)
+        .then((resp) => {
+            const result = resp.body
+            expect(resp.status).toBe(403)
+            expect(resp.res.statusMessage).toMatch("Forbidden")
+            expect(result).toEqual({message: 'Forbidden access'})
+            done()
+        })
+        .catch((err) => {
+            done(err)
+        })
+    })
+
     test("user success to delete a comment", (done) => {
         let commentId = comment._id.toString()
         request(app)
@@ -282,23 +299,6 @@ describe("DELETE /comments", () => {
             const result = resp.body
             expect(resp.statusCode).toBe(200)
             expect(resp.res.statusMessage).toMatch("OK")
-            done()
-        })
-        .catch((err) => {
-            done(err)
-        })
-    })
-
-    test("user success to delete a comment due to different user", (done) => {
-        let commentId = comment._id.toString()
-        request(app)
-        .delete(`/comments/${commentId}`)
-        .set('access_token', access_token)
-        .then((resp) => {
-            const result = resp.body
-            expect(resp.status).toBe(400)
-            expect(resp.res.statusMessage).toMatch("Bad Request")
-            expect(result).toEqual({message: 'Content not found'})
             done()
         })
         .catch((err) => {
