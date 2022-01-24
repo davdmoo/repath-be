@@ -87,7 +87,7 @@ class Friend{
 
             res.status(200).json(request)
         } catch (error) {
-            console.log(error, "ini kenapaaaa");
+            // console.log(error, "ini kenapaaaa");
             next(error)
         }
     }
@@ -108,7 +108,7 @@ class Friend{
             
             res.status(201).json(friend)
         } catch (error) {
-            console.log(error, "INI KENAPA DI DELETE FRIENDS");
+            // console.log(error, "INI KENAPA DI DELETE FRIENDS");
             next(error)
         }
     }
