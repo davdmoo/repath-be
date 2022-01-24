@@ -7,21 +7,35 @@ class Friend{
         try {
             const {id} = req.user
             
-            const friends = await userModel.findById(id).populate(
-                { path: "friends", 
-                populate: 
-                [
-                    { path: "sender" },
-                    { path: "receiver" },
-                ]})
+            // const friends = await userModel.findById(id).populate(
+            //     { path: "friends", 
+            //     populate: 
+            //     [
+            //         { path: "sender" },
+            //         { path: "receiver" },
+            //     ]})
             
-            let payload = [];
+            // let payload = [];
 
-            friends.friends.forEach(friend => {
-                if(friend.sender._id.toString() == id.toString() && friend.status) {
-                  payload.push(friend.receiver)
-                } else if (friend.receiver._id.toString() == id.toString() && friend.status) {
-                  payload.push(friend.sender)
+            // friends.friends.forEach(friend => {
+            //     if(friend.sender._id.toString() == id.toString() && friend.status) {
+            //       payload.push(friend.receiver)
+            //     } else if (friend.receiver._id.toString() == id.toString() && friend.status) {
+            //       payload.push(friend.sender)
+            //     }
+            // })
+
+            const friends = await friendModel.find({status: true}).populate([
+                { path: "sender" },
+                { path: "receiver"},
+            ])
+            
+            let payload = []
+            friends.forEach(el =>{
+                if(el.sender._id.toString() == id.toString()){
+                    payload.push(el.receiver)
+                }else if(el.receiver._id.toString() == id.toString()){
+                    payload.push(el.sender)
                 }
             })
             
@@ -56,6 +70,7 @@ class Friend{
     static async getRequest(req, res, next){
         try {
             const {id} = req.user
+            
             let request = await friendModel.find({receiver: id, status: false}).populate("sender")
 
             res.status(200).json(request)
@@ -69,17 +84,6 @@ class Friend{
             const {id} = req.user
             const {reqId} = req.params
             const friendReq = await friendModel.findById(reqId);
-<<<<<<< HEAD
-            console.log(friendReq,"========", id);
-            if(friendReq.sender.toString() == id.toString()){
-                throw {name: "Forbidden"};
-            }
-            if(friendReq.receiver.toString() !== id.toString()){
-                throw {name: "Forbidden"};
-            }
-
-=======
->>>>>>> 03b159d63bc2963bcec79dbc47cee59297d8fb8f
             if(!friendReq) throw {name: "NotFound"};
             
             if(friendReq.sender.toString() === id.toString() || friendReq.sender.toString() !== id.toString() && friendReq.receiver.toString() !== id.toString()) {

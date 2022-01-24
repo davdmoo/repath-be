@@ -94,6 +94,25 @@ describe("POST /friends", () => {
         })
     })
 
+    test("failed send friend request due to existing request", (done) => {
+        const userId = user_two._id.toString()
+        request(app)
+        .post(`/friends/${userId}`)
+        .set({
+            access_token: access_token_one
+        })
+        .then((resp)=>{
+            const result = resp.body
+            expect(resp.status).toBe(400)
+            expect(resp.res.statusMessage).toMatch("Bad Request")
+            expect(result).toEqual({message: 'You have a pending friend request involving this user'})
+            done()
+        })
+        .catch((err)=>{
+            done(err)
+        })
+    })
+
     test("failed send friend request due to existing friend", (done) => {
         const userId = user_three._id.toString()
         request(app)
@@ -103,9 +122,9 @@ describe("POST /friends", () => {
         })
         .then((resp)=>{
             const result = resp.body
-            expect(resp.status).toBe(403)
-            expect(resp.res.statusMessage).toMatch("Forbidden")
-            expect(result).toEqual({message: 'Forbidden access'})
+            expect(resp.status).toBe(400)
+            expect(resp.res.statusMessage).toMatch("Bad Request")
+            expect(result).toEqual({message: 'You have a pending friend request involving this user'})
             done()
         })
         .catch((err)=>{
@@ -165,6 +184,25 @@ describe("PATCH /friends", () => {
             const result = resp.body
             expect(resp.status).toBe(200)
             expect(result).toEqual(expect.any(Object))
+            done()
+        })
+        .catch((err)=>{
+            done(err)
+        })
+    })
+
+    test("failed acc friend request twice", (done) => {
+        const reqId = request_one._id
+        request(app)
+        .patch(`/friends/${reqId}`)
+        .set({
+            access_token: access_token_two
+        })
+        .then((resp)=>{
+            const result = resp.body
+            expect(resp.status).toBe(400)
+            expect(resp.res.statusMessage).toMatch("Bad Request")
+            expect(result).toEqual({message: 'You are already friends with this user'})
             done()
         })
         .catch((err)=>{
