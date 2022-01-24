@@ -1,5 +1,6 @@
 const postModel = require('../models/postModel');
 const likeModel = require('../models/likesModel');
+const friendModel = require('../models/friendModel');
 const userModel = require('../models/userModel');
 const commentModel = require('../models/commentModel');
 const friendModel = require('../models/friendModel');
@@ -10,31 +11,26 @@ class Post {
         try {
             const {id} = req.user
             let filter = [];
-            
+            const { id } = req.user;
+
             const friends = await friendModel.find({status: true}).populate([
                 { path: "sender" },
                 { path: "receiver"},
             ])
             
             let payload = []
-            friends.forEach(el =>{
-                if(el.sender._id.toString() == id.toString()){
-                    payload = [...payload,...el.receiver.posts]
-                }else if(el.receiver._id.toString() == id.toString()){
-                    payload = [...payload,...el.sender.posts]
+            friends.forEach(el => {
+                if(el.sender._id.toString() == id.toString()) {
+                    filter.push(el.receiver._id)
+                    payload.push(el.receiver)
+                } else if(el.receiver._id.toString() == id.toString()) {
+                    filter.push(el.sender._id)
+                    payload.push(el.sender)
                 }
             })
+
+            const posts = await postModel.find({ userId: filter }).sort({ created_at: -1 }).populate([{ path: "likes", populate: "userId" }, { path: "comments", populate: "userId" }, { path: "userId" }]);
             
-            const posts = await postModel.find().sort({ created_at: -1 }).populate([{ path: "likes", populate: "userId" }, { path: "comments", populate: "userId" }, { path: "userId" }]);
-
-            posts.forEach(element => {
-                const postId = ObjectId(element._id)
-                // console.log(postId, "=========");
-                if(payload.includes(postId)){
-                    filter.push(element)
-                }
-            });
-
             res.status(200).json(posts);
         } catch(err){
             console.log(err);
@@ -50,6 +46,8 @@ class Post {
                 type,
                 userId,
             }
+
+            if (!type) throw { name: "NoType" };
             
             if (type === 'text' && text) {
                payload.text = text
