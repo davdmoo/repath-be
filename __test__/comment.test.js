@@ -273,8 +273,25 @@ describe("PUT /comments", () => {
 })
 
 describe("DELETE /comments", () => {
-    test("user failed to delete a comment due to different user", (done) => {
-        let commentId = comment._id.toString()
+    // test("user success to delete a comment", (done) => {
+    //     let commentId = comment._id.toString()
+    //     request(app)
+    //     .delete(`/comments/${commentId}`)
+    //     .set('access_token', access_token)
+    //     .then((resp) => {
+    //         const result = resp.body
+    //         expect(resp.statusCode).toBe(200)
+    //         expect(resp.res.statusMessage).toMatch("OK")
+    //         done()
+    //     })
+    //     .catch((err) => {
+    //         done(err)
+    //     })
+    // })
+
+    test("user fails to delete a comment due to different user", (done) => {
+        let commentId = comment._id.toString();
+        
         request(app)
         .delete(`/comments/${commentId}`)
         .set('access_token', access_token_one)
@@ -283,6 +300,23 @@ describe("DELETE /comments", () => {
             expect(resp.status).toBe(403)
             expect(resp.res.statusMessage).toMatch("Forbidden")
             expect(result).toEqual({message: 'Forbidden access'})
+            done()
+        })
+        .catch((err) => {
+            done(err)
+        })
+    })
+
+    test("user fail to delete a comment", (done) => {
+        let commentId = comment._id.toString()
+        request(app)
+        .delete(`/comments/${commentId}`)
+        .set('access_token', null)
+        .then((resp) => {
+            const result = resp.body
+            expect(resp.statusCode).toBe(401)
+            expect(resp.res.statusMessage).toMatch("Unauthorized")
+            expect(result).toMatchObject({"message": 'Invalid token'})
             done()
         })
         .catch((err) => {
@@ -299,23 +333,6 @@ describe("DELETE /comments", () => {
             const result = resp.body
             expect(resp.statusCode).toBe(200)
             expect(resp.res.statusMessage).toMatch("OK")
-            done()
-        })
-        .catch((err) => {
-            done(err)
-        })
-    })
-
-    test("user success to delete a comment", (done) => {
-        let commentId = comment._id.toString()
-        request(app)
-        .delete(`/comments/${commentId}`)
-        .set('access_token', null)
-        .then((resp) => {
-            const result = resp.body
-            expect(resp.statusCode).toBe(401)
-            expect(resp.res.statusMessage).toMatch("Unauthorized")
-            expect(result).toMatchObject({"message": 'Invalid token'})
             done()
         })
         .catch((err) => {

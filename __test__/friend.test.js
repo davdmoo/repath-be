@@ -221,6 +221,25 @@ describe("GET /friends", () => {
 })
 
 describe("DELETE /friends", () => {
+    test("failed decline friend request", (done) => {
+        const reqId = request_one._id
+        request(app)
+        .delete(`/friends/${reqId}`)
+        .set({
+            access_token: access_token_three
+        })
+        .then((resp)=>{
+            const result = resp.body
+            expect(resp.status).toBe(403)
+            expect(resp.res.statusMessage).toMatch("Forbidden")
+            expect(result).toEqual({message: 'Forbidden access'})
+            done()
+        })
+        .catch((err)=>{
+            done(err)
+        })
+    })
+
     test("success decline friend request", (done) => {
         const reqId = request_one._id
         request(app)
@@ -232,25 +251,6 @@ describe("DELETE /friends", () => {
             const result = resp.body
             expect(resp.status).toBe(200)
             expect(result).toEqual(expect.any(Object))
-            done()
-        })
-        .catch((err)=>{
-            done(err)
-        })
-    })
-
-    test("failed decline friend request", (done) => {
-        const reqId = request_one._id
-        request(app)
-        .delete(`/friends/${reqId}`)
-        .set({
-            access_token: access_token_three
-        })
-        .then((resp)=>{
-            const result = resp.body
-            expect(resp.status).toBe(400)
-            expect(resp.res.statusMessage).toMatch("Bad Request")
-            expect(result).toEqual({message: 'Content not found'})
             done()
         })
         .catch((err)=>{
