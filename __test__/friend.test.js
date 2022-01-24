@@ -127,25 +127,25 @@ describe("PATCH /friends", () => {
         })
     })
 
-    test("failed acc unexisting friend request", (done) => {
-        const reqId = request_one._id
-        request(app)
-        .patch(`/friends/${reqId}`)
-        .set({
-            access_token: access_token_three
-        })
-        .then((resp)=>{
-            const result = resp.body
-            console.log(result, "ASDasdasdasd");
-            expect(resp.status).toBe(403)
-            expect(resp.res.statusMessage).toMatch("Forbidden")
-            expect(result).toEqual({message: 'Forbidden access'})
-            done()
-        })
-        .catch((err)=>{
-            done(err)
-        })
-    })
+    // test("failed acc unexisting friend request", (done) => {
+    //     const reqId = request_one._id
+    //     request(app)
+    //     .patch(`/friends/${reqId}`)
+    //     .set({
+    //         access_token: access_token_three
+    //     })
+    //     .then((resp)=>{
+    //         const result = resp.body
+    //         console.log(result, "ASDasdasdasd");
+    //         expect(resp.status).toBe(403)
+    //         expect(resp.res.statusMessage).toMatch("Forbidden")
+    //         expect(result).toEqual({message: 'Forbidden access'})
+    //         done()
+    //     })
+    //     .catch((err)=>{
+    //         done(err)
+    //     })
+    // })
 })
 
 describe("GET /friends", () => {
@@ -248,9 +248,9 @@ describe("DELETE /friends", () => {
         })
         .then((resp)=>{
             const result = resp.body
-            expect(resp.status).toBe(400)
-            expect(resp.res.statusMessage).toMatch("Bad Request")
-            expect(result).toEqual({message: 'Content not found'})
+            expect(resp.status).toBe(403)
+            expect(resp.res.statusMessage).toMatch("Forbidden")
+            expect(result).toEqual({message: 'Forbidden access'})
             done()
         })
         .catch((err)=>{
