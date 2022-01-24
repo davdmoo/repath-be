@@ -27,8 +27,8 @@ class Friend{
     static async addFriend(req, res, next){
         try {
             const {id} = req.user
-            const {userId} = req.params
-
+            const {followId} = req.params
+            
             const sendReq = await friendModel.create({
                 sender: id,
                 receiver: userId,
@@ -44,7 +44,7 @@ class Friend{
     static async getRequest(req, res, next){
         try {
             const {id} = req.user
-            const request = await friendModel.find({receiver: id, status: false})
+            let request = await friendModel.find({receiver: id, status: false}).populate("sender")
 
             res.status(200).json(request)
         } catch (error) {
@@ -56,10 +56,13 @@ class Friend{
         try {
             const {id} = req.user
             const {reqId} = req.params
-
-            const friendReq = await friendModel.findById(reqId)
-           
+            
+            const friendReq = await friendModel.findOne(ObjectId(reqId))
+            
             if(friendReq.sender.toString() == id.toString()){
+                throw {name: "Forbidden"}
+            }
+            if(friendReq.sender.toString() !== id.toString() && friendReq.receiver.toString() !== id.toString()){
                 throw {name: "Forbidden"}
             }
             if(!friendReq){
@@ -84,9 +87,14 @@ class Friend{
                     friends: request
                     }
                 });
-
+            // const list = await friendModel.find()
+            console.log(request)
             res.status(200).json(request)
         } catch (error) {
+<<<<<<< HEAD
+=======
+            console.log(error);
+>>>>>>> 930f7a14c1bd20e62b1458ecdc05c1a6eb3db5a3
             next(error)
         }
     }
@@ -95,18 +103,25 @@ class Friend{
         try {
             const {id} = req.user
             const { reqId } = req.params
-            const friend = await friendModel.findById(reqId)
+            const list = await friendModel.find()
+            console.log(list);
+            const friend = await friendModel.findOne({_id: ObjectId(reqId)})
+            console.log(friend);
             if (!friend) throw { name: "NotFound" }
             
             if(friend.receiver.toString() !== id.toString()
             && friend.sender.toString() !== id.toString()){
                 throw {name: "Forbidden"}
             }
-
-            await friendModel.deleteOne({ _id: ObjectId(reqId) })
+            console.log("masuk uhuy delete request");
+            // await friendModel.deleteOne({ _id: ObjectId(reqId) })
             
             res.status(200).json(friend)
         } catch (error) {
+<<<<<<< HEAD
+=======
+            console.log(error);
+>>>>>>> 930f7a14c1bd20e62b1458ecdc05c1a6eb3db5a3
             next(error)
         }
     }

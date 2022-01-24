@@ -35,7 +35,6 @@ beforeAll(async () => {
     } 
 
     thePost = await postModel.create(payload)
-    console.log(thePost._id.toString(), "<<<<<<<<<<<<<<<<<");
 });
 
 
@@ -51,7 +50,6 @@ describe("GET /likes", () => {
         .set('access_token', null)
         .then((resp)=>{
             const result = resp.body
-            console.log(result);
             expect(resp.statusCode).toBe(401)
             expect(resp.res.statusMessage).toMatch("Unauthorized")
             expect(result).toMatchObject({"message": 'Invalid token'})
@@ -66,6 +64,22 @@ describe("GET /likes", () => {
         const postId = thePost._id.toString()
         request(app)
         .get(`/likes/${postId}`)
+        .set('access_token', access_token)
+        .then((resp)=>{
+            const result = resp.body
+            expect(resp.statusCode).toBe(200)
+            expect(result).toEqual(expect.arrayContaining(result))
+            done()
+        })
+        .catch((err)=>{
+            done(err)
+        })
+    })
+
+    test("user can access likes section by userId", (done) => {
+        const userId = payload.userId.toString()
+        request(app)
+        .get(`/likes/${userId}`)
         .set('access_token', access_token)
         .then((resp)=>{
             const result = resp.body

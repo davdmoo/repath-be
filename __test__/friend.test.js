@@ -132,10 +132,11 @@ describe("PATCH /friends", () => {
         request(app)
         .patch(`/friends/${reqId}`)
         .set({
-            access_token: access_token_one
+            access_token: access_token_three
         })
         .then((resp)=>{
             const result = resp.body
+            console.log(result, "ASDasdasdasd");
             expect(resp.status).toBe(403)
             expect(resp.res.statusMessage).toMatch("Forbidden")
             expect(result).toEqual({message: 'Forbidden access'})

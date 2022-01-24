@@ -19,7 +19,7 @@ async function authentication (req, res, next) {
       id: ObjectId(user._id),
       email: user.email
     };
-
+    
     next();
   } catch (err) {
     next(err);

@@ -83,7 +83,7 @@ class Post {
         }catch(err) {
             next(err);
         }
-    }
+    }d
 
     static async editPost(req, res, next){
         try {
