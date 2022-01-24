@@ -44,7 +44,7 @@ class Comment{
 
             res.status(201).json(newComment);
         } catch(err) {
-            console.log(err);
+            // console.log(err);
             next(err);
         }
     }
