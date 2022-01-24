@@ -33,16 +33,21 @@ class Friend{
 
     static async addFriend(req, res, next){
         try {
-            const {id} = req.user
-            const {userId} = req.params
+            const {id} = req.user;
+            const {userId} = req.params;
+
+            const friendRequests = await friendModel.find({status: false});
+            friendRequests.forEach(fr => {
+              if (fr.sender.toString() === id.toString() || fr.receiver.toString() === id.toString()) throw { name: "FriendTwice" };
+            });
             
             const sendReq = await friendModel.create({
                 sender: id,
                 receiver: userId,
                 status: false
-            })
+            });
 
-            res.status(201).json(sendReq)
+            res.status(201).json(sendReq);
         } catch (error) {
             next(error)
         }
@@ -63,38 +68,44 @@ class Friend{
         try {
             const {id} = req.user
             const {reqId} = req.params
-            
             const friendReq = await friendModel.findById(reqId);
-            
-            if(friendReq.sender.toString() == id.toString()){
-                throw {name: "Forbidden"};
-            }
-            if(friendReq.receiver.toString() !== id.toString()){
-                throw {name: "Forbidden"};
-            }
-
             if(!friendReq) throw {name: "NotFound"};
+            
+            if(friendReq.sender.toString() === id.toString() || friendReq.sender.toString() !== id.toString() && friendReq.receiver.toString() !== id.toString()) {
+                throw {name: "Forbidden"};
+            }
 
+            if (friendReq.status) throw { name: "AccFriendTwice" };
+            
+            
             const request = await friendModel.findOneAndUpdate(
                 {_id: reqId},
                 {
                     status: true
                 })
-            
-            const receiver = await userModel.findOneAndUpdate({_id: friendReq.receiver},
+            await userModel.findOneAndUpdate({_id: request.receiver},
                 {
-                    $push: {
-                    friends: request.sender
+                    $push: 
+                    {
+                        friends: request.sender
                     }
+                },
+                {
+                    upsert: true
                 });
-            const sender = await userModel.findOneAndUpdate({_id: friendReq.sender},
+
+            await userModel.findOneAndUpdate({_id: request.sender},
                 {
                     $push: {
                     friends: request.receiver
-                    }
+                    },
+                    upsert: true
                 });
 
-            res.status(200).json(request)
+            res.status(200).json({
+                _id: reqId,
+                status: true
+            });
         } catch (error) {
             console.log(error, "INI ERROR DARI FRIEND CONTROLLER");
             next(error)
