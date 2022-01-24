@@ -37,7 +37,7 @@ const errorHandler = (err, req, res, next) => {
             res.status(400).json({ message: "You have liked this post before" })
             break;
         case "NotFound":
-            res.status(400).json({ message: "Content not found" })
+            res.status(404).json({ message: "Content not found" })
             break;
         case "BigImage":
             res.status(400).json({ message: "Maximum file size is 300kb" })

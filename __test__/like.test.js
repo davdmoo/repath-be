@@ -216,10 +216,9 @@ describe("POST /likes", () =>{
 
 describe("DELETE /likes", () =>{
     test("user failed to delete a likes", (done) => {
-        let postId = thePost._id.toString()
         let likeId = like._id.toString()
         request(app)
-        .delete(`/likes/${postId}/${likeId}`)
+        .delete(`/likes/${likeId}`)
         .set('access_token', null)
         .then((resp) => {
             const result = resp.body
@@ -234,15 +233,15 @@ describe("DELETE /likes", () =>{
     })
 
     test("user failed to make a likes due to different user", (done) => {
-        let postId = thePost._id.toString()
+        let likeId = like._id.toString()
         request(app)
-        .delete(`/likes/${postId}`)
+        .delete(`/likes/${likeId}`)
         .set('access_token', access_token_one)
         .then((resp) => {
             const result = resp.body
-            expect(resp.status).toBe(400)
-            expect(resp.res.statusMessage).toMatch("Bad Request")
-            expect(result).toEqual({message: 'Content not found'})
+            expect(resp.status).toBe(403)
+            expect(resp.res.statusMessage).toMatch("Forbidden")
+            expect(result).toEqual({message: 'Forbidden access'})
             done()
         })
         .catch((err) => {
@@ -250,11 +249,11 @@ describe("DELETE /likes", () =>{
         })
     })
 
-    test("user failed to make a likes due post not found", (done) => {
-        let postId = thePost._id.toString().slice(2, 0)
+    test("user failed to make a likes due to like not found", (done) => {
+        let likeId = like._id.toString().slice(2, 0)
         request(app)
-        .delete(`/likes/${postId}`)
-        .set('access_token', access_token_one)
+        .delete(`/likes/${likeId}`)
+        .set('access_token', access_token)
         .then((resp) => {
             expect(resp.res.statusCode).toBe(404)
             expect(resp.res.statusMessage).toMatch("Not Found")
@@ -267,7 +266,6 @@ describe("DELETE /likes", () =>{
     })
 
     test("user success to delete a likes", (done) => {
-        let postId = thePost._id.toString()
         let likeId = like._id.toString()
         request(app)
         .delete(`/likes/${likeId}`)

@@ -83,13 +83,13 @@ class Comment{
             const userId = req.user.id
             
             const deletedComment = await commentModel.findById(id).exec();
-            console.log(deletedComment.userId.toString(), "!==", userId.toString());
+            
+            if (!deletedComment) throw { name: "NotFound" };
+
             if(deletedComment.userId.toString() !== userId.toString()){
                 throw {name: "Forbidden"}
             }
 
-            if (!deletedComment) throw { name: "NotFound" };
-            
             await commentModel.deleteOne({_id: id});
 
             await postModel.findOneAndUpdate({_id: deletedComment.postId},
