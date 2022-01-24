@@ -1,36 +1,43 @@
-const e = require('express');
 const postModel = require('../models/postModel');
 const likeModel = require('../models/likesModel');
-const followModel = require('../models/followModel');
 const userModel = require('../models/userModel');
 const commentModel = require('../models/commentModel');
+const friendModel = require('../models/friendModel');
+const { ObjectId } = require("mongodb");
 
 class Post {
     static async findPosts(req, res, next){
         try {
+            const {id} = req.user
             let filter = [];
-            const friends = await followModel.find({ follower: req.user.id });
-            // const friends = await friendModel.find().populate("user");
-            friends.forEach(friend => {
-              filter.push(friend.following)
+            
+            const friends = await friendModel.find({status: true}).populate([
+                { path: "sender" },
+                { path: "receiver"},
+            ])
+            
+            let payload = []
+            friends.forEach(el =>{
+                if(el.sender._id.toString() == id.toString()){
+                    payload = [...payload,...el.receiver.posts]
+                }else if(el.receiver._id.toString() == id.toString()){
+                    payload = [...payload,...el.sender.posts]
+                }
+            })
+            
+            const posts = await postModel.find().sort({ created_at: -1 }).populate([{ path: "likes", populate: "userId" }, { path: "comments", populate: "userId" }, { path: "userId" }]);
+
+            posts.forEach(element => {
+                const postId = ObjectId(element._id)
+                // console.log(postId, "=========");
+                if(payload.includes(postId)){
+                    filter.push(element)
+                }
             });
 
-            const posts = await postModel.find().sort({ created_at: -1 }).populate([{ path: "likes", populate: "userId" }, { path: "comments", populate: "userId" }, { path: "userId" }]);
-            // const posts = await postModel.find().populate([{ path: "likes" }, { path: "comments" }, { path: "userId" }]);
-            // let filterLikes = [];
-            // posts.forEach(post => {
-            //   filterLikes.push(post._id)
-            // });
-
-            // let payload = [posts];
-            // const likes = await likeModel.find({ postId: filterLikes });
-
-            // payload.push(likes);
-            // console.log(likes);
-
-            // res.status(200).json(payload);
             res.status(200).json(posts);
         } catch(err){
+            console.log(err);
             next(err);
         }
     }
