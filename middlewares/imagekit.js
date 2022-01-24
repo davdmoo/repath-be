@@ -6,6 +6,7 @@ const imagekit = async (req, res, next) => {
     if (req.file === undefined) {
       next();
     } else {
+    
       const form = new FormData();
       form.append('file', req.file.buffer.toString('base64'));
       form.append('fileName', req.file.originalname);
@@ -25,6 +26,7 @@ const imagekit = async (req, res, next) => {
 
       // if (req.body.profilePicture) {
       req.body.imgUrl = data.url;
+      console.log(req.body.imgUrl, `<<<<<<<<<<BODY IMAGE`);
       // }
       // if (req.body.backgroundImage) {
       //     req.body.backgroundImage = data.url

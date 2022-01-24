@@ -5,6 +5,8 @@ const app = require('../app.js')
 const jwt = require("jsonwebtoken");
 const mongoose = require('../config/monggoConfig');
 const secretKey = process.env.SECRETKEY;
+const axios = require('axios')
+jest.mock('axios')
 
 let access_token;
 let dummyAccToken;
@@ -92,16 +94,22 @@ describe("GET /posts", () => {
 
 describe("POST /posts", () =>{
     describe("user input is correct", () => {
+      const imgUrl = "https://ik.imagekit.io/repathImageKit/james_Y2mFuV0noVO.jpg"
+      const resp = {data : imgUrl};
+      const test =  axios.get.mockImplementation(() => Promise.resolve(resp))
+      console.log(test.mockReturnValueOnce,`AAAAAAAAAAAAAAAAAA`)
         test("success posting", (done) => {
             request(app)
             .post("/posts")
             .set('access_token', access_token)
             .send({
               type: "text",
-              text: "test post"
+              text: "test post",
+              // imgUrl :  axios.get.mockResolvedValue(resp)
             })
               .then((response) => {
                 const result = response.body;
+                console.log(result, `TESTT`)
                 expect(response.status).toBe(201);
                 expect(result).toEqual(expect.any(Object));
                 expect(result).toHaveProperty("text");
