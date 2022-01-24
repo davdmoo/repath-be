@@ -230,7 +230,7 @@ describe("DELETE /friends", () => {
         })
         .then((resp)=>{
             const result = resp.body
-            expect(resp.status).toBe(201)
+            expect(resp.status).toBe(200)
             expect(result).toEqual(expect.any(Object))
             done()
         })

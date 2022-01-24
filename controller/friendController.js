@@ -19,9 +19,9 @@ class Friend{
 
             friends.friends.forEach(friend => {
                 if(friend.sender._id.toString() == id.toString() && friend.status) {
-                  payload.push(friend)
+                  payload.push(friend.receiver)
                 } else if (friend.receiver._id.toString() == id.toString() && friend.status) {
-                  payload.push(friend)
+                  payload.push(friend.sender)
                 }
             })
             
