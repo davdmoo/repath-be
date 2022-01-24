@@ -84,8 +84,11 @@ class Like{
     static async deleteLike(req, res, next){
         try{
             const { id } = req.params;
+            const userId = req.user.id;
             const like = await likeModel.findById(id);
             if (!like) throw { name: "NotFound" };
+
+            if (like.userId.toString() !== userId.toString()) throw { name: "Forbidden" };
 
             await likeModel.deleteOne({_id: id});
 
