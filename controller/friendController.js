@@ -41,6 +41,7 @@ class Friend{
             
             res.status(200).json(payload)
         } catch (error) {
+            console.log(error, "INI EROR=======");
             next(error)
         }
     }
@@ -140,8 +141,19 @@ class Friend{
             && friend.sender.toString() !== id.toString()){
                 throw {name: "Forbidden"}
             }
+            await friendModel.deleteOne({ _id: ObjectId(reqId)})
             
-            await friendModel.deleteOne({ _id: ObjectId(reqId) })
+            if(friend.sender.toString() == id.toString()){
+                await userModel.findOneAndUpdate({_id: id},
+                    {
+                        $pull: { friends:  friend.receiver}
+                    });
+            }else if(friend.receiver.toString() == id.toString()){
+                await userModel.findOneAndUpdate({_id: id},
+                    {
+                        $pull: { friends:  friend.sender}
+                    });
+            }
             
             res.status(200).json(friend)
         } catch (error) {

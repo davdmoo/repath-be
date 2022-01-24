@@ -15,6 +15,7 @@ let request_one
 let reqUser_one_three
 
 beforeAll(async () => {
+    await friendModel.collection.drop()
     await userModel.deleteOne({   email: "testuser@mail.com" })
     await userModel.deleteOne({   email: "testuser2@mail.com" })
     await userModel.deleteOne({   email: "testuser3@mail.com" })
