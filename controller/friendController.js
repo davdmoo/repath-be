@@ -107,6 +107,7 @@ class Friend{
                 status: true
             });
         } catch (error) {
+            console.log(error, "INI ERROR DARI FRIEND CONTROLLER");
             next(error)
         }
     }

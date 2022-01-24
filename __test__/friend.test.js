@@ -12,6 +12,7 @@ let user_one
 let user_two
 let user_three
 let request_one
+let reqUser_one_three
 
 beforeAll(async () => {
     await userModel.deleteOne({   email: "testuser@mail.com" })
@@ -61,12 +62,17 @@ beforeAll(async () => {
     user_three = await userModel.create(userPayloadThree)
     const payloadJWT_THREE = { email: user_three.email };
     access_token_three = jwt.sign(payloadJWT_THREE, "repathkeren");
+
+    reqUser_one_three = await friendModel.create({
+        sender: user_one._id,
+        receiver: user_three._id,
+        status: true
+    })
 });
 
 afterAll(async()=>{
    await  mongoose.disconnect()
 })
-
 
 describe("POST /friends", () => {
     test("success send friend request", (done) => {
@@ -81,6 +87,25 @@ describe("POST /friends", () => {
             request_one = result
             expect(resp.status).toBe(201)
             expect(result).toEqual(expect.any(Object))
+            done()
+        })
+        .catch((err)=>{
+            done(err)
+        })
+    })
+
+    test("failed send friend request due to existing friend", (done) => {
+        const userId = user_three._id.toString()
+        request(app)
+        .post(`/friends/${userId}`)
+        .set({
+            access_token: access_token_one
+        })
+        .then((resp)=>{
+            const result = resp.body
+            expect(resp.status).toBe(403)
+            expect(resp.res.statusMessage).toMatch("Forbidden")
+            expect(result).toEqual({message: 'Forbidden access'})
             done()
         })
         .catch((err)=>{
@@ -147,25 +172,45 @@ describe("PATCH /friends", () => {
         })
     })
 
-    // test("failed acc unexisting friend request", (done) => {
-    //     const reqId = request_one._id
-    //     request(app)
-    //     .patch(`/friends/${reqId}`)
-    //     .set({
-    //         access_token: access_token_three
-    //     })
-    //     .then((resp)=>{
-    //         const result = resp.body
-    //         console.log(result, "ASDasdasdasd");
-            // expect(resp.status).toBe(403)
-            // expect(resp.res.statusMessage).toMatch("Forbidden")
-            // expect(result).toEqual({message: 'Forbidden access'})
-    //         done()
-    //     })
-    //     .catch((err)=>{
-    //         done(err)
-    //     })
-    // })
+    test("failed acc unexisting friend request", (done) => {
+        console.log(request_one, "<<<<INIAPA");
+        const reqId = request_one._id
+        request(app)
+        .patch(`/friends/${reqId}`)
+        .set({
+            access_token: access_token_three
+        })
+        .then((resp)=>{
+            const result = resp.body
+            console.log(result, "ASDasdasdasd");
+            expect(resp.status).toBe(403)
+            expect(resp.res.statusMessage).toMatch("Forbidden")
+            expect(result).toEqual({message: 'Forbidden access'})
+            done()
+        })
+        .catch((err)=>{
+            done(err)
+        })
+    })
+
+    test("failed acc request from a friend", (done) => {
+        const reqId = reqUser_one_three._id
+        request(app)
+        .patch(`/friends/${reqId}`)
+        .set({
+            access_token: access_token_one
+        })
+        .then((resp)=>{
+            const result = resp.body
+            expect(resp.status).toBe(403)
+            expect(resp.res.statusMessage).toMatch("Forbidden")
+            expect(result).toEqual({message: 'Forbidden access'})
+            done()
+        })
+        .catch((err)=>{
+            done(err)
+        })
+    })
 })
 
 describe("GET /friends", () => {
