@@ -59,12 +59,11 @@ class Friend{
             
             const friendReq = await friendModel.findOne(ObjectId(reqId))
             
-            if(friendReq.sender.toString() == id.toString()){
+            if(friendReq.sender == id){
+                console.log("masuk 1");
                 throw {name: "Forbidden"}
             }
-            if(friendReq.sender.toString() !== id.toString() && friendReq.receiver.toString() !== id.toString()){
-                throw {name: "Forbidden"}
-            }
+            
             if(!friendReq){
                 throw {name: "NotFound"}
             }
@@ -100,18 +99,17 @@ class Friend{
         try {
             const {id} = req.user
             const { reqId } = req.params
-            const list = await friendModel.find()
-            console.log(list);
+            
             const friend = await friendModel.findOne({_id: ObjectId(reqId)})
-            console.log(friend);
+            
             if (!friend) throw { name: "NotFound" }
             
             if(friend.receiver.toString() !== id.toString()
             && friend.sender.toString() !== id.toString()){
                 throw {name: "Forbidden"}
             }
-            console.log("masuk uhuy delete request");
-            // await friendModel.deleteOne({ _id: ObjectId(reqId) })
+            
+            await friendModel.deleteOne({ _id: ObjectId(reqId) })
             
             res.status(201).json(friend)
         } catch (error) {
