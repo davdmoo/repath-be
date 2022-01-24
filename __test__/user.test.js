@@ -468,12 +468,12 @@ describe("PUT /users", () =>{
         })
         .set('access_token',access_token_two)
         .then((resp)=>{
-            console.log(resp, "==============", resp.body);
+            // console.log(resp, "==============", resp.body);
             const result = resp.body
             expect(resp.status).toBe(200)
             expect(result).toEqual(expect.any(Object))
     
-            console.log(result, `NANI DELETE`)
+            // console.log(result, `NANI DELETE`)
             done()
         })
         .catch((err)=>{

@@ -42,7 +42,7 @@ beforeAll(async () => {
     access_token = jwt.sign(payloadJwt, "repathkeren");
 
     const userOne = await userModel.create(userPayloadOne)
-    const payloadJwtOne = { email: user.email };
+    const payloadJwtOne = { email: userOne.email };
     access_token_one = jwt.sign(payloadJwtOne, "repathkeren");
     
     await postModel.deleteOne({  title: "text 1" })
@@ -210,10 +210,9 @@ describe("GET /comments", () => {
 
 describe("PUT /comments", () => {
     test("user succes to edit a comment with access token", (done) => {
-        let postId = thePost._id.toString()
         let commentId = comment._id.toString()
         request(app)
-        .put(`/comments/${postId}/${commentId}`)
+        .put(`/comments/${commentId}`)
         .set('access_token', access_token)
         .send({
             content: "haloo ini edit comment"
@@ -235,10 +234,9 @@ describe("PUT /comments", () => {
     })
 
     test("user failed to edit a comment due to unexisting comment", (done) => {
-        let postId = thePost._id.toString()
         let commentId = comment._id.toString().slice(2, 0)
         request(app)
-        .put(`/comments/${postId}/${commentId}`)
+        .put(`/comments/${commentId}`)
         .set('access_token', access_token)
         .send({
             content: "haloo ini edit comment"
@@ -254,10 +252,9 @@ describe("PUT /comments", () => {
     })
 
     test("user failed to edit a comment with access token", (done) => {
-        let postId = thePost._id.toString()
         let commentId = comment._id.toString()
         request(app)
-        .put(`/comments/${postId}/${commentId}`)
+        .put(`/comments/${commentId}`)
         .set('access_token', null)
         .send({
             content: "haloo ini edit comment"
@@ -276,16 +273,33 @@ describe("PUT /comments", () => {
 })
 
 describe("DELETE /comments", () => {
-    test("user success to delete a comment", (done) => {
-        let postId = thePost._id.toString()
-        let commentId = comment._id.toString()
+    // test("user success to delete a comment", (done) => {
+    //     let commentId = comment._id.toString()
+    //     request(app)
+    //     .delete(`/comments/${commentId}`)
+    //     .set('access_token', access_token)
+    //     .then((resp) => {
+    //         const result = resp.body
+    //         expect(resp.statusCode).toBe(200)
+    //         expect(resp.res.statusMessage).toMatch("OK")
+    //         done()
+    //     })
+    //     .catch((err) => {
+    //         done(err)
+    //     })
+    // })
+
+    test("user fails to delete a comment due to different user", (done) => {
+        let commentId = comment._id.toString();
+        
         request(app)
-        .delete(`/comments/${postId}/${commentId}`)
-        .set('access_token', access_token)
+        .delete(`/comments/${commentId}`)
+        .set('access_token', access_token_one)
         .then((resp) => {
             const result = resp.body
-            expect(resp.statusCode).toBe(200)
-            expect(resp.res.statusMessage).toMatch("OK")
+            expect(resp.status).toBe(403)
+            expect(resp.res.statusMessage).toMatch("Forbidden")
+            expect(result).toEqual({message: 'Forbidden access'})
             done()
         })
         .catch((err) => {
@@ -293,35 +307,32 @@ describe("DELETE /comments", () => {
         })
     })
 
-    test("user success to delete a comment due to different user", (done) => {
-        let postId = thePost._id.toString()
+    test("user fail to delete a comment", (done) => {
         let commentId = comment._id.toString()
         request(app)
-        .delete(`/comments/${postId}/${commentId}`)
-        .set('access_token', access_token)
-        .then((resp) => {
-            const result = resp.body
-            expect(resp.status).toBe(400)
-            expect(resp.res.statusMessage).toMatch("Bad Request")
-            expect(result).toEqual({message: 'Content not found'})
-            done()
-        })
-        .catch((err) => {
-            done(err)
-        })
-    })
-
-    test("user success to delete a comment", (done) => {
-        let postId = thePost._id.toString()
-        let commentId = comment._id.toString()
-        request(app)
-        .delete(`/comments/${postId}/${commentId}`)
+        .delete(`/comments/${commentId}`)
         .set('access_token', null)
         .then((resp) => {
             const result = resp.body
             expect(resp.statusCode).toBe(401)
             expect(resp.res.statusMessage).toMatch("Unauthorized")
             expect(result).toMatchObject({"message": 'Invalid token'})
+            done()
+        })
+        .catch((err) => {
+            done(err)
+        })
+    })
+
+    test("user success to delete a comment", (done) => {
+        let commentId = comment._id.toString()
+        request(app)
+        .delete(`/comments/${commentId}`)
+        .set('access_token', access_token)
+        .then((resp) => {
+            const result = resp.body
+            expect(resp.statusCode).toBe(200)
+            expect(resp.res.statusMessage).toMatch("OK")
             done()
         })
         .catch((err) => {
