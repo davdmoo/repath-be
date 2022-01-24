@@ -109,6 +109,26 @@ describe("POST /friends", () => {
 })
 
 describe("PATCH /friends", () => {
+    test("failed accepting friend request as a sender 403", (done) => {
+        const reqId = request_one._id;
+        request(app)
+        .patch(`/friends/${reqId}`)
+        .set({
+            access_token: access_token_one
+        })
+          .then((resp) => {
+              const { body, status } = resp;
+              expect(status).toBe(403);
+              expect(body).toEqual(expect.any(Object));
+              expect(body).toHaveProperty("message", "Forbidden access");
+
+              done();
+          })
+          .catch((err) => {
+              done(err);
+          })
+    })
+
     test("success acc friend request", (done) => {
         const reqId = request_one._id
         request(app)
@@ -251,6 +271,25 @@ describe("DELETE /friends", () => {
             const result = resp.body
             expect(resp.status).toBe(200)
             expect(result).toEqual(expect.any(Object))
+            done()
+        })
+        .catch((err)=>{
+            done(err)
+        })
+    })
+
+    test("fail decline/delete friend request not found", (done) => {
+        const reqId = request_one._id
+        request(app)
+        .delete(`/friends/${reqId}`)
+        .set({
+            access_token: access_token_one
+        })
+        .then((resp)=>{
+            const result = resp.body
+            expect(resp.status).toBe(404)
+            expect(result).toEqual(expect.any(Object))
+            expect(result).toHaveProperty("message", "Content not found")
             done()
         })
         .catch((err)=>{

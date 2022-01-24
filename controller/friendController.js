@@ -27,7 +27,6 @@ class Friend{
             
             res.status(200).json(payload)
         } catch (error) {
-            console.log(error);
             next(error)
         }
     }
@@ -64,18 +63,12 @@ class Friend{
         try {
             const {id} = req.user
             const {reqId} = req.params
-            console.log(reqId);
             
-            const friendReq = await friendModel.findById(reqId)
+            const friendReq = await friendModel.findById(reqId);
             
-            if(friendReq.sender == id){
-                console.log("masuk 1");
-                throw {name: "Forbidden"}
-            }
+            if(friendReq.sender.toString() == id) throw {name: "Forbidden"};
             
-            if(!friendReq){
-                throw {name: "NotFound"}
-            }
+            if(!friendReq) throw {name: "NotFound"};
 
             const request = await friendModel.findOneAndUpdate(
                 {_id: reqId},
@@ -95,11 +88,9 @@ class Friend{
                     friends: request.receiver
                     }
                 });
-            // const list = await friendModel.find()
-            console.log(request)
+
             res.status(200).json(request)
         } catch (error) {
-            console.log(error);
             next(error)
         }
     }
@@ -109,11 +100,9 @@ class Friend{
             const {id} = req.user
             const { reqId } = req.params
             
-            const friend = await friendModel.findOne({_id: ObjectId(reqId)})
-            
-            if (!friend) {
-                throw { name: "NotFound" }
-            }
+            const friend = await friendModel.findById(reqId);
+            if (!friend) throw { name: "NotFound" };
+            console.log(friend, "<<<<< delete friend");
             
             if(friend.receiver.toString() !== id.toString()
             && friend.sender.toString() !== id.toString()){
@@ -124,7 +113,6 @@ class Friend{
             
             res.status(200).json(friend)
         } catch (error) {
-            console.log(error, "INI MAU DELETE ERROR");
             next(error)
         }
     }
