@@ -173,7 +173,6 @@ describe("PATCH /friends", () => {
     })
 
     test("failed acc unexisting friend request", (done) => {
-        console.log(request_one, "<<<<INIAPA");
         const reqId = request_one._id
         request(app)
         .patch(`/friends/${reqId}`)
@@ -182,7 +181,6 @@ describe("PATCH /friends", () => {
         })
         .then((resp)=>{
             const result = resp.body
-            console.log(result, "ASDasdasdasd");
             expect(resp.status).toBe(403)
             expect(resp.res.statusMessage).toMatch("Forbidden")
             expect(result).toEqual({message: 'Forbidden access'})

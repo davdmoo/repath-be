@@ -65,7 +65,7 @@ class Friend{
             const {reqId} = req.params
             
             const friendReq = await friendModel.findById(reqId);
-            
+            console.log(friendReq,"========", id);
             if(friendReq.sender.toString() == id.toString()){
                 throw {name: "Forbidden"};
             }
