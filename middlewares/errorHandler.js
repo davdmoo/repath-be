@@ -51,6 +51,12 @@ const errorHandler = (err, req, res, next) => {
         case "EditInput":
             res.status(400).json({message: "Please input required fields on edit form"})
             break;
+        case "FriendTwice":
+            res.status(400).json({ message: "You have a pending friend request involving this user"});
+            break;
+        case "AccFriendTwice":
+            res.status(400).json({ message: "You are already friends with this user" });
+            break;
         default:
             // console.log(err);
             res.status(500).json({ message: "Internal server error" })
