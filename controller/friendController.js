@@ -83,19 +83,18 @@ class Friend{
                     status: true
                 })
             
-            const friendReceiver = await userModel.findOneAndUpdate({_id: friendReq.receiver},
+            await userModel.findOneAndUpdate({_id: friendReq.receiver},
                 {
                     $push: {
-                    friends: request
+                    friends: request.sender
                     }
                 });
-            const friendSender = userModel.findOneAndUpdate({_id: friendReq.sender},
+            await userModel.findOneAndUpdate({_id: friendReq.sender},
                 {
                     $push: {
-                    friends: request
+                    friends: request.receiver
                     }
                 });
-            console.log(friendReceiver, friendSender);
             // const list = await friendModel.find()
             console.log(request)
             res.status(200).json(request)
@@ -112,7 +111,9 @@ class Friend{
             
             const friend = await friendModel.findOne({_id: ObjectId(reqId)})
             
-            if (!friend) throw { name: "NotFound" }
+            if (!friend) {
+                throw { name: "NotFound" }
+            }
             
             if(friend.receiver.toString() !== id.toString()
             && friend.sender.toString() !== id.toString()){
@@ -123,7 +124,7 @@ class Friend{
             
             res.status(200).json(friend)
         } catch (error) {
-            console.log(error);
+            console.log(error, "INI MAU DELETE ERROR");
             next(error)
         }
     }
