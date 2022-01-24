@@ -3,6 +3,7 @@ const request = require('supertest');
 const app = require('../app.js')
 const mongoose = require('../config/monggoConfig');
 const jwt = require("jsonwebtoken");
+const User = require("../controller/userController");
 
 let access_token_one
 let access_token_two
@@ -63,12 +64,26 @@ beforeAll(async () => {
     access_token_three = jwt.sign(payloadJWT_THREE, "repathkeren");
 });
 
-
-afterAll(async()=>{
+afterAll(async()=> {
    await  mongoose.disconnect()
 })
 
 describe("GET /users", () => {
+    it('Should handle error 500', async () => {
+        jest.spyOn(User, 'findUsers').mockRejectedValue('Error')
+    
+        return request(app)
+          .get('/users')
+          .then((res) => {
+            expect(res.status).toBe(500)
+    
+            expect(res.body.err).toBe('Error')
+          })
+          .catch((err) => {
+            console.log(err)
+          })
+      })
+
     test("success get all user", (done) => {
         request(app)
         .get('/users')
@@ -134,7 +149,22 @@ describe("GET /users", () => {
     })
 })
 
-describe("POST /register", () =>{
+describe("POST /register", () => {
+    test('Should handle error 500', async () => {
+        jest.spyOn(User, 'addUser').mockRejectedValue('Error')
+    
+        return request(app)
+          .post('/users/register')
+          .then((res) => {
+            expect(res.status).toBe(500)
+    
+            expect(res.body.err).toBe('Error')
+          })
+          .catch((err) => {
+            console.log(err)
+          })
+      })
+    
     test("success register", (done) => {
         request(app)
          .post('/users/register')
@@ -349,7 +379,22 @@ describe("POST /register", () =>{
     })
 })
 
-describe("POST /login", () =>{
+describe("POST /login", () => {
+    test('Should handle error 500', async () => {
+        jest.spyOn(User, 'login').mockRejectedValue('Error')
+    
+        return request(app)
+          .post('/users/login')
+          .then((res) => {
+            expect(res.status).toBe(500)
+    
+            expect(res.body.err).toBe('Error')
+          })
+          .catch((err) => {
+            console.log(err)
+          })
+      })
+    
     test("success login", (done) => {
         request(app)
          .post('/users/login')
@@ -452,8 +497,22 @@ describe("POST /login", () =>{
     })
 })
 
-describe("PUT /users", () =>{
-   
+describe("PUT /users", () => {
+    test('Should handle error 500', async () => {
+        jest.spyOn(User, 'editUser').mockRejectedValue('Error')
+    
+        return request(app)
+          .put('/users/mockId')
+          .then((res) => {
+            expect(res.status).toBe(500)
+    
+            expect(res.body.err).toBe('Error')
+          })
+          .catch((err) => {
+            console.log(err)
+          })
+      })
+
     test("success update own account", (done) => {
         const user_two_id = user_two._id.toString()
         // console.log(user_two_id, `AAAAAAAAAAAA`)
@@ -535,8 +594,21 @@ describe("PUT /users", () =>{
     })
 })
 
-describe("DELETE /users", () =>{
-   
+describe("DELETE /users", () => {
+    test('Should handle error 500', async () => {
+        jest.spyOn(User, 'deleteUser').mockRejectedValue('Error')
+    
+        return request(app)
+          .delete('/users/mockId')
+          .then((res) => {
+            expect(res.status).toBe(500)
+    
+            expect(res.body.err).toBe('Error')
+          })
+          .catch((err) => {
+            console.log(err)
+          })
+      })
         test("success delete own account", (done) => {
             const user_one_id = user_one._id.toString()
             request(app)
