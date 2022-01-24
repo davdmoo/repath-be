@@ -309,7 +309,7 @@ describe("DELETE /posts", () =>{
             const { body, status } = response;
             expect(status).toBe(200);
             expect(body).toEqual(expect.any(Object));
-            // console.log(body, `AAAAAAAAAAAAAAAAAAAAAAAA DELTE POST`);
+            
             done();
           })
           .catch((err) => {

@@ -7,19 +7,27 @@ class Friend{
         try {
             const {id} = req.user
             
-            const friends = await userModel.findById(id).populate("friends")
+            const friends = await userModel.findById(id).populate(
+                { path: "friends", 
+                populate: 
+                [
+                    { path: "sender" },
+                    { path: "receiver" },
+                ]})
+            
             let payload = [];
 
             friends.friends.forEach(friend => {
-                if(friend.sender.toString() == id.toString() && friend.status) {
-                  payload.push(friend)
-                } else if (friend.sender == id && friend.status) {
-                  payload.push(friend)
+                if(friend.sender._id.toString() == id.toString() && friend.status) {
+                  payload.push(friend.receiver)
+                } else if (friend.receiver._id.toString() == id.toString() && friend.status) {
+                  payload.push(friend.sender)
                 }
             })
             
             res.status(200).json(payload)
         } catch (error) {
+            console.log(error);
             next(error)
         }
     }
@@ -27,11 +35,11 @@ class Friend{
     static async addFriend(req, res, next){
         try {
             const {id} = req.user
-            const {followId} = req.params
-
+            const {userId} = req.params
+            
             const sendReq = await friendModel.create({
                 sender: id,
-                receiver: followId,
+                receiver: userId,
                 status: false
             })
 
@@ -44,7 +52,7 @@ class Friend{
     static async getRequest(req, res, next){
         try {
             const {id} = req.user
-            const request = await friendModel.find({receiver: id, status: false})
+            let request = await friendModel.find({receiver: id, status: false}).populate("sender")
 
             res.status(200).json(request)
         } catch (error) {
@@ -56,12 +64,15 @@ class Friend{
         try {
             const {id} = req.user
             const {reqId} = req.params
-
+            console.log(reqId);
+            
             const friendReq = await friendModel.findById(reqId)
-           
-            if(friendReq.sender.toString() == id.toString()){
+            
+            if(friendReq.sender == id){
+                console.log("masuk 1");
                 throw {name: "Forbidden"}
             }
+            
             if(!friendReq){
                 throw {name: "NotFound"}
             }
@@ -75,19 +86,20 @@ class Friend{
             await userModel.findOneAndUpdate({_id: friendReq.receiver},
                 {
                     $push: {
-                    friends: request
+                    friends: request.sender
                     }
                 });
             await userModel.findOneAndUpdate({_id: friendReq.sender},
                 {
                     $push: {
-                    friends: request
+                    friends: request.receiver
                     }
                 });
-
+            // const list = await friendModel.find()
+            console.log(request)
             res.status(200).json(request)
         } catch (error) {
-            console.log(error, "ini kenapaaaa");
+            console.log(error);
             next(error)
         }
     }
@@ -96,19 +108,23 @@ class Friend{
         try {
             const {id} = req.user
             const { reqId } = req.params
-            const friend = await friendModel.findById(reqId)
-            if (!friend) throw { name: "NotFound" }
+            
+            const friend = await friendModel.findOne({_id: ObjectId(reqId)})
+            
+            if (!friend) {
+                throw { name: "NotFound" }
+            }
             
             if(friend.receiver.toString() !== id.toString()
             && friend.sender.toString() !== id.toString()){
                 throw {name: "Forbidden"}
             }
-
+            
             await friendModel.deleteOne({ _id: ObjectId(reqId) })
             
-            res.status(201).json(friend)
+            res.status(200).json(friend)
         } catch (error) {
-            console.log(error, "INI KENAPA DI DELETE FRIENDS");
+            console.log(error, "INI MAU DELETE ERROR");
             next(error)
         }
     }

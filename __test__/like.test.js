@@ -7,13 +7,16 @@ const userModel = require('../models/userModel');
 const { ObjectId } = require("mongodb");
 
 let access_token;
+let access_token_one;
+let user_one
 let thePost;
 let payload;
 let like;
 
 beforeAll(async () => {
     await userModel.deleteOne({   email: "test@mail.com" })
-   
+    await userModel.deleteOne({   email: "testuser8@mail.com" })
+
     const userPayload = {
         firstName: "test",
         lastName: "test",
@@ -23,6 +26,20 @@ beforeAll(async () => {
         city: "test",
         phoneNumber :"1234455"
     }
+
+    const userPayloadOne = {
+        firstName: "testuser28",
+        lastName: "testuser28",
+        email: "testuser8@mail.com",
+        password: "12345",
+        username: "testuser28",
+        city: "testuser24",
+        phoneNumber :"1234455"
+    }
+    user_one = await userModel.create(userPayloadOne)
+    const payloadJWT_ONE = { email: user_one.email };
+    access_token_one = jwt.sign(payloadJWT_ONE, "repathkeren");
+
     const user = await userModel.create(userPayload)
     const payloadJwt = { email: user.email };
     access_token = jwt.sign(payloadJwt, "repathkeren");
@@ -35,7 +52,6 @@ beforeAll(async () => {
     } 
 
     thePost = await postModel.create(payload)
-    console.log(thePost._id.toString(), "<<<<<<<<<<<<<<<<<");
 });
 
 
@@ -51,7 +67,6 @@ describe("GET /likes", () => {
         .set('access_token', null)
         .then((resp)=>{
             const result = resp.body
-            console.log(result);
             expect(resp.statusCode).toBe(401)
             expect(resp.res.statusMessage).toMatch("Unauthorized")
             expect(result).toMatchObject({"message": 'Invalid token'})
@@ -77,6 +92,56 @@ describe("GET /likes", () => {
             done(err)
         })
     })
+
+    test("failed fetch likes section due post not found", (done) => {
+        const postId = thePost._id.toString() + "123"
+        request(app)
+        .get(`/likes/${postId}`)
+        .set('access_token', access_token)
+        .then((resp)=>{
+            const result = resp.body
+            expect(resp.status).toBe(404)
+            expect(resp.res.statusMessage).toMatch("Not Found")
+            expect(result).toEqual({message: 'Content not found'})
+            done()
+        })
+        .catch((err)=>{
+            done(err)
+        })
+    })
+
+    test("user can access likes section by userId", (done) => {
+        const userId = payload.userId.toString()
+        request(app)
+        .get(`/likes/${userId}`)
+        .set('access_token', access_token)
+        .then((resp)=>{
+            const result = resp.body
+            expect(resp.statusCode).toBe(200)
+            expect(result).toEqual(expect.arrayContaining(result))
+            done()
+        })
+        .catch((err)=>{
+            done(err)
+        })
+    })
+
+    test("failed fetch likes section due userId not found", (done) => {
+        const userId = payload.userId.toString() + "123"
+        request(app)
+        .get(`/likes/${userId}`)
+        .set('access_token', access_token)
+        .then((resp)=>{
+            const result = resp.body
+            expect(resp.status).toBe(404)
+            expect(resp.res.statusMessage).toMatch("Not Found")
+            expect(result).toEqual({message: 'Content not found'})
+            done()
+        })
+        .catch((err)=>{
+            done(err)
+        })
+    })
 })
 
 describe("POST /likes", () =>{
@@ -85,19 +150,45 @@ describe("POST /likes", () =>{
         request(app)
         .post(`/likes/${postId}`)
         .set('access_token', access_token)
-        .send({
-            content: "haloo"
-        })
         .then((resp) => {
             const result = resp.body
             like = result
             expect(resp.statusCode).toBe(201)
             expect(resp.res.statusMessage).toMatch("Created")
-            // expect(result).objectContaining({
-            //     userId: expect.any(String),
-            //     content: expect.any(String),
-            //     _id: expect.any(String)
-            // })
+            expect(result).toEqual(expect.any(Object))
+            done()
+        })
+        .catch((err) => {
+            done(err)
+        })
+    })
+
+    test("user failed to make a likes due to existing likes", (done) => {
+        let postId = thePost._id.toString()
+        request(app)
+        .post(`/likes/${postId}`)
+        .set('access_token', access_token)
+        .then((resp) => {
+            const result = resp.body
+            expect(resp.statusCode).toBe(400)
+            expect(resp.res.statusMessage).toMatch("Bad Request")
+            expect(result).toEqual({ message: 'You have liked this post before' })
+            done()
+        })
+        .catch((err) => {
+            done(err)
+        })
+    })
+
+    test("user failed to make a likes due post not found", (done) => {
+        let postId = thePost._id.toString().slice(2, 0)
+        request(app)
+        .post(`/likes/${postId}`)
+        .set('access_token', access_token)
+        .then((resp) => {
+            expect(resp.res.statusCode).toBe(404)
+            expect(resp.res.statusMessage).toMatch("Not Found")
+            expect(resp.created).toEqual(false)
             done()
         })
         .catch((err) => {
@@ -110,10 +201,6 @@ describe("POST /likes", () =>{
         request(app)
         .post(`/likes/${postId}`)
         .set('access_token', null)
-        .send({
-            userId: payload.userId,
-            content: "haloo"
-        })
         .then((resp) => {
             const result = resp.body
             expect(resp.statusCode).toBe(401)
@@ -139,6 +226,39 @@ describe("DELETE /likes", () =>{
             expect(resp.statusCode).toBe(401)
             expect(resp.res.statusMessage).toMatch("Unauthorized")
             expect(result).toMatchObject({"message": 'Invalid token'})
+            done()
+        })
+        .catch((err) => {
+            done(err)
+        })
+    })
+
+    test("user failed to make a likes due to different user", (done) => {
+        let postId = thePost._id.toString()
+        request(app)
+        .delete(`/likes/${postId}`)
+        .set('access_token', access_token_one)
+        .then((resp) => {
+            const result = resp.body
+            expect(resp.status).toBe(400)
+            expect(resp.res.statusMessage).toMatch("Bad Request")
+            expect(result).toEqual({message: 'Content not found'})
+            done()
+        })
+        .catch((err) => {
+            done(err)
+        })
+    })
+
+    test("user failed to make a likes due post not found", (done) => {
+        let postId = thePost._id.toString().slice(2, 0)
+        request(app)
+        .delete(`/likes/${postId}`)
+        .set('access_token', access_token_one)
+        .then((resp) => {
+            expect(resp.res.statusCode).toBe(404)
+            expect(resp.res.statusMessage).toMatch("Not Found")
+            expect(resp.created).toEqual(false)
             done()
         })
         .catch((err) => {

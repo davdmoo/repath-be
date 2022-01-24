@@ -3,7 +3,7 @@ const friendController = require('../controller/friendController')
 
 router.get('/', friendController.findFriends)
 router.get('/requests', friendController.getRequest)
-router.post('/:followId', friendController.addFriend)
+router.post('/:userId', friendController.addFriend)
 router.patch('/:reqId', friendController.accFriend)
 router.delete('/:reqId', friendController.delFriend)
 

@@ -23,7 +23,7 @@ app.use(authentication)
 app.use('/posts', postRoutes)
 app.use('/comments', commentRoutes)
 app.use('/likes', likesRoutes)
-app.use('/follows', followRoutes)
+// app.use('/follows', followRoutes)
 app.use('/friends', friendRoutes)
 app.use('/fetchs', fetchRoutes)
 

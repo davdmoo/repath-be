@@ -18,12 +18,8 @@ router.use(authentication)
 router.get('/', postController.findPosts)
 // router.post('/',authentication, postController.addPost)
 router.post('/', authentication, upload.single('imgUrl'),imagekit,sizeValidation,typeValidation,postController.addPost)
-router.get('/:id', postController.findPost)
+// router.get('/:id', postController.findPost)
 router.put('/:id', postController.editPost)
 router.delete('/:id', postController.deletePost)
-// router.use('/:id/comments', commentRoutes)
-// router.use('/:id/likes', likesRoutes)
-
-
 
 module.exports = router

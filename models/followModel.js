@@ -10,7 +10,7 @@ const followSchema = new mongoose.Schema({
         type: Schema.Types.ObjectId,
         ref: "User"
     }
-})
+},{ strict: true })
 
 const followModel = mongoose.model("Follow", followSchema)
 

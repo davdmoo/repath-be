@@ -7,13 +7,16 @@ const userModel = require('../models/userModel.js');
 const { ObjectId } = require('mongodb');
 
 let access_token;
-let thePost;
+let access_token_one;
 let payload;
+let payload_one
+let thePost;
 let comment;
 
 beforeAll(async () => {
     await userModel.deleteOne({   email: "test@mail.com" })
-   
+    await userModel.deleteOne({   email: "testii@mail.com" })
+
     const userPayload = {
         firstName: "test",
         lastName: "test",
@@ -23,59 +26,43 @@ beforeAll(async () => {
         city: "test",
         phoneNumber :"1234455"
     }
+
+    const userPayloadOne = {
+        firstName: "testii",
+        lastName: "testii",
+        email: "testii@mail.com",
+        password: "12345",
+        username: "testii",
+        city: "testii",
+        phoneNumber :"1234455"
+    }
+
     const user = await userModel.create(userPayload)
     const payloadJwt = { email: user.email };
     access_token = jwt.sign(payloadJwt, "repathkeren");
+
+    const userOne = await userModel.create(userPayloadOne)
+    const payloadJwtOne = { email: user.email };
+    access_token_one = jwt.sign(payloadJwtOne, "repathkeren");
     
     await postModel.deleteOne({  title: "text 1" })
     payload = {
         type : "text",
         userId: user._id,
         title: "text 1"
+    }
+
+    payload_one = {
+        type : "text",
+        userId: userOne._id,
+        title: "text 1"
     } 
 
     thePost = await postModel.create(payload)
-    // await postModel.findOne({type: "text", title: "text 1"}).exec()
 })
 
 afterAll(async()=>{
     mongoose.disconnect()
-})
-
-describe("GET /comments", () => {
-    test("user cannot access comment section", (done) => {
-        let postId = thePost._id.toString()
-        request(app)
-        .get(`/comments/${postId}`)
-        .set('access_token', null)
-        .then((resp) => {
-            const result = resp.body
-            console.log(result);
-            expect(resp.statusCode).toBe(401)
-            expect(resp.res.statusMessage).toMatch("Unauthorized")
-            expect(result).toMatchObject({"message": 'Invalid token'})
-            done()
-        })
-        .catch((err) => {
-            done(err)
-        })
-    })
-
-    test("user can access and see comment section", (done) => {
-        let postId = thePost._id.toString()
-        request(app)
-        .get(`/comments/${postId}`)
-        .set('access_token', access_token)
-        .then((resp) => {
-            const result = resp.body
-            expect(resp.statusCode).toBe(200)
-            expect(result).toEqual(expect.arrayContaining(result))
-            done()
-        })
-        .catch((err)=> {
-            done(err)
-        })
-    })
 })
 
 describe("POST /comments", () => {
@@ -113,11 +100,7 @@ describe("POST /comments", () => {
             const result = resp.body
             expect(resp.statusCode).toBe(201)
             expect(resp.res.statusMessage).toMatch("Created")
-            // expect(result).objectContaining({
-            //     userId: expect.any(String),
-            //     content: expect.any(String),
-            //     _id: expect.any(String)
-            // })
+            expect(result).toEqual(expect.any(Object))
             done()
         })
         .catch((err) => {
@@ -125,6 +108,104 @@ describe("POST /comments", () => {
         })
     })
     
+    test("user failed to make a comment due to unexisting post", (done) => {
+        let postId = thePost._id.toString().slice(2, 0)
+        request(app)
+        .post(`/comments/${postId}`)
+        .set('access_token', access_token)
+        .send({
+            content: "haloo"
+        })
+        .then((resp) => {
+            expect(resp.status).toBe(404)
+            expect(resp.res.statusMessage).toMatch("Not Found")
+            done()
+        })
+        .catch((err) => {
+            done(err)
+        })
+    })
+})
+
+describe("GET /comments", () => {
+    test("user cannot access comment section", (done) => {
+        let postId = thePost._id.toString()
+        request(app)
+        .get(`/comments/${postId}`)
+        .set('access_token', null)
+        .then((resp) => {
+            const result = resp.body
+            expect(resp.statusCode).toBe(401)
+            expect(resp.res.statusMessage).toMatch("Unauthorized")
+            expect(result).toMatchObject({"message": 'Invalid token'})
+            done()
+        })
+        .catch((err) => {
+            done(err)
+        })
+    })
+
+    test("user cannot access comment section due to unexisting post", (done) => {
+        let postId = thePost._id.toString().slice(2, 0)
+        request(app)
+        .get(`/comments/${postId}`)
+        .set('access_token', access_token)
+        .then((resp) => {
+            expect(resp.status).toBe(404)
+            expect(resp.res.statusMessage).toMatch("Not Found")
+            done()
+        })
+        .catch((err) => {
+            done(err)
+        })
+    })
+
+    test("user can access and see comment section", (done) => {
+        let postId = thePost._id.toString()
+        request(app)
+        .get(`/comments/${postId}`)
+        .set('access_token', access_token)
+        .then((resp) => {
+            const result = resp.body
+            expect(resp.statusCode).toBe(200)
+            expect(result).toEqual(expect.arrayContaining(result))
+            done()
+        })
+        .catch((err)=> {
+            done(err)
+        })
+    })
+
+    test("user can access and see certain comment", (done) => {
+        let commentId = comment._id.toString()
+        request(app)
+        .get(`/comments/${commentId}`)
+        .set('access_token', access_token)
+        .then((resp) => {
+            const result = resp.body
+            expect(resp.statusCode).toBe(200)
+            expect(result).toEqual(expect.arrayContaining(result))
+            done()
+        })
+        .catch((err)=> {
+            done(err)
+        })
+    })
+
+    test("user cannot access certain comment due to unexisting comment", (done) => {
+        let commentId = comment._id.toString().slice(2, 0)
+        request(app)
+        .get(`/comments/${commentId}`)
+        .set('access_token', access_token)
+        .then((resp) => {
+            expect(resp.status).toBe(404)
+            expect(resp.res.statusMessage).toMatch("Not Found")
+            done()
+        })
+        .catch((err) => {
+            done(err)
+        })
+    })
 })
 
 describe("PUT /comments", () => {
@@ -146,6 +227,25 @@ describe("PUT /comments", () => {
             //     content: expect.any(String),
             //     _id: expect.any(String)
             // })
+            done()
+        })
+        .catch((err) => {
+            done(err)
+        })
+    })
+
+    test("user failed to edit a comment due to unexisting comment", (done) => {
+        let postId = thePost._id.toString()
+        let commentId = comment._id.toString().slice(2, 0)
+        request(app)
+        .put(`/comments/${postId}/${commentId}`)
+        .set('access_token', access_token)
+        .send({
+            content: "haloo ini edit comment"
+        })
+        .then((resp) => {
+            expect(resp.status).toBe(404)
+            expect(resp.res.statusMessage).toMatch("Not Found")
             done()
         })
         .catch((err) => {
@@ -186,6 +286,24 @@ describe("DELETE /comments", () => {
             const result = resp.body
             expect(resp.statusCode).toBe(200)
             expect(resp.res.statusMessage).toMatch("OK")
+            done()
+        })
+        .catch((err) => {
+            done(err)
+        })
+    })
+
+    test("user success to delete a comment due to different user", (done) => {
+        let postId = thePost._id.toString()
+        let commentId = comment._id.toString()
+        request(app)
+        .delete(`/comments/${postId}/${commentId}`)
+        .set('access_token', access_token)
+        .then((resp) => {
+            const result = resp.body
+            expect(resp.status).toBe(400)
+            expect(resp.res.statusMessage).toMatch("Bad Request")
+            expect(result).toEqual({message: 'Content not found'})
             done()
         })
         .catch((err) => {
