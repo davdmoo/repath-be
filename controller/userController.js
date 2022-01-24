@@ -10,7 +10,6 @@ class User {
 
       if (name) {
         const users = await userModel.find({ username: { $regex: name + '.*' } }).exec();
-        if (!users) throw { name: 'NotFound' };
 
         res.status(200).json(users);
       } else {
@@ -80,7 +79,10 @@ class User {
   static async editUser(req, res, next) {
     try {
       const id = req.user.id;
+      const userId = req.params.id;
       let payload;
+
+      if (id.toString() !== userId.toString()) throw { name: "Forbidden" };
 
       if (req.body.imgUrl !== `[object Object]`) {
         payload = {
@@ -129,7 +131,6 @@ class User {
 
       res.status(200).json(updatedUser);
     } catch (err) {
-      console.log(err, `AAAAA KNAPA`);
       next(err);
     }
   }
