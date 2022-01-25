@@ -21,7 +21,7 @@ class Like{
         try {
             const userId = req.user.id;
 
-            const likes = await likeModel.find({ userId: userId }).exec();
+            const likes = await likeModel.find({ userId: userId }).populate("postId").exec();
             if (!likes) throw { name: "NotFound" };
 
             res.status(200).json(likes);
