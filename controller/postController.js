@@ -8,8 +8,8 @@ const commentModel = require('../models/commentModel');
 class Post {
     static async findPosts(req, res, next){
         try {
-            let filter = [];
             const { id } = req.user;
+            let filter = [id];
 
             const friends = await friendModel.find({status: true}).populate([
                 { path: "sender" },

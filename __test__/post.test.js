@@ -128,8 +128,8 @@ describe("POST /posts", () => {
   })
     describe("user input is correct", () => {
       const imgUrl = "https://ik.imagekit.io/repathImageKit/james_Y2mFuV0noVO.jpg"
-      const resp = {data : imgUrl};
-      const test =  axios.get.mockImplementation(() => Promise.resolve(resp))
+      const resp = {data : {url :imgUrl}};
+      const test =  axios.post.mockImplementation(() => Promise.resolve(resp))
       console.log(test.mockReturnValueOnce,`AAAAAAAAAAAAAAAAAA`)
         test("success posting", (done) => {
             request(app)
