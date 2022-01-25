@@ -40,10 +40,9 @@ class Friend {
                     payload.push(el.sender)
                 }
             })
-            console.log(payload);
+
             res.status(200).json(payload)
         } catch (error) {
-            console.log(error);
             next(error)
         }
     }

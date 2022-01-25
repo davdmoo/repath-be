@@ -10,6 +10,7 @@ class Post {
     try {
       const { id } = req.user;
       let filter = [id];
+      const skip = req.query.skip && /^\d+$/.test(req.query.skip) ? Number(req.query.skip) : 0;
 
       const friends = await friendModel.find({ status: true }).populate([{ path: 'sender' }, { path: 'receiver' }]);
 
@@ -26,7 +27,7 @@ class Post {
       });
 
       const posts = await postModel
-        .find({ userId: filter })
+        .find({ userId: filter }, undefined, { skip, limit: 3 })
         .sort({ created_at: -1 })
         .populate([{ path: 'likes', populate: 'userId' }, { path: 'comments', populate: 'userId' }, { path: 'userId' }]);
 
