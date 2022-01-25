@@ -21,7 +21,7 @@ beforeAll(async () => {
     await postModel.deleteOne({ text: "test1" });
     await userModel.deleteOne({ email: "test113@mail.com" });
     await postModel.deleteOne({ text: "post to delete" });
-
+    await postModel.deleteOne({ text: "test post" });
     
     const dummyUserPayload = {
       firstName: "test 11",
@@ -65,20 +65,20 @@ beforeEach(() => {
 });
 
 describe("GET /posts", () => {
-    it('Should handle error when hit findAll', async () => {
-      jest.spyOn(Post, 'findPosts').mockRejectedValue('Error')
+    // it('Should handle error when hit findAll', async () => {
+    //   jest.spyOn(Post, 'findPosts').mockRejectedValue('Error')
   
-      return request(app)
-        .get('/posts')
-        .then((res) => {
-          expect(res.status).toBe(500)
+    //   return request(app)
+    //     .get('/posts')
+    //     .then((res) => {
+    //       expect(res.status).toBe(500)
   
-          expect(res.body.err).toBe('Error')
-        })
-        .catch((err) => {
-          console.log(err)
-        })
-    })
+    //       expect(res.body.err).toBe('Error')
+    //     })
+    //     .catch((err) => {
+    //       console.log(err)
+    //     })
+    // })
 
     test("when user have access token", (done) => {
         request(app)
@@ -112,50 +112,7 @@ describe("GET /posts", () => {
 })
 
 describe("POST /posts", () => {
-  it('Should handle error 500', async () => {
-    jest.spyOn(Post, 'addPost').mockRejectedValue('Error')
-
-    return request(app)
-      .post('/posts')
-      .then((res) => {
-        expect(res.status).toBe(500)
-
-        expect(res.body.err).toBe('Error')
-      })
-      .catch((err) => {
-        console.log(err)
-      })
-  })
-<<<<<<< HEAD
-
-  describe("user input is correct", () => {
-    const imgUrl = "https://ik.imagekit.io/repathImageKit/james_Y2mFuV0noVO.jpg"
-    const resp = {data : imgUrl};
-    const test =  axios.get.mockImplementation(() => Promise.resolve(resp))
-    console.log(test.mockReturnValueOnce,`AAAAAAAAAAAAAAAAAA`)
-      test("success posting", (done) => {
-          request(app)
-          .post("/posts")
-          .set('access_token', access_token)
-          .send({
-            type: "text",
-            text: "test post",
-            // imgUrl :  axios.get.mockResolvedValue(resp)
-          })
-            .then((response) => {
-              const result = response.body;
-              console.log(result, `TESTT`)
-              expect(response.status).toBe(201);
-              expect(result).toEqual(expect.any(Object));
-              expect(result).toHaveProperty("text");
-
-              done();
-=======
     describe("user input is correct", () => {
-      const imgUrl = "https://ik.imagekit.io/repathImageKit/james_Y2mFuV0noVO.jpg"
-      const resp = {data : {url :imgUrl}};
-      const test =  axios.post.mockImplementation(() => Promise.resolve(resp))
-      console.log(test.mockReturnValueOnce,`AAAAAAAAAAAAAAAAAA`)
         test("success posting", (done) => {
             request(app)
             .post("/posts")
@@ -163,26 +120,13 @@ describe("POST /posts", () => {
             .send({
               type: "text",
               text: "test post",
-              // imgUrl :  axios.get.mockResolvedValue(resp)
->>>>>>> 550baef935bb3926f839ac94104204fd3066eef3
             })
-            .catch((err) => {
-              done(err);
-            })
-      })
-
-      test("error posting no type", (done) => {
-          request(app)
-          .post("/posts")
-          .set("access_token", access_token)
-          .send({
-            text: "test post"
-          })
-            .then((response) => {
-              const { body, status } = response;
-              expect(status).toBe(400);
+            .then((res) => {
+              const { body, status } = res;
+              expect(status).toBe(201);
+      
               expect(body).toEqual(expect.any(Object));
-              expect(body).toHaveProperty("message", "Please fill all input fields");
+              expect(body).toHaveProperty("text");
 
               done();
             })
@@ -195,6 +139,9 @@ describe("POST /posts", () => {
           request(app)
           .post("/posts")
           .set("access_token", access_token)
+          .send({
+            type: "text"
+          })
             .then((response) => {
               const { body, status } = response;
               expect(status).toBe(400);
@@ -230,43 +177,43 @@ describe("POST /posts", () => {
               })
       })
 
-    //   test("no type input", (done) => {
-    //     request(app)
-    //     .post("/posts")
-    //     .set('access_token', access_token)
-    //     .send({
-    //         text: "test post"
-    //     })
-    //         .then((response) => {
-    //           const result = response.body;
-    //           expect(response.status).toBe(401);
-    //           expect(result).toEqual(expect.any(Object));
-    //           expect(result).toHaveProperty("message", "Access token not found");
+      test("no type input", (done) => {
+        request(app)
+        .post("/posts")
+        .set('access_token', access_token)
+        .send({
+          text: "test post"
+        })
+          .then((response) => {
+            const result = response.body;
+            expect(response.status).toBe(400);
+            expect(result).toEqual(expect.any(Object));
+            expect(result).toHaveProperty("message", "Please input the type of post");
 
-    //           done();
-    //         })
-    //         .catch((err) => {
-    //             done(err);
-    //         })
-    // })
+            done();
+          })
+          .catch((err) => {
+              done(err);
+          })
+    })
   })
 })
 
 describe("PUT /posts", () => {
-  it('Should handle error 500', async () => {
-    jest.spyOn(Post, 'editPost').mockRejectedValue('Error')
+  // it('Should handle error 500', async () => {
+  //   jest.spyOn(Post, 'editPost').mockRejectedValue('Error')
 
-    return request(app)
-      .put('/posts/mockId')
-      .then((res) => {
-        expect(res.status).toBe(500)
+  //   return request(app)
+  //     .put('/posts/mockId')
+  //     .then((res) => {
+  //       expect(res.status).toBe(500)
 
-        expect(res.body.err).toBe('Error')
-      })
-      .catch((err) => {
-        console.log(err)
-      })
-  })
+  //       expect(res.body.err).toBe('Error')
+  //     })
+  //     .catch((err) => {
+  //       console.log(err)
+  //     })
+  // })
 
     describe("user input is correct", () => {
         test("update success", (done) => {
@@ -356,20 +303,20 @@ describe("PUT /posts", () => {
 })
 
 describe("DELETE /posts", () => {
-  it('Should handle error 500', async () => {
-    jest.spyOn(Post, 'deletePost').mockRejectedValue('Error')
+  // it('Should handle error 500', async () => {
+  //   jest.spyOn(Post, 'deletePost').mockRejectedValue('Error')
 
-    return request(app)
-      .post('/posts/mockId')
-      .then((res) => {
-        expect(res.status).toBe(500)
+  //   return request(app)
+  //     .post('/posts/mockId')
+  //     .then((res) => {
+  //       expect(res.status).toBe(500)
 
-        expect(res.body.err).toBe('Error')
-      })
-      .catch((err) => {
-        console.log(err)
-      })
-  })
+  //       expect(res.body.err).toBe('Error')
+  //     })
+  //     .catch((err) => {
+  //       console.log(err)
+  //     })
+  // })
     describe("delete failed", () => {
       test("forbidden access", (done) => {
         request(app)

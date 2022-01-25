@@ -1,8 +1,8 @@
 const router = require('express').Router()
 const likesController = require('../controller/likesController')
 
+router.get('/', likesController.findLikesByUser)
 router.get('/:postId', likesController.findLikes)
-router.get('/:userId', likesController.findLikesByUser)
 router.post('/:postId', likesController.addLike)
 // router.get('/:id', likesController.findLike)
 // router.put('/:id', likesController.editLike)
