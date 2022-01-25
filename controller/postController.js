@@ -6,17 +6,10 @@ const commentModel = require('../models/commentModel');
 const { ObjectId } = require("mongodb");
 
 class Post {
-<<<<<<< HEAD
-    static async findPosts(req, res, next){
-        try {
-            const {id} = req.user
-            let filter = [id];
-=======
   static async findPosts(req, res, next) {
     try {
       const { id } = req.user;
       let filter = [id];
->>>>>>> 9dc2308824c61e2f7d7899202e82d4a0eafeab8d
 
       const friends = await friendModel.find({ status: true }).populate([{ path: 'sender' }, { path: 'receiver' }]);
 
