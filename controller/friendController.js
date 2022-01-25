@@ -2,7 +2,7 @@ const { ObjectId } = require("mongodb");
 const friendModel = require("../models/friendModel")
 const userModel = require('../models/userModel')
 
-class Friend{
+class Friend {
     static async findFriends(req, res, next){
         try {
             const {id} = req.user
@@ -43,7 +43,6 @@ class Friend{
             
             res.status(200).json(payload)
         } catch (error) {
-            console.log(error, "INI EROR=======");
             next(error)
         }
     }
@@ -71,7 +70,6 @@ class Friend{
 
             res.status(201).json(sendReq);
         } catch (error) {
-            console.log(error);
             next(error)
         }
     }
