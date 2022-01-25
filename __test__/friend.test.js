@@ -125,7 +125,7 @@ describe("POST /friends", () => {
             const result = resp.body
             expect(resp.status).toBe(400)
             expect(resp.res.statusMessage).toMatch("Bad Request")
-            expect(result).toEqual({message: 'You have a pending friend request involving this user'})
+            expect(result).toEqual({message: 'You are already friends with this user'})
             done()
         })
         .catch((err)=>{

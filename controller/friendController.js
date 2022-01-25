@@ -31,10 +31,12 @@ class Friend{
             ])
             
             let payload = []
-            friends.forEach(el =>{
+            friends.forEach((el, idx) =>{
                 if(el.sender._id.toString() == id.toString()){
+                    el.receiver._id = el._id
                     payload.push(el.receiver)
                 }else if(el.receiver._id.toString() == id.toString()){
+                    el.sender._id = el._id
                     payload.push(el.sender)
                 }
             })
@@ -90,6 +92,7 @@ class Friend{
         try {
             const {id} = req.user
             const {reqId} = req.params
+
             const friendReq = await friendModel.findById(reqId);
             if(!friendReq) throw {name: "NotFound"};
             
@@ -141,7 +144,6 @@ class Friend{
             
             const friend = await friendModel.findById(reqId);
             if (!friend) throw { name: "NotFound" };
-            console.log(friend, "<<<<< delete friend");
             
             if(friend.receiver.toString() !== id.toString()
             && friend.sender.toString() !== id.toString()){

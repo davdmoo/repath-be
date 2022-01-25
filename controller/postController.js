@@ -14,6 +14,7 @@ class Post {
       const friends = await friendModel.find({ status: true }).populate([{ path: 'sender' }, { path: 'receiver' }]);
 
       let payload = [];
+      
       friends.forEach((el) => {
         if (el.sender._id.toString() == id.toString()) {
           filter.push(el.receiver._id);
@@ -31,7 +32,6 @@ class Post {
 
       res.status(200).json(posts);
     } catch (err) {
-      console.log(err);
       next(err);
     }
   }
