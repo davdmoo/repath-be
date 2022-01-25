@@ -126,6 +126,7 @@ describe("POST /posts", () => {
         console.log(err)
       })
   })
+<<<<<<< HEAD
 
   describe("user input is correct", () => {
     const imgUrl = "https://ik.imagekit.io/repathImageKit/james_Y2mFuV0noVO.jpg"
@@ -149,6 +150,21 @@ describe("POST /posts", () => {
               expect(result).toHaveProperty("text");
 
               done();
+=======
+    describe("user input is correct", () => {
+      const imgUrl = "https://ik.imagekit.io/repathImageKit/james_Y2mFuV0noVO.jpg"
+      const resp = {data : {url :imgUrl}};
+      const test =  axios.post.mockImplementation(() => Promise.resolve(resp))
+      console.log(test.mockReturnValueOnce,`AAAAAAAAAAAAAAAAAA`)
+        test("success posting", (done) => {
+            request(app)
+            .post("/posts")
+            .set('access_token', access_token)
+            .send({
+              type: "text",
+              text: "test post",
+              // imgUrl :  axios.get.mockResolvedValue(resp)
+>>>>>>> 550baef935bb3926f839ac94104204fd3066eef3
             })
             .catch((err) => {
               done(err);
