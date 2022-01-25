@@ -3,15 +3,13 @@ const likeModel = require('../models/likesModel');
 const friendModel = require('../models/friendModel');
 const userModel = require('../models/userModel');
 const commentModel = require('../models/commentModel');
-const friendModel = require('../models/friendModel');
 const { ObjectId } = require("mongodb");
 
 class Post {
     static async findPosts(req, res, next){
         try {
             const {id} = req.user
-            let filter = [];
-            const { id } = req.user;
+            let filter = [id];
 
             const friends = await friendModel.find({status: true}).populate([
                 { path: "sender" },
