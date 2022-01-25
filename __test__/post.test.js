@@ -21,6 +21,8 @@ beforeAll(async () => {
     await userModel.deleteOne({ email: "test113@mail.com" });
     await postModel.deleteOne({ text: "post to delete" });
     await postModel.deleteOne({ text: "test post" });
+    await postModel.deleteOne({ title: "Bruno" });
+    await postModel.deleteOne({ location: "Jakarta" });
     
     const dummyUserPayload = {
       firstName: "test 11",
@@ -134,6 +136,53 @@ describe("POST /posts", () => {
               done(err);
             })
       })
+
+      test("success posting music", (done) => {
+        request(app)
+        .post("/posts")
+        .set('access_token', access_token)
+        .send({
+          type: "music",
+          title: "Bruno",
+        })
+        .then((res) => {
+          const { body, status } = res;
+          console.log(body, `BODY`);
+          expect(status).toBe(201);
+  
+          expect(body).toEqual(expect.any(Object));
+          expect(body).toHaveProperty("type", "music");
+          expect(body).toHaveProperty("title", "Bruno");
+
+          done();
+        })
+        .catch((err) => {
+          done(err);
+        })
+      })
+
+      test("success posting location", (done) => {
+        request(app)
+        .post("/posts")
+        .set('access_token', access_token)
+        .send({
+          type: "location",
+          location: "Jakarta",
+        })
+        .then((res) => {
+          const { body, status } = res;
+          expect(status).toBe(201);
+  
+          expect(body).toEqual(expect.any(Object));
+          expect(body).toHaveProperty("type", "location");
+          expect(body).toHaveProperty("location", "Jakarta");
+
+          done();
+        })
+        .catch((err) => {
+          done(err);
+        })
+  })
 
       test("error posting no input", (done) => {
           request(app)
