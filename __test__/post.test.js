@@ -5,7 +5,6 @@ const app = require('../app.js')
 const jwt = require("jsonwebtoken");
 const mongoose = require('../config/monggoConfig');
 const secretKey = process.env.SECRETKEY;
-const axios = require('axios')
 jest.mock('axios')
 const Post = require("../controller/postController");
 
@@ -113,7 +112,8 @@ describe("GET /posts", () => {
 
 describe("POST /posts", () => {
     describe("user input is correct", () => {
-        test("success posting", (done) => {
+    
+        test("success posting without image", (done) => {
             request(app)
             .post("/posts")
             .set('access_token', access_token)
