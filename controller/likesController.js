@@ -65,7 +65,6 @@ class Like{
 
             res.status(201).json(like);
         } catch(err){
-            console.log(err, "INI DARI ADD LIKES ERROR");
             next(err);
         }
     }

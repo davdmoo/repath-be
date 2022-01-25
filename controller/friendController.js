@@ -33,17 +33,17 @@ class Friend{
             let payload = []
             friends.forEach((el, idx) =>{
                 if(el.sender._id.toString() == id.toString()){
-                    el.receiver._id = el._id
+                    el.receiver.phoneNumber = el._id
                     payload.push(el.receiver)
                 }else if(el.receiver._id.toString() == id.toString()){
-                    el.sender._id = el._id
+                    el.sender.phoneNumber = el._id
                     payload.push(el.sender)
                 }
             })
-            
+            console.log(payload);
             res.status(200).json(payload)
         } catch (error) {
-            console.log(error, "INI EROR=======");
+            console.log(error);
             next(error)
         }
     }
@@ -71,7 +71,6 @@ class Friend{
 
             res.status(201).json(sendReq);
         } catch (error) {
-            console.log(error);
             next(error)
         }
     }
@@ -132,7 +131,6 @@ class Friend{
                 status: true
             });
         } catch (error) {
-            console.log(error, "INI ERROR DARI FRIEND CONTROLLER");
             next(error)
         }
     }
