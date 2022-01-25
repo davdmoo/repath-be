@@ -4,7 +4,7 @@ const friendModel = require('../models/friendModel');
 const userModel = require('../models/userModel');
 const commentModel = require('../models/commentModel');
 const { ObjectId } = require("mongodb");
-
+const { inspect } = require('util');
 class Post {
   static async findPosts(req, res, next) {
     try {
@@ -27,7 +27,7 @@ class Post {
       });
 
       const posts = await postModel
-        .find({ userId: filter }, undefined, { skip, limit: 3 })
+        .find({ userId: filter }, undefined, { skip, limit: 0 })
         .sort({ created_at: -1 })
         .populate([{ path: 'likes', populate: 'userId' }, { path: 'comments', populate: 'userId' }, { path: 'userId' }]);
 
@@ -79,17 +79,33 @@ class Post {
     }
   }
 
-  // static async findPost(req, res, next) {
-  //     try {
-  //         const id = req.params.id
-  //         const post = await postModel.findOne({_id: id}).exec()
-  //         if (!post) throw { name: "NotFound" };
-
-  //         res.status(200).json(post)
-  //     }catch(err) {
-  //         next(err);
-  //     }
-  // }
+  static async findPostByLikes(req, res, next) {
+      try {
+        const {id} = req.user
+        let payload = []
+        const likedPosts = await likeModel.find({userId: id}).populate({
+          path : 'postId',
+          populate : {
+            path : 'userId',
+            path: 'comments',
+            populate: {
+              path : 'userId',
+            },
+            path: 'likes',
+            populate: {
+              path : 'userId',
+            }
+          }
+        })
+        likedPosts.forEach(el => {
+          payload.push(el.postId)
+        });
+        res.status(200).json(payload)
+      }catch(err) {
+        console.log(err);
+        next(err);
+      }
+  }
 
   static async editPost(req, res, next) {
     try {
