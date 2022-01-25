@@ -7,7 +7,6 @@ const errorHandler = (err, req, res, next) => {
       else if (err.errors.username) res.status(400).json({ message: err.errors.username.properties.message });
       else if (err.errors.phoneNumber) res.status(400).json({ message: err.errors.phoneNumber.properties.message });
       else if (err.errors.city) res.status(400).json({ message: err.errors.city.properties.message });
-      else if (err.errors.type) res.status(400).json({ message: err.errors.type.properties.message });
     } else if (err.kind === "ObjectId") {
       res.status(404).json({ message: "Content not found" });
     } else {
@@ -53,6 +52,9 @@ const errorHandler = (err, req, res, next) => {
             break;
         case "AccFriendTwice":
             res.status(400).json({ message: "You are already friends with this user" });
+            break;
+        case "NoType":
+            res.status(400).json({ message: "Please input the type of post" });
             break;
         default:
             res.status(500).json({ message: "Internal server error" })

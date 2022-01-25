@@ -2,7 +2,7 @@ const { ObjectId } = require("mongodb");
 const friendModel = require("../models/friendModel")
 const userModel = require('../models/userModel')
 
-class Friend{
+class Friend {
     static async findFriends(req, res, next){
         try {
             const {id} = req.user

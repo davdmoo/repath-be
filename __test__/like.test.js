@@ -111,9 +111,9 @@ describe("GET /likes", () => {
     })
 
     test("user can access likes section by userId", (done) => {
-        const userId = payload.userId.toString()
+        // const userId = payload.userId.toString()
         request(app)
-        .get(`/likes/${userId}`)
+        .get(`/likes`)
         .set('access_token', access_token)
         .then((resp)=>{
             const result = resp.body

@@ -19,7 +19,7 @@ class Like{
 
     static async findLikesByUser(req, res, next){
         try {
-            const { userId } = req.params;
+            const userId = req.user.id;
 
             const likes = await likeModel.find({ userId: userId }).exec();
             if (!likes) throw { name: "NotFound" };
