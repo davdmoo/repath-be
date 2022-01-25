@@ -1,9 +1,9 @@
-const e = require('express');
 const postModel = require('../models/postModel');
 const likeModel = require('../models/likesModel');
 const friendModel = require('../models/friendModel');
 const userModel = require('../models/userModel');
 const commentModel = require('../models/commentModel');
+const { ObjectId } = require("mongodb");
 
 class Post {
   static async findPosts(req, res, next) {

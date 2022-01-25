@@ -53,7 +53,12 @@ class Friend{
 
             const friendRequests = await friendModel.find({status: false});
             friendRequests.forEach(fr => {
-              if (fr.sender.toString() === id.toString() || fr.receiver.toString() === id.toString()) throw { name: "FriendTwice" };
+                if ( (fr.sender.toString() === id.toString() && fr.receiver.toString() === userId) || (fr.receiver.toString() === id.toString() && fr.sender.toString() === userId) ) throw { name: "FriendTwice" };
+              });
+
+            const friendRequests2 = await friendModel.find({status: true});
+            friendRequests2.forEach(fr => {
+                if ( (fr.sender.toString() === id.toString() && fr.receiver.toString() === userId) || (fr.receiver.toString() === id.toString() && fr.sender.toString() === userId) ) throw { name: "AccFriendTwice" };
             });
             
             const sendReq = await friendModel.create({
@@ -64,6 +69,7 @@ class Friend{
 
             res.status(201).json(sendReq);
         } catch (error) {
+            console.log(error);
             next(error)
         }
     }
