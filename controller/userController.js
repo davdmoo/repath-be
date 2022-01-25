@@ -2,7 +2,7 @@ const userModel = require('../models/userModel');
 const postModel = require('../models/postModel');
 const jwt = require('jsonwebtoken');
 const secretKey = process.env.SECRETKEY;
-const {OAuth2Client} = require('google-auth-library');
+const { OAuth2Client } = require('google-auth-library');
 
 class User {
   static async findUsers(req, res, next) {
@@ -10,9 +10,7 @@ class User {
       const { name } = req.query;
 
       if (name) {
-        const users = await userModel.find(
-          { username: { $regex: '^' + name, $options: 'i' } }
-        ).exec();
+        const users = await userModel.find({ username: { $regex: '^' + name, $options: 'i' } }).exec();
 
         res.status(200).json(users);
       } else {
@@ -85,7 +83,7 @@ class User {
       const userId = req.params.id;
       let payload;
 
-      if (id.toString() !== userId.toString()) throw { name: "Forbidden" };
+      if (id.toString() !== userId.toString()) throw { name: 'Forbidden' };
 
       if (req.body.imgUrl !== `[object Object]`) {
         payload = {
@@ -158,58 +156,63 @@ class User {
   }
 
   static async googleLogin(req, res, next) {
-  
     try {
       const { idToken } = req.body;
       const client = new OAuth2Client(process.env.GOOGLE_CLIENT);
       const ticket = await client.verifyIdToken({
-          idToken,
-          audience : process.env.GOOGLE_CLIENT
-      })
-
+        idToken,
+        audience: process.env.GOOGLE_CLIENT,
+      });
 
       const payload = ticket.getPayload();
-      let payloadJWT
+      let payloadJWT;
+      let access_token;
+      let payloadUser;
 
-      const user = await userModel.findOne({ email: payload.email})
+      const user = await userModel.findOne({ email: payload.email });
       if (user) {
-      
+        console.log('INI LOGIN GOOGLE');
         payloadJWT = { email: user.email };
 
-         const payloadUser = {
-            email: user.email,
-            id: user._id.toString(),
-            firstName: user.firstName,
-            lastName: user.lastName,
-          };
+        payloadUser = {
+          email: user.email,
+          _id: user._id.toString(),
+          firstName: user.firstName,
+          lastName: user.lastName,
+        };
 
-        const access_token = jwt.sign(payloadJWT, secretKey);
+        if (user.imgUrl) payloadUser.imgUrl = user.imgUrl;
+        if (user.header) payloadUser.header = user.header;
+
+        access_token = jwt.sign(payloadJWT, secretKey);
         res.status(200).json({ access_token, payloadUser });
+      } else {
+        console.log('INI REGISTER GOOGLE');
+        const username = payload.name.replace(' ', '_');
+        payloadJWT = { email: payload.email };
+        console.log(payload);
+        const payloadCreate = {
+          firstName: payload.given_name,
+          lastName: payload.family_name,
+          email: payload.email,
+          password: '12345',
+          username,
+          phoneNumber: '+62',
+          city: '-',
+          imgUrl: payload.picture,
+        };
+
+        payloadUser = await userModel.create(payloadCreate);
+        payloadJWT = { email: payloadUser.email };
+        access_token = jwt.sign(payloadJWT, secretKey);
+
+        console.log(payloadUser, 'HALOOOOOOOOOOOOOOO');
+        res.status(201).json({ payloadUser, access_token });
       }
-
-      else{
-        const username = payload.name.replace(' ','_')
-        payloadJWT = { email: payload.email};
-        const  payloadCreate = {
-          firstName : payload.given_name,
-          lastName : payload.family_name,
-          email : payload.email,
-          password : "12345",
-          username ,
-          phoneNumber: "+62",
-          city: "-"
-        }
-
-        const newUser = await userModel.create(payloadCreate);
-
-        res.status(201).json(newUser);
-      }
-   
     } catch (err) {
-      next(err)
+      next(err);
     }
   }
 }
 
 module.exports = User;
-
