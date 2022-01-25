@@ -10,7 +10,6 @@ function imageUser(req, res, next) {
     }
     else if (req.files.length === 1) {
         req.files.forEach((element) => {
-            console.log(element, `INI 1 Image`)
          
             const form = new FormData()
             form.append('file', element.buffer.toString('base64'))
@@ -44,7 +43,6 @@ function imageUser(req, res, next) {
         })
     }
     else if (req.files.length === 2) {
-        console.log(req.files, `INI 2 Image`)
         req.files.forEach((element) => {
         //     if (element.mimetype !== 'image/jpeg' && element.mimetype !== 'image/png') {
         //         next({ code: 400, message: 'You can only upload png or jpg' })

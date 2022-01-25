@@ -1,7 +1,4 @@
 const errorHandler = (err, req, res, next) => {
-    // console.log(err, "ERROR HANDLER");
-    // validation di mongoose: err.errors -> cek pathnya (ct. email/username/pass) -> masuk properties -> message
-    // ct. err.errors.email.properties.message
     if (err.errors) {
       if (err.errors.email) res.status(400).json({ message: err.errors.email.properties.message });
       else if (err.errors.firstName) res.status(400).json({ message: err.errors.firstName.properties.message });
@@ -60,7 +57,6 @@ const errorHandler = (err, req, res, next) => {
             res.status(400).json({ message: "Please input the type of post" });
             break;
         default:
-            // console.log(err);
             res.status(500).json({ message: "Internal server error" })
             break;
       }

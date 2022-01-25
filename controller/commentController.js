@@ -99,7 +99,6 @@ class Comment{
 
             res.status(200).json(deletedComment)
         } catch(err) {
-            console.log(err, "INI ERROR");
             next(err);
         }
     }

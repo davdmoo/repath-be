@@ -26,7 +26,6 @@ const imagekit = async (req, res, next) => {
 
       // if (req.body.profilePicture) {
       req.body.imgUrl = data.url;
-      console.log(req.body.imgUrl, `<<<<<<<<<<BODY IMAGE`);
       // }
       // if (req.body.backgroundImage) {
       //     req.body.backgroundImage = data.url
