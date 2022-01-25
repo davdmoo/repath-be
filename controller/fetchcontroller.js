@@ -14,7 +14,6 @@ class Fetch {
                     'x-rapidapi-key': 'a0fd5fdf04msha9dde7e4ff273a1p10644fjsn1b7f916cb262'
                 }
             })
-            // console.log(data, `DI CONTROLER FETCH`)
 
             const limit =  data.data.slice(0, 10)
             const tampung = []
@@ -42,7 +41,6 @@ class Fetch {
                 url: `https://api.mapbox.com/geocoding/v5/mapbox.places/${location}.json?country=id&proximity=-73.990593%2C40.740121&types=poi%2Cplace%2Cregion&access_token=pk.eyJ1IjoiYWduZXNzdXJ5YSIsImEiOiJja3ltMmt5cnExczhpMnBvbHZzNjZwNHlyIn0.SdeuPBofv_1xPCmVIlI_-Q`,
             })
             const limit =  data.features.slice(0, 5)
-            console.log(limit,`DATAAAA`)
         
             const tampung = []
             limit.map(el=>{

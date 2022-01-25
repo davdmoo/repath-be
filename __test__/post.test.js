@@ -20,7 +20,7 @@ beforeAll(async () => {
     await postModel.deleteOne({ text: "test1" });
     await userModel.deleteOne({ email: "test113@mail.com" });
     await postModel.deleteOne({ text: "post to delete" });
-
+    await postModel.deleteOne({ text: "test post" });
     
     const dummyUserPayload = {
       firstName: "test 11",
@@ -28,7 +28,7 @@ beforeAll(async () => {
       email: "test113@mail.com",
       password: "12345",
       username: "test311",
-      city: "test11",
+      city: "test11", 
       phoneNumber :"1234455"
     }
     dummyUser = await userModel.create(dummyUserPayload);
@@ -64,25 +64,25 @@ beforeEach(() => {
 });
 
 describe("GET /posts", () => {
-    it('Should handle error when hit findAll', async () => {
-      jest.spyOn(Post, 'findPosts').mockRejectedValue('Error')
+    // it('Should handle error when hit findAll', async () => {
+    //   jest.spyOn(Post, 'findPosts').mockRejectedValue('Error')
   
-      return request(app)
-        .get('/posts')
-        .then((res) => {
-          expect(res.status).toBe(500)
+    //   return request(app)
+    //     .get('/posts')
+    //     .then((res) => {
+    //       expect(res.status).toBe(500)
   
-          expect(res.body.err).toBe('Error')
-        })
-        .catch((err) => {
-          console.log(err)
-        })
-    })
+    //       expect(res.body.err).toBe('Error')
+    //     })
+    //     .catch((err) => {
+    //       console.log(err)
+    //     })
+    // })
 
     test("when user have access token", (done) => {
         request(app)
         .get('/posts')
-        .set('access_token',access_token)
+        .set('access_token', access_token)
         .then((resp)=>{
             const result = resp.body
             expect(resp.status).toBe(200)
@@ -111,20 +111,6 @@ describe("GET /posts", () => {
 })
 
 describe("POST /posts", () => {
-  it('Should handle error 500', async () => {
-    jest.spyOn(Post, 'addPost').mockRejectedValue('Error')
-
-    return request(app)
-      .post('/posts')
-      .then((res) => {
-        expect(res.status).toBe(500)
-
-        expect(res.body.err).toBe('Error')
-      })
-      .catch((err) => {
-        console.log(err)
-      })
-  })
     describe("user input is correct", () => {
     
         test("success posting without image", (done) => {
@@ -135,96 +121,99 @@ describe("POST /posts", () => {
               type: "text",
               text: "test post",
             })
+            .then((res) => {
+              const { body, status } = res;
+              expect(status).toBe(201);
+      
+              expect(body).toEqual(expect.any(Object));
+              expect(body).toHaveProperty("text");
+
+              done();
+            })
+            .catch((err) => {
+              done(err);
+            })
+      })
+
+      test("error posting no input", (done) => {
+          request(app)
+          .post("/posts")
+          .set("access_token", access_token)
+          .send({
+            type: "text"
+          })
+            .then((response) => {
+              const { body, status } = response;
+              expect(status).toBe(400);
+              expect(body).toEqual(expect.any(Object));
+              expect(body).toHaveProperty("message", "Please fill all input fields");
+
+              done();
+            })
+            .catch((err) => {
+              done(err);
+            });
+      })
+  })
+  
+  describe("user input is incorrect", () => {
+      test("no access token", (done) => {
+          request(app)
+          .post("/posts")
+          .send({
+              type: "text1",
+              text: "test post"
+          })
               .then((response) => {
                 const result = response.body;
-                console.log(result, `TESTT`)
-                expect(response.status).toBe(201);
+                expect(response.status).toBe(401);
                 expect(result).toEqual(expect.any(Object));
-                expect(result).toHaveProperty("text");
+                expect(result).toHaveProperty("message", "Access token not found");
 
                 done();
               })
               .catch((err) => {
-                done(err);
+                  done(err);
               })
+      })
+
+      test("no type input", (done) => {
+        request(app)
+        .post("/posts")
+        .set('access_token', access_token)
+        .send({
+          text: "test post"
         })
+          .then((response) => {
+            const result = response.body;
+            expect(response.status).toBe(400);
+            expect(result).toEqual(expect.any(Object));
+            expect(result).toHaveProperty("message", "Please input the type of post");
 
-        test("error posting no type", (done) => {
-            request(app)
-            .post("/posts")
-            .set("access_token", access_token)
-            .send({
-              text: "test post"
-            })
-              .then((response) => {
-                const { body, status } = response;
-                expect(status).toBe(400);
-                expect(body).toEqual(expect.any(Object));
-                expect(body).toHaveProperty("message", "Please fill all input fields");
-
-                done();
-              })
-              .catch((err) => {
-                done(err);
-              })
-        })
-
-        test("error posting no input", (done) => {
-            request(app)
-            .post("/posts")
-            .set("access_token", access_token)
-              .then((response) => {
-                const { body, status } = response;
-                expect(status).toBe(400);
-                expect(body).toEqual(expect.any(Object));
-                expect(body).toHaveProperty("message", "Please fill all input fields");
-
-                done();
-              })
-              .catch((err) => {
-                done(err);
-              });
-        })
+            done();
+          })
+          .catch((err) => {
+              done(err);
+          })
     })
-    
-    describe("user input is incorrect", () => {
-        test("no access token", (done) => {
-            request(app)
-            .post("/posts")
-            .send({
-                type: "text1",
-                text: "test post"
-            })
-                .then((response) => {
-                  const result = response.body;
-                  expect(response.status).toBe(401);
-                  expect(result).toEqual(expect.any(Object));
-                  expect(result).toHaveProperty("message", "Access token not found");
-  
-                  done();
-                })
-                .catch((err) => {
-                    done(err);
-                })
-        })
-    })
+  })
 })
 
 describe("PUT /posts", () => {
-  it('Should handle error 500', async () => {
-    jest.spyOn(Post, 'editPost').mockRejectedValue('Error')
+  // it('Should handle error 500', async () => {
+  //   jest.spyOn(Post, 'editPost').mockRejectedValue('Error')
 
-    return request(app)
-      .put('/posts/mockId')
-      .then((res) => {
-        expect(res.status).toBe(500)
+  //   return request(app)
+  //     .put('/posts/mockId')
+  //     .then((res) => {
+  //       expect(res.status).toBe(500)
 
-        expect(res.body.err).toBe('Error')
-      })
-      .catch((err) => {
-        console.log(err)
-      })
-  })
+  //       expect(res.body.err).toBe('Error')
+  //     })
+  //     .catch((err) => {
+  //       console.log(err)
+  //     })
+  // })
 
     describe("user input is correct", () => {
         test("update success", (done) => {
@@ -314,20 +303,20 @@ describe("PUT /posts", () => {
 })
 
 describe("DELETE /posts", () => {
-  it('Should handle error 500', async () => {
-    jest.spyOn(Post, 'deletePost').mockRejectedValue('Error')
+  // it('Should handle error 500', async () => {
+  //   jest.spyOn(Post, 'deletePost').mockRejectedValue('Error')
 
-    return request(app)
-      .post('/posts/mockId')
-      .then((res) => {
-        expect(res.status).toBe(500)
+  //   return request(app)
+  //     .post('/posts/mockId')
+  //     .then((res) => {
+  //       expect(res.status).toBe(500)
 
-        expect(res.body.err).toBe('Error')
-      })
-      .catch((err) => {
-        console.log(err)
-      })
-  })
+  //       expect(res.body.err).toBe('Error')
+  //     })
+  //     .catch((err) => {
+  //       console.log(err)
+  //     })
+  // })
     describe("delete failed", () => {
       test("forbidden access", (done) => {
         request(app)

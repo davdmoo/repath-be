@@ -48,17 +48,18 @@ class Comment{
         }
     }
 
-    static async findComment(req, res, next) {
-        try {
-            const id = req.params.id
-            const comment = await commentModel.findOne({_id: id}).exec()
-            if (!comment) throw { name: "NotFound" };
+    // static async findComment(req, res, next) {
+    //     try {
+    //         const id = req.params.id
+    //         const comment = await commentModel.findById(id).exec();
 
-            res.status(200).json(comment)
-        } catch(err){
-            next(err);
-        }
-    }
+    //         if (!comment) throw { name: "NotFound" };
+
+    //         res.status(200).json(comment)
+    //     } catch(err){
+    //         next(err);
+    //     }
+    // }
 
     static async editComment(req, res, next) {
         try{
@@ -98,7 +99,6 @@ class Comment{
 
             res.status(200).json(deletedComment)
         } catch(err) {
-            console.log(err, "INI ERROR");
             next(err);
         }
     }

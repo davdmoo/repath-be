@@ -2,7 +2,7 @@ const { ObjectId } = require("mongodb");
 const friendModel = require("../models/friendModel")
 const userModel = require('../models/userModel')
 
-class Friend{
+class Friend {
     static async findFriends(req, res, next){
         try {
             const {id} = req.user
@@ -31,17 +31,19 @@ class Friend{
             ])
             
             let payload = []
-            friends.forEach(el =>{
+            friends.forEach((el, idx) =>{
                 if(el.sender._id.toString() == id.toString()){
+                    el.receiver.phoneNumber = el._id
                     payload.push(el.receiver)
                 }else if(el.receiver._id.toString() == id.toString()){
+                    el.sender.phoneNumber = el._id
                     payload.push(el.sender)
                 }
             })
-            
+            console.log(payload);
             res.status(200).json(payload)
         } catch (error) {
-            console.log(error, "INI EROR=======");
+            console.log(error);
             next(error)
         }
     }
@@ -69,7 +71,6 @@ class Friend{
 
             res.status(201).json(sendReq);
         } catch (error) {
-            console.log(error);
             next(error)
         }
     }
@@ -90,6 +91,7 @@ class Friend{
         try {
             const {id} = req.user
             const {reqId} = req.params
+
             const friendReq = await friendModel.findById(reqId);
             if(!friendReq) throw {name: "NotFound"};
             
@@ -129,7 +131,6 @@ class Friend{
                 status: true
             });
         } catch (error) {
-            console.log(error, "INI ERROR DARI FRIEND CONTROLLER");
             next(error)
         }
     }
@@ -141,7 +142,6 @@ class Friend{
             
             const friend = await friendModel.findById(reqId);
             if (!friend) throw { name: "NotFound" };
-            console.log(friend, "<<<<< delete friend");
             
             if(friend.receiver.toString() !== id.toString()
             && friend.sender.toString() !== id.toString()){
