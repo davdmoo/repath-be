@@ -11,7 +11,7 @@ const upload = multer({
     storage,
 })
 
-
+router.post('/googleLogin', userController.googleLogin)
 router.post('/register', userController.addUser)
 router.post('/login', userController.login)
 

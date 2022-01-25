@@ -2,6 +2,7 @@ const userModel = require('../models/userModel');
 const postModel = require('../models/postModel');
 const jwt = require('jsonwebtoken');
 const secretKey = process.env.SECRETKEY;
+const {OAuth2Client} = require('google-auth-library');
 
 class User {
   static async findUsers(req, res, next) {
@@ -153,6 +154,59 @@ class User {
       res.status(200).json(`The following user has been deleted: ${deletedUser.email}`);
     } catch (err) {
       next(err);
+    }
+  }
+
+  static async googleLogin(req, res, next) {
+  
+    try {
+      const { idToken } = req.body;
+      const client = new OAuth2Client(process.env.GOOGLE_CLIENT);
+      const ticket = await client.verifyIdToken({
+          idToken,
+          audience : process.env.GOOGLE_CLIENT
+      })
+
+
+      const payload = ticket.getPayload();
+      let payloadJWT
+
+      const user = await userModel.findOne({ email: payload.email})
+      if (user) {
+      
+        payloadJWT = { email: user.email };
+
+         const payloadUser = {
+            email: user.email,
+            id: user._id.toString(),
+            firstName: user.firstName,
+            lastName: user.lastName,
+          };
+
+        const access_token = jwt.sign(payloadJWT, secretKey);
+        res.status(200).json({ access_token, payloadUser });
+      }
+
+      else{
+        const username = payload.name.replace(' ','_')
+        payloadJWT = { email: payload.email};
+        const  payloadCreate = {
+          firstName : payload.given_name,
+          lastName : payload.family_name,
+          email : payload.email,
+          password : "12345",
+          username ,
+          phoneNumber: "+62",
+          city: "-"
+        }
+
+        const newUser = await userModel.create(payloadCreate);
+
+        res.status(201).json(newUser);
+      }
+   
+    } catch (err) {
+      next(err)
     }
   }
 }
