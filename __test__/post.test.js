@@ -29,7 +29,7 @@ beforeAll(async () => {
       email: "test113@mail.com",
       password: "12345",
       username: "test311",
-      city: "test11",
+      city: "test11", 
       phoneNumber :"1234455"
     }
     dummyUser = await userModel.create(dummyUserPayload);
@@ -83,7 +83,7 @@ describe("GET /posts", () => {
     test("when user have access token", (done) => {
         request(app)
         .get('/posts')
-        .set('access_token',access_token)
+        .set('access_token', access_token)
         .then((resp)=>{
             const result = resp.body
             expect(resp.status).toBe(200)
@@ -126,93 +126,114 @@ describe("POST /posts", () => {
         console.log(err)
       })
   })
-    describe("user input is correct", () => {
-      const imgUrl = "https://ik.imagekit.io/repathImageKit/james_Y2mFuV0noVO.jpg"
-      const resp = {data : imgUrl};
-      const test =  axios.get.mockImplementation(() => Promise.resolve(resp))
-      console.log(test.mockReturnValueOnce,`AAAAAAAAAAAAAAAAAA`)
-        test("success posting", (done) => {
-            request(app)
-            .post("/posts")
-            .set('access_token', access_token)
-            .send({
-              type: "text",
-              text: "test post",
-              // imgUrl :  axios.get.mockResolvedValue(resp)
+
+  describe("user input is correct", () => {
+    const imgUrl = "https://ik.imagekit.io/repathImageKit/james_Y2mFuV0noVO.jpg"
+    const resp = {data : imgUrl};
+    const test =  axios.get.mockImplementation(() => Promise.resolve(resp))
+    console.log(test.mockReturnValueOnce,`AAAAAAAAAAAAAAAAAA`)
+      test("success posting", (done) => {
+          request(app)
+          .post("/posts")
+          .set('access_token', access_token)
+          .send({
+            type: "text",
+            text: "test post",
+            // imgUrl :  axios.get.mockResolvedValue(resp)
+          })
+            .then((response) => {
+              const result = response.body;
+              console.log(result, `TESTT`)
+              expect(response.status).toBe(201);
+              expect(result).toEqual(expect.any(Object));
+              expect(result).toHaveProperty("text");
+
+              done();
             })
+            .catch((err) => {
+              done(err);
+            })
+      })
+
+      test("error posting no type", (done) => {
+          request(app)
+          .post("/posts")
+          .set("access_token", access_token)
+          .send({
+            text: "test post"
+          })
+            .then((response) => {
+              const { body, status } = response;
+              expect(status).toBe(400);
+              expect(body).toEqual(expect.any(Object));
+              expect(body).toHaveProperty("message", "Please fill all input fields");
+
+              done();
+            })
+            .catch((err) => {
+              done(err);
+            })
+      })
+
+      test("error posting no input", (done) => {
+          request(app)
+          .post("/posts")
+          .set("access_token", access_token)
+            .then((response) => {
+              const { body, status } = response;
+              expect(status).toBe(400);
+              expect(body).toEqual(expect.any(Object));
+              expect(body).toHaveProperty("message", "Please fill all input fields");
+
+              done();
+            })
+            .catch((err) => {
+              done(err);
+            });
+      })
+  })
+  
+  describe("user input is incorrect", () => {
+      test("no access token", (done) => {
+          request(app)
+          .post("/posts")
+          .send({
+              type: "text1",
+              text: "test post"
+          })
               .then((response) => {
                 const result = response.body;
-                console.log(result, `TESTT`)
-                expect(response.status).toBe(201);
+                expect(response.status).toBe(401);
                 expect(result).toEqual(expect.any(Object));
-                expect(result).toHaveProperty("text");
+                expect(result).toHaveProperty("message", "Access token not found");
 
                 done();
               })
               .catch((err) => {
-                done(err);
+                  done(err);
               })
-        })
+      })
 
-        test("error posting no type", (done) => {
-            request(app)
-            .post("/posts")
-            .set("access_token", access_token)
-            .send({
-              text: "test post"
-            })
-              .then((response) => {
-                const { body, status } = response;
-                expect(status).toBe(400);
-                expect(body).toEqual(expect.any(Object));
-                expect(body).toHaveProperty("message", "Please fill all input fields");
+    //   test("no type input", (done) => {
+    //     request(app)
+    //     .post("/posts")
+    //     .set('access_token', access_token)
+    //     .send({
+    //         text: "test post"
+    //     })
+    //         .then((response) => {
+    //           const result = response.body;
+    //           expect(response.status).toBe(401);
+    //           expect(result).toEqual(expect.any(Object));
+    //           expect(result).toHaveProperty("message", "Access token not found");
 
-                done();
-              })
-              .catch((err) => {
-                done(err);
-              })
-        })
-
-        test("error posting no input", (done) => {
-            request(app)
-            .post("/posts")
-            .set("access_token", access_token)
-              .then((response) => {
-                const { body, status } = response;
-                expect(status).toBe(400);
-                expect(body).toEqual(expect.any(Object));
-                expect(body).toHaveProperty("message", "Please fill all input fields");
-
-                done();
-              })
-              .catch((err) => {
-                done(err);
-              });
-        })
-    })
-    
-    describe("user input is incorrect", () => {
-        test("no access token", (done) => {
-            request(app)
-            .post("/posts")
-            .send({
-                type: "text1",
-                text: "test post"
-            })
-                .then((response) => {
-                  const result = response.body;
-                  expect(response.status).toBe(401);
-                  expect(result).toEqual(expect.any(Object));
-                  expect(result).toHaveProperty("message", "Access token not found");
-  
-                  done();
-                })
-                .catch((err) => {
-                    done(err);
-                })
-        })
-    })
+    //           done();
+    //         })
+    //         .catch((err) => {
+    //             done(err);
+    //         })
+    // })
+  })
 })
 
 describe("PUT /posts", () => {
