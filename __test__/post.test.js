@@ -147,7 +147,6 @@ describe("POST /posts", () => {
         })
         .then((res) => {
           const { body, status } = res;
-          console.log(body, `BODY`);
           expect(status).toBe(201);
   
           expect(body).toEqual(expect.any(Object));

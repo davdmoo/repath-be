@@ -16,6 +16,7 @@ const upload = multer({
 
 router.use(authentication)
 router.get('/', postController.findPosts)
+router.get('/likes', postController.findPostByLikes)
 // router.post('/',authentication, postController.addPost)
 router.post('/', authentication, upload.single('imgUrl'),imagekit,sizeValidation,typeValidation,postController.addPost)
 // router.get('/:id', postController.findPost)

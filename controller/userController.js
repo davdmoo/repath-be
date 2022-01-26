@@ -96,7 +96,6 @@ class User {
           imgUrl: req.body.imgUrl,
         };
       } else {
-        console.log(` MASUK ELSE`)
         payload = {
           firstName: req.body.firstName,
           lastName: req.body.lastName,
@@ -172,7 +171,6 @@ class User {
 
       const user = await userModel.findOne({ email: payload.email });
       if (user) {
-        console.log('INI LOGIN GOOGLE');
         payloadJWT = { email: user.email };
 
         payloadUser = {
@@ -188,10 +186,8 @@ class User {
         access_token = jwt.sign(payloadJWT, secretKey);
         res.status(200).json({ access_token, payloadUser });
       } else {
-        console.log('INI REGISTER GOOGLE');
         const username = payload.name.replace(' ', '_');
         payloadJWT = { email: payload.email };
-        console.log(payload);
         const payloadCreate = {
           firstName: payload.given_name,
           lastName: payload.family_name,
