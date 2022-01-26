@@ -45,7 +45,8 @@ afterAll(async()=>{
         })
     })
 
-    test("success get all music with access token", (done) => {
+
+    test("failed to get all music without access token", (done) => {
         request(app)
         .post('/fetchs/musics')
         .send({ title : 'Bruno'})
@@ -64,7 +65,7 @@ afterAll(async()=>{
 })
 
 describe("POST /fetchs/locations", () => {
-    test("success get all music with access token", (done) => {
+    test("success get all locations with access token", (done) => {
         request(app)
         .post('/fetchs/locations')
         .set('access_token',access_token)
@@ -80,7 +81,7 @@ describe("POST /fetchs/locations", () => {
         })
     })
 
-    test("success get all music with access token", (done) => {
+    test("failed get all locations without access token", (done) => {
         request(app)
         .post('/fetchs/locations')
         .send({ location : 'Jakarta'})
@@ -89,6 +90,24 @@ describe("POST /fetchs/locations", () => {
             expect(resp.status).toBe(401)
             expect(result).toEqual(expect.any(Object))
             expect(result).toHaveProperty('message', 'Access token not found')
+            done()
+        })
+        .catch((err)=>{
+            done(err)
+        })
+    })
+
+    test("success get all locations with access token", (done) => {
+        request(app)
+        .post('/fetchs/locations')
+        .set('access_token',"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RmZXRjaEBtYWlsLmNvbSIsImlhdCI6MTY0MzE2NjUxNn0.daJNOZv_ANYS24moOfUjNoGyA1-d2LUs1unuyGkHb")
+        .send({ location : 'Jakarta'})
+        .then((resp)=>{
+            const result = resp.body
+            expect(resp.status).toBe(401)
+            expect(result).toEqual(expect.any(Object))
+            expect(result).toHaveProperty('message', 'Invalid token')
+            
             done()
         })
         .catch((err)=>{

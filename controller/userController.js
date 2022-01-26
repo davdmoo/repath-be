@@ -96,6 +96,7 @@ class User {
           imgUrl: req.body.imgUrl,
         };
       } else {
+        console.log(` MASUK ELSE`)
         payload = {
           firstName: req.body.firstName,
           lastName: req.body.lastName,
