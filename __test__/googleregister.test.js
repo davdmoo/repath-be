@@ -48,8 +48,9 @@ describe('google login', () => {
            const {status,body} = resp
            expect(status).toBe(201)
            expect(body).toEqual(expect.any(Object));
-           expect(body).toHaveProperty("email",'herokuagnes@gmail.com')
-           expect(body).toHaveProperty("firstName",'heroku')
+           expect(body).toHaveProperty("access_token")
+           expect(body.payloadUser).toHaveProperty("email",'herokuagnes@gmail.com')
+           expect(body.payloadUser).toHaveProperty("firstName",'heroku')
            done()
         })
         .catch((err)=>{
