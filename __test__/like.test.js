@@ -52,7 +52,7 @@ beforeAll(async () => {
     } 
 
     thePost = await postModel.create(payload)
-});
+}, 10000);
 
 
 afterAll(async()=>{
