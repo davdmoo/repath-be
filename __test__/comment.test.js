@@ -52,11 +52,16 @@ beforeAll(async () => {
     title: "text 1",
   };
 
+
   payload_one = {
     type: "text",
     userId: userOne._id,
     title: "text 1",
   };
+
+    thePost = await postModel.create(payload)
+}, 10000)
+
 
   thePost = await postModel.create(payload);
 });

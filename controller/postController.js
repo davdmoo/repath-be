@@ -89,7 +89,7 @@ class Post {
           populate : {
             path : 'userId',
           }
-        })
+        }).sort({ created_at: -1 })
         // console.log(likedPosts);
         let apus = "[object Object]"
         likedPosts.forEach(el => {

@@ -28,4 +28,3 @@ app.use('/fetchs', fetchRoutes)
 app.use(errorHandler)
 
 module.exports = app
-

@@ -181,7 +181,7 @@ class User {
 
       const user = await userModel.findOne({ email: payload.email });
       if (user) {
-        console.log(user.imgUrl, `PIC LOGIN`)
+
         payloadJWT = { email: user.email };
 
         payloadUser = {
@@ -197,12 +197,14 @@ class User {
         access_token = jwt.sign(payloadJWT, secretKey);
         res.status(200).json({ access_token, payloadUser });
       } else {
+
         const username = payload.name.replace(" ", "_");
+
         payloadJWT = { email: payload.email };
         console.log(payload.picture, `PIC`)
         const payloadCreate = {
           firstName: payload.given_name,
-          lastName: payload.family_name,
+          lastName: payload.family_name || payload.given_name,
           email: payload.email,
           password: "12345",
           username,
@@ -219,6 +221,7 @@ class User {
         res.status(201).json({ payloadUser, access_token });
       }
     } catch (err) {
+      console.log(err, "INI ERROR ===");
       next(err);
     }
   }
