@@ -4,7 +4,7 @@ const friendModel = require('../models/friendModel');
 const userModel = require('../models/userModel');
 const commentModel = require('../models/commentModel');
 const { ObjectId } = require("mongodb");
-const { inspect } = require('util');
+
 class Post {
   static async findPosts(req, res, next) {
     try {
@@ -83,23 +83,30 @@ class Post {
       try {
         const {id} = req.user
         let payload = []
-        const likedPosts = await likeModel.find({userId: id}).populate({
+        const likedPosts = await likeModel.find({userId: id}).populate(
+          {
           path : 'postId',
           populate : {
             path : 'userId',
-            path: 'comments',
-            populate: {
-              path : 'userId',
-            },
-            path: 'likes',
-            populate: {
-              path : 'userId',
-            }
           }
         })
+        // console.log(likedPosts);
+        let apus = "[object Object]"
         likedPosts.forEach(el => {
+          if(el.postId.imgUrl == apus){
+            let temp = {
+              _id: el.postId._id,
+              type: el.postId.type,
+              text: el.postId.text,
+              userId: el.postId.userId,
+              created_at: el.postId.created_at,
+              updatedAt: el.postId.updatedAt,
+            }
+            return payload.push(temp)
+          }
           payload.push(el.postId)
         });
+
         res.status(200).json(payload)
       }catch(err) {
         console.log(err);
