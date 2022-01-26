@@ -1,5 +1,6 @@
 const postModel = require('../models/postModel');
 const userModel = require('../models/userModel');
+const friendModel = require('../models/friendModel')
 const request = require('supertest');
 const app = require('../app.js')
 const jwt = require("jsonwebtoken");
@@ -66,27 +67,14 @@ beforeEach(() => {
 });
 
 describe("GET /posts", () => {
-    // it('Should handle error when hit findAll', async () => {
-    //   jest.spyOn(Post, 'findPosts').mockRejectedValue('Error')
-  
-    //   return request(app)
-    //     .get('/posts')
-    //     .then((res) => {
-    //       expect(res.status).toBe(500)
-  
-    //       expect(res.body.err).toBe('Error')
-    //     })
-    //     .catch((err) => {
-    //       console.log(err)
-    //     })
-    // })
-
+ 
     test("when user have access token", (done) => {
         request(app)
         .get('/posts')
         .set('access_token', access_token)
         .then((resp)=>{
             const result = resp.body
+            console.log(result, `RESULT`)
             expect(resp.status).toBe(200)
             expect(result).toEqual(expect.any(Array))
             done()

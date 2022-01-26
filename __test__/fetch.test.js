@@ -43,7 +43,7 @@ afterAll(async()=>{
         .catch((err)=>{
             done(err)
         })
-    })
+    }, 10000)
 
 
     test("failed to get all music without access token", (done) => {
