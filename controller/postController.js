@@ -109,7 +109,6 @@ class Post {
 
         res.status(200).json(payload)
       }catch(err) {
-        console.log(err);
         next(err);
       }
   }

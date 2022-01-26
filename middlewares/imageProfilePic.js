@@ -36,8 +36,7 @@ function imageUser(req, res, next) {
                         // }
                     })
                     .catch((err) => {
-                        console.log(err, `AAAAAAAAAAAAAAAAAAAAAAAA IMAGE 2`)
-                        // next({ code: 500, message: err.message })
+                        next(err)
                     })
             
         })
@@ -75,8 +74,7 @@ function imageUser(req, res, next) {
                         // }
                     })
                     .catch((err) => {
-                        console.log(err, `AAAAAAAAAAAAAAAAAAAAAAAA IMAGE 2`)
-                        // next({ code: 500, message: err.message })
+                        next(err)
                     })
           
                 })
