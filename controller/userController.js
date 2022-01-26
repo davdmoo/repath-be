@@ -1,8 +1,8 @@
-const userModel = require('../models/userModel');
-const postModel = require('../models/postModel');
-const jwt = require('jsonwebtoken');
+const userModel = require("../models/userModel");
+const postModel = require("../models/postModel");
+const jwt = require("jsonwebtoken");
 const secretKey = process.env.SECRETKEY;
-const { OAuth2Client } = require('google-auth-library');
+const { OAuth2Client } = require("google-auth-library");
 
 class User {
   static async findUsers(req, res, next) {
@@ -10,12 +10,14 @@ class User {
       const { name } = req.query;
 
       if (name) {
-        const users = await userModel.find({ username: { $regex: '^' + name, $options: 'i' } }).exec();
+        const users = await userModel
+          .find({ username: { $regex: "^" + name, $options: "i" } })
+          
 
         res.status(200).json(users);
       } else {
-        const users = await userModel.find().exec();
-        if (!users) throw { name: 'NotFound' };
+        const users = await userModel.find()
+        if (!users) throw { name: "NotFound" };
 
         res.status(200).json(users);
       }
@@ -37,14 +39,14 @@ class User {
   static async login(req, res, next) {
     try {
       const { email, password } = req.body;
-      if (!email) throw { name: 'EmailRequired' };
-      else if (!password) throw { name: 'PassRequired' };
+      if (!email) throw { name: "EmailRequired" };
+      else if (!password) throw { name: "PassRequired" };
 
       const user = await userModel.findOne({ email });
-      if (!user) throw { name: 'InvalidCredentials' };
+      if (!user) throw { name: "InvalidCredentials" };
 
       const validate = await user.validatePassword(password);
-      if (!validate) throw { name: 'InvalidCredentials' };
+      if (!validate) throw { name: "InvalidCredentials" };
 
       const payload = { email: user.email };
 
@@ -68,8 +70,8 @@ class User {
   static async findUserById(req, res, next) {
     try {
       const { id } = req.params;
-      const user = await userModel.findById(id).exec();
-      if (!user) throw { name: 'NotFound' };
+      const user = await userModel.findById(id)
+      if (!user) throw { name: "NotFound" };
 
       res.status(200).json(user);
     } catch (err) {
@@ -83,7 +85,7 @@ class User {
       const userId = req.params.id;
       let payload;
 
-      if (id.toString() !== userId.toString()) throw { name: 'Forbidden' };
+      if (id.toString() !== userId.toString()) throw { name: "Forbidden" };
 
       if (req.body.imgUrl !== `[object Object]`) {
         payload = {
@@ -107,12 +109,18 @@ class User {
         };
       }
 
-      if (!payload.firstName || !payload.lastName || !payload.username || !payload.phoneNumber || !payload.city) {
-        throw { name: 'EditInput' };
+      if (
+        !payload.firstName ||
+        !payload.lastName ||
+        !payload.username ||
+        !payload.phoneNumber ||
+        !payload.city
+      ) {
+        throw { name: "EditInput" };
       }
       const user = await userModel.findOne({ _id: id });
 
-      if (!user) throw { name: 'NotFound' };
+      if (!user) throw { name: "NotFound" };
 
       await userModel.updateOne(
         { _id: id },
@@ -141,15 +149,17 @@ class User {
       const id = req.params.id;
       const userId = req.user.id;
 
-      if (id !== userId.toString()) throw { name: 'Forbidden' };
+      if (id !== userId.toString()) throw { name: "Forbidden" };
 
       const deletedUser = await userModel.findById(id).exec();
-      if (!deletedUser) throw { name: 'NotFound' };
+      if (!deletedUser) throw { name: "NotFound" };
 
       await userModel.deleteOne({ _id: id });
       await postModel.deleteMany({ userId });
 
-      res.status(200).json(`The following user has been deleted: ${deletedUser.email}`);
+      res
+        .status(200)
+        .json(`The following user has been deleted: ${deletedUser.email}`);
     } catch (err) {
       next(err);
     }
@@ -171,6 +181,7 @@ class User {
 
       const user = await userModel.findOne({ email: payload.email });
       if (user) {
+        console.log(user.imgUrl, `PIC LOGIN`)
         payloadJWT = { email: user.email };
 
         payloadUser = {
@@ -186,16 +197,17 @@ class User {
         access_token = jwt.sign(payloadJWT, secretKey);
         res.status(200).json({ access_token, payloadUser });
       } else {
-        const username = payload.name.replace(' ', '_');
+        const username = payload.name.replace(" ", "_");
         payloadJWT = { email: payload.email };
+        console.log(payload.picture, `PIC`)
         const payloadCreate = {
           firstName: payload.given_name,
           lastName: payload.family_name,
           email: payload.email,
-          password: '12345',
+          password: "12345",
           username,
-          phoneNumber: '+62',
-          city: '-',
+          phoneNumber: "+62",
+          city: "-",
           imgUrl: payload.picture,
         };
 
@@ -203,7 +215,7 @@ class User {
         payloadJWT = { email: payloadUser.email };
         access_token = jwt.sign(payloadJWT, secretKey);
 
-        console.log(payloadUser, 'HALOOOOOOOOOOOOOOO');
+        // console.log(payloadUser, "HALOOOOOOOOOOOOOOO");
         res.status(201).json({ payloadUser, access_token });
       }
     } catch (err) {

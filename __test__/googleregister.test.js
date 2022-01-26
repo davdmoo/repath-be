@@ -40,6 +40,23 @@ OAuth2Client.mockImplementation(() => {
 });
 
 describe('google login', () => {
+
+    it('Should handle error 500', async () => {
+        jest.spyOn(userModel, 'create').mockRejectedValueOnce('Error')
+    
+        return request(app)
+          .post('/users/googleLogin')
+          .then((res) => {
+    
+            expect(res.status).toBe(500)
+    
+            expect(res.body.message).toBe('Internal server error')
+          })
+          .catch((err) => {
+            console.log(err)
+          })
+      })
+
     test("success get all user", (done) => {
         request(app)
         .post('/users/googleLogin')
