@@ -95,6 +95,21 @@ describe("GET /posts", () => {
             done(err)
         })
     })
+
+    test("fetching liked posts by user", (done) => {
+      request(app)
+      .get('/posts/likes')
+      .set('access_token', access_token)
+      .then((resp)=>{
+          const result = resp.body
+          expect(resp.status).toBe(200)
+          expect(result).toEqual(expect.any(Array))
+          done()
+      })
+      .catch((err)=>{
+          done(err)
+      })
+    })
     
     test("when user dont have access token", (done) => {
         request(app)
@@ -147,7 +162,6 @@ describe("POST /posts", () => {
         })
         .then((res) => {
           const { body, status } = res;
-          console.log(body, `BODY`);
           expect(status).toBe(201);
   
           expect(body).toEqual(expect.any(Object));

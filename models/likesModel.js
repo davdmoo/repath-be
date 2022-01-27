@@ -11,6 +11,8 @@ const likeSchema = new Schema({
     type: ObjectId,
     ref: "Post"
   }
+}, { 
+  timestamps: { createdAt: 'created_at' } 
 });
 
 const likeModel = mongoose.model("Like", likeSchema);

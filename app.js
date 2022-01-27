@@ -3,7 +3,6 @@ const express = require('express')
 const app = express()
 const mongoose = require('mongoose');
 const userRoutes = require('./routes/userRoutes')
-const followRoutes = require('./routes/followRoutes')
 const friendRoutes = require('./routes/friendRoutes')
 const postRoutes = require('./routes/postRoutes')
 const commentRoutes = require('./routes/commentRoutes')
@@ -23,11 +22,9 @@ app.use(authentication)
 app.use('/posts', postRoutes)
 app.use('/comments', commentRoutes)
 app.use('/likes', likesRoutes)
-// app.use('/follows', followRoutes)
 app.use('/friends', friendRoutes)
 app.use('/fetchs', fetchRoutes)
 
 app.use(errorHandler)
 
 module.exports = app
-

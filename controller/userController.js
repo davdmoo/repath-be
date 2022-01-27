@@ -171,7 +171,7 @@ class User {
 
       const user = await userModel.findOne({ email: payload.email });
       if (user) {
-        console.log('INI LOGIN GOOGLE');
+        console.log("masuk if");
         payloadJWT = { email: user.email };
 
         payloadUser = {
@@ -187,13 +187,13 @@ class User {
         access_token = jwt.sign(payloadJWT, secretKey);
         res.status(200).json({ access_token, payloadUser });
       } else {
-        console.log('INI REGISTER GOOGLE');
+        console.log("masuk else");
+        console.log(payload);
         const username = payload.name.replace(' ', '_');
         payloadJWT = { email: payload.email };
-        console.log(payload);
         const payloadCreate = {
           firstName: payload.given_name,
-          lastName: payload.family_name,
+          lastName: payload.family_name || payload.given_name,
           email: payload.email,
           password: '12345',
           username,
@@ -210,6 +210,7 @@ class User {
         res.status(201).json({ payloadUser, access_token });
       }
     } catch (err) {
+      console.log(err, "INI ERROR ===");
       next(err);
     }
   }

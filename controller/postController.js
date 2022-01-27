@@ -79,17 +79,41 @@ class Post {
     }
   }
 
-  // static async findPost(req, res, next) {
-  //     try {
-  //         const id = req.params.id
-  //         const post = await postModel.findOne({_id: id}).exec()
-  //         if (!post) throw { name: "NotFound" };
+  static async findPostByLikes(req, res, next) {
+    try {
+      const { id } = req.user;
+      let payload = [];
+      const likedPosts = await likeModel
+        .find({ userId: id })
+        .populate({
+          path: 'postId',
+          populate: {
+            path: 'userId',
+          },
+        })
+        .sort({ created_at: -1 });
+      // console.log(likedPosts);
+      let apus = '[object Object]';
+      likedPosts.forEach((el) => {
+        if (el.postId.imgUrl == apus) {
+          let temp = {
+            _id: el.postId._id,
+            type: el.postId.type,
+            text: el.postId.text,
+            userId: el.postId.userId,
+            created_at: el.postId.created_at,
+            updatedAt: el.postId.updatedAt,
+          };
+          return payload.push(temp);
+        }
+        payload.push(el.postId);
+      });
 
-  //         res.status(200).json(post)
-  //     }catch(err) {
-  //         next(err);
-  //     }
-  // }
+      res.status(200).json(payload);
+    } catch (err) {
+      next(err);
+    }
+  }
 
   static async editPost(req, res, next) {
     try {
