@@ -1,25 +1,26 @@
-const router = require('express').Router()
-const commentRoutes = require('./commentRoutes')
-const likesRoutes = require('./likesRoutes')
-const postController = require('../controller/postController')
-const authentication = require("../middlewares/authentication")
+const router = require('express').Router();
+const commentRoutes = require('./commentRoutes');
+const likesRoutes = require('./likesRoutes');
+const postController = require('../controller/postController');
+const authentication = require('../middlewares/authentication');
 
 const multer = require('multer');
-const imagekit = require('../middlewares/imagekit')
-const {sizeValidation, typeValidation} = require('../middlewares/imageValidation')
-const { route } = require('./commentRoutes')
+const imagekit = require('../middlewares/imagekit');
+const { sizeValidation, typeValidation } = require('../middlewares/imageValidation');
+const { route } = require('./commentRoutes');
 
-const storage = multer.memoryStorage()
+const storage = multer.memoryStorage();
 const upload = multer({
-    storage,
-})
+  storage,
+});
 
-router.use(authentication)
-router.get('/', postController.findPosts)
+router.use(authentication);
+router.get('/', postController.findPosts);
+router.get('/allposts', postController.findPostsAll);
 // router.post('/',authentication, postController.addPost)
-router.post('/', authentication, upload.single('imgUrl'),imagekit,sizeValidation,typeValidation,postController.addPost)
+router.post('/', authentication, upload.single('imgUrl'), imagekit, sizeValidation, typeValidation, postController.addPost);
 // router.get('/:id', postController.findPost)
-router.put('/:id', postController.editPost)
-router.delete('/:id', postController.deletePost)
+router.put('/:id', postController.editPost);
+router.delete('/:id', postController.deletePost);
 
-module.exports = router
+module.exports = router;
