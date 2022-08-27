@@ -1,4 +1,4 @@
-const app = require('../app.js');
+const app = require('../index.js');
 const request = require('supertest');
 const mongoose = require('mongoose');
 const jwt = require("jsonwebtoken");

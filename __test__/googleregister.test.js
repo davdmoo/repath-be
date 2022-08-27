@@ -1,7 +1,7 @@
 jest.mock("google-auth-library");
 const { OAuth2Client } = require('google-auth-library');
 const request = require('supertest');
-const app = require('../app.js')
+const app = require('../index.js')
 const mongoose = require('../config/monggoConfig');
 const userModel = require('../models/userModel');
 

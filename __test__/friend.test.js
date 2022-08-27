@@ -1,6 +1,6 @@
 const userModel = require('../models/userModel');
 const request = require('supertest');
-const app = require('../app.js')
+const app = require('../index.js')
 const mongoose = require('../config/monggoConfig');
 const jwt = require("jsonwebtoken");
 const friendModel = require('../models/friendModel');
